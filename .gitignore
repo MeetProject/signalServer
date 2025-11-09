@@ -1,3 +1,27 @@
+/build/
+/out/
+/target/
+
+.gradle/
+/.gradle/
+/**/.gradle/
+/**/build/
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+.DB_Store
+Thumbs.db
+.vscode/
+
+*.log
+logs/
+
+.env
+.env.*
+
 # Compiled class file
 *.class
 
@@ -18,6 +42,10 @@
 *.zip
 *.tar.gz
 *.rar
+
+#Temporary
+*.swp
+*.swo
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
