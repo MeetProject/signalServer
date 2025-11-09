@@ -1,5 +1,7 @@
 package com.meetProject.signalserver.model;
 
+import com.meetProject.signalserver.constant.ErrorMessage;
+import com.meetProject.signalserver.constant.RoomRule;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,9 @@ public class Room {
     }
 
     public void addParticipant(User participant) {
+        if(participants.size() >= RoomRule.MAX_ROOM_PARTICIPANTS) {
+            throw new IllegalArgumentException(ErrorMessage.ROOM_FULL);
+        }
         participants.add(participant);
     }
 
