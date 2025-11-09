@@ -4,7 +4,9 @@ import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.dto.JoinPayload;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.JoinResponse;
+import com.meetProject.signalserver.model.dto.OfferResponse;
 import com.meetProject.signalserver.model.dto.RegisterResponse;
+import com.meetProject.signalserver.model.dto.SDPPayload;
 import com.meetProject.signalserver.service.RoomsManagementService;
 import java.security.Principal;
 import java.util.List;
@@ -39,8 +41,15 @@ public class SignalController {
     @MessageMapping("/signal/join")
     @SendToUser("/queue/signal/join")
     public JoinResponse join(@Payload JoinPayload joinPayload) {
-        String targetRoomId = joinPayload.getRoomId();
+        String targetRoomId = joinPayload.roomId();
         List<User> participants = roomsManagementService.getParticipants(targetRoomId);
         return new JoinResponse(SignalType.JOIN, targetRoomId, participants);
+    }
+
+    @MessageMapping("/signal/offer")
+    public void offer(@Payload SDPPayload sdpPayload) {
+        String toUserId = sdpPayload.toUserId();
+        OfferResponse offerResponse = new OfferResponse(SignalType.OFFER, sdpPayload.fromUserId(), sdpPayload.fromUserSDP());
+        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/offer", offerResponse);
     }
 }
