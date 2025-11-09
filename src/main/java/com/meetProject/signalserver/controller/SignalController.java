@@ -6,12 +6,10 @@ import com.meetProject.signalserver.service.RoomsManagementService;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -37,8 +35,9 @@ public class SignalController {
 
     @MessageMapping("/signal/join")
     public void join(@Payload JoinPayload joinPayload) {
-        String targetRoomId = joinPayload.roomId();
+        String targetRoomId = joinPayload.getRoomId();
+        System.out.println(joinPayload.getRoomId());
         List<User> participants = roomsManagementService.getParticipants(targetRoomId);
-        messagingTemplate.convertAndSendToUser(joinPayload.userId(), "/topic/signal/join", participants);
+        messagingTemplate.convertAndSendToUser(joinPayload.getUserId(), "/queue/signal/join", participants);
     }
 }
