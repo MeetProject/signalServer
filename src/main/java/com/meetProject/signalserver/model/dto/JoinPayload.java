@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.model;
+package com.meetProject.signalserver.model.dto;
 
 public class JoinPayload {
     private final String userId;

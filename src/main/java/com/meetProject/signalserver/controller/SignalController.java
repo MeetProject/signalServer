@@ -1,7 +1,9 @@
 package com.meetProject.signalserver.controller;
 
-import com.meetProject.signalserver.model.JoinPayload;
+import com.meetProject.signalserver.constant.SignalType;
+import com.meetProject.signalserver.model.dto.JoinPayload;
 import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.service.RoomsManagementService;
 import java.security.Principal;
 import java.util.List;
@@ -38,6 +40,7 @@ public class SignalController {
         String targetRoomId = joinPayload.getRoomId();
         System.out.println(joinPayload.getRoomId());
         List<User> participants = roomsManagementService.getParticipants(targetRoomId);
-        messagingTemplate.convertAndSendToUser(joinPayload.getUserId(), "/queue/signal/join", participants);
+        JoinResponse joinResponse = new JoinResponse(SignalType.JOIN, targetRoomId, participants);
+        messagingTemplate.convertAndSendToUser(joinPayload.getUserId(), "/queue/signal/join", joinResponse);
     }
 }
