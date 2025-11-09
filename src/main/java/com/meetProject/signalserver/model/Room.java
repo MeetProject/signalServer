@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
-    private final String roomID;
+    private final String roomId;
     private final List<User> participants;
 
-    public Room(String roomID, User host) {
-        this.roomID = roomID;
-        this.participants = new ArrayList<>(List.of(host));
+    public Room(String roomId,  List<User> participants) {
+        this.roomId = roomId;
+        this.participants = new ArrayList<>(List.copyOf(participants));
     }
 
-    public String getRoomID() {
-        return roomID;
+    public String getRoomId() {
+        return roomId;
     }
 
     public List<User> getParticipants() {

@@ -1,3 +1,3 @@
 package com.meetProject.signalserver.model;
 
-public record User(String userName, String profileColor, String userID) {}
+public record User(String userName, String profileColor, String userId) {}
