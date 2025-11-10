@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.SignalType;
+import com.meetProject.signalserver.model.dto.AnswerResponse;
 import com.meetProject.signalserver.model.dto.JoinPayload;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.JoinResponse;
@@ -51,5 +52,12 @@ public class SignalController {
         String toUserId = sdpPayload.toUserId();
         OfferResponse offerResponse = new OfferResponse(SignalType.OFFER, sdpPayload.fromUserId(), sdpPayload.fromUserSDP());
         messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/offer", offerResponse);
+    }
+
+    @MessageMapping("/signal/answer")
+    public void answer(@Payload SDPPayload sdpPayload) {
+        String toUserId = sdpPayload.toUserId();
+        AnswerResponse answerResponse = new AnswerResponse(SignalType.ANSWER, sdpPayload.fromUserId(), sdpPayload.fromUserSDP());
+        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/answer", answerResponse);
     }
 }
