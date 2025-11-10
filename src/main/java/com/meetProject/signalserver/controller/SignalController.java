@@ -3,6 +3,7 @@ package com.meetProject.signalserver.controller;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.IceResponse;
+import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.ParticipantPayload;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.JoinResponse;
@@ -77,5 +78,17 @@ public class SignalController {
         String toUserId = icePayload.toUserId();
         IceResponse iceResponse = new IceResponse(SignalType.ICE, icePayload.fromUserId(), icePayload.fromCandidate());
         messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/ice", iceResponse);
+    }
+
+    @MessageMapping("/signal/leave")
+    public void leave(@Payload ParticipantPayload participantPayload) {
+        String userId = participantPayload.userId();
+        String roomId = participantPayload.roomId();
+        User user = userManagementService.getUser(participantPayload.userId());
+
+        roomsManagementService.removeParticipant(roomId, user);
+        LeaveResponse leaveResponse = new LeaveResponse(SignalType.LEAVE, userId);
+
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", leaveResponse);
     }
 }
