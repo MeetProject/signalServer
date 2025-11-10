@@ -2,6 +2,8 @@ package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.dto.AnswerResponse;
+import com.meetProject.signalserver.model.dto.IcePayload;
+import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.JoinPayload;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.JoinResponse;
@@ -59,5 +61,12 @@ public class SignalController {
         String toUserId = sdpPayload.toUserId();
         AnswerResponse answerResponse = new AnswerResponse(SignalType.ANSWER, sdpPayload.fromUserId(), sdpPayload.fromUserSDP());
         messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/answer", answerResponse);
+    }
+
+    @MessageMapping("/signal/ice")
+    public void ice(@Payload IcePayload icePayload) {
+        String toUserId = icePayload.toUserId();
+        IceResponse iceResponse = new IceResponse(SignalType.ICE, icePayload.fromUserId(), icePayload.fromCandidate());
+        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/ice", iceResponse);
     }
 }
