@@ -3,7 +3,9 @@ package com.meetProject.signalserver.service;
 import com.meetProject.signalserver.model.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserManagementService {
     private final Map<String, User> users = new ConcurrentHashMap<>();
 
