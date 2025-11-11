@@ -4,7 +4,6 @@ import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.User;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +19,9 @@ public class RoomsManagementService {
     private final Map<String, Room> rooms = new ConcurrentHashMap<>(Map.of(this.testRoom.getRoomId(), this.testRoom));
 
     public void createRoom(Room room) {
+        if(this.rooms.containsKey(room.getRoomId())) {
+            throw new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_EXISTS);
+        }
         rooms.put(room.getRoomId(), room);
     }
 
@@ -27,6 +29,10 @@ public class RoomsManagementService {
         Room room = rooms.get(roomId);
         if (room == null) {
             throw new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND);
+        }
+
+        if(room.getParticipants().contains(user)) {
+            throw new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_JOINED);
         }
 
         room.addParticipant(user);

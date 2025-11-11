@@ -1,3 +1,5 @@
 package com.meetProject.signalserver.model.dto;
 
-public record CreateRoomResponse(String roomId) {}
+import com.meetProject.signalserver.constant.SignalType;
+
+public record CreateRoomResponse(SignalType type, String roomId) {}
