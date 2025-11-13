@@ -4,4 +4,4 @@ import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.User;
 import java.util.List;
 
-public record JoinResponse(SignalType type, String roomId, List<User> participants, String screenId) {}
+public record ScreenResponse(SignalType type, String screenId, List<User> participants ) {}
