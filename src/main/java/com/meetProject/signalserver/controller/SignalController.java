@@ -3,6 +3,7 @@ package com.meetProject.signalserver.controller;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.ScreenSharing;
+import com.meetProject.signalserver.model.dto.ForceLeavePayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.LeavePayload;
@@ -78,8 +79,9 @@ public class SignalController {
         String toUserId = sdpPayload.toUserId();
         StreamType streamType = sdpPayload.streamType();
         String fromUserId = header.getUser().getName();
+        Boolean isScreenSender = screenSharingService.isScreenSharingId(toUserId);
 
-        SDPResponse offerResponse = new SDPResponse(SignalType.OFFER, fromUserId, sdpPayload.fromUserSDP(), streamType);
+        SDPResponse offerResponse = new SDPResponse(SignalType.OFFER, fromUserId, sdpPayload.fromUserSDP(), streamType, isScreenSender);
         messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/offer", offerResponse);
     }
 
@@ -90,7 +92,9 @@ public class SignalController {
         String fromUserSDP = sdpPayload.fromUserSDP();
         StreamType streamType = sdpPayload.streamType();
 
-        SDPResponse answerResponse = new SDPResponse(SignalType.ANSWER, fromUserId, fromUserSDP, streamType);
+        Boolean isScreenSender = screenSharingService.isScreenSharingId(toUserId);
+
+        SDPResponse answerResponse = new SDPResponse(SignalType.ANSWER, fromUserId, fromUserSDP, streamType, isScreenSender);
         messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/answer", answerResponse);
     }
 
@@ -121,8 +125,13 @@ public class SignalController {
         }
 
         User user = userManagementService.getUser(fromUserId);
-        roomsManagementService.removeParticipant(roomId, user);
 
+        if(screenSharingService.isScreenSharingId(fromUserId)) {
+            screenSharingService.stopSharing(roomId);
+            LeaveResponse response = new LeaveResponse(SignalType.LEAVE, fromUserId, StreamType.SCREEN);
+            messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", response);
+        }
+        roomsManagementService.removeParticipant(roomId, user);
         LeaveResponse leaveResponse = new LeaveResponse(SignalType.LEAVE, fromUserId, streamType);
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", leaveResponse);
     }
