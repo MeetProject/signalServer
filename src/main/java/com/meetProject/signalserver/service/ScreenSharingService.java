@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 public class ScreenSharingService {
     private final Map<String, ScreenSharing> activeScreenSharings =  new ConcurrentHashMap<>();
 
-    public void startSharing(String roomId, ScreenSharing screenSharing) {
+    public void startSharing(String roomId, String ownerId) {
         if(activeScreenSharings.containsKey(roomId)) {
             throw new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_SCREEN_SHARING);
         }
-        activeScreenSharings.put(roomId, screenSharing);
+        activeScreenSharings.put(roomId, new ScreenSharing(roomId, ownerId));
     }
 
     public void stopSharing(String roomId) {
@@ -22,7 +22,7 @@ public class ScreenSharingService {
     }
 
 
-    public String getScreenSharingOwnerId(String roomId) {
+    public String getOwnerId(String roomId) {
         ScreenSharing screenSharing = activeScreenSharings.get(roomId);
         if(screenSharing == null) {
             return null;
@@ -30,8 +30,8 @@ public class ScreenSharingService {
         return screenSharing.ownerId();
     }
 
-    public Boolean isScreenSharingId(String ownerId) {
-        activeScreenSharings.forEach((key,value)->{System.out.println(key + ": " + value);});
-        return activeScreenSharings.values().stream().anyMatch(screen -> screen.ownerId().equals(ownerId));
+    public boolean isSharing(String userId) {
+        return activeScreenSharings.values().stream()
+                .anyMatch(screen -> screen.ownerId().equals(userId));
     }
 }
