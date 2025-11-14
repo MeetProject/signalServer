@@ -55,9 +55,10 @@ public class SignalController {
         String targetRoomId = joinPayload.roomId();
         String userId = getUSerId(headers);
 
-        List<User> participants = roomsManagementService.getParticipants(targetRoomId);
-        User user = userManagementService.getUser(userId);
-        roomsManagementService.addParticipant(targetRoomId, user);
+        List<User> participants = roomsManagementService.getParticipants(targetRoomId).stream()
+                .map(userManagementService::getUser)
+                .toList();
+        roomsManagementService.addParticipant(targetRoomId, userId);
         String screenOwnerId = getScreenOwner(joinPayload.roomId());
         return new JoinResponse(SignalType.JOIN, targetRoomId, participants, screenOwnerId);
     }
@@ -93,8 +94,7 @@ public class SignalController {
         }
 
         if (streamType.equals(StreamType.USER)) {
-            User user = userManagementService.getUser(fromUserId);
-            roomsManagementService.removeParticipant(roomId, user);
+            roomsManagementService.removeParticipant(roomId, fromUserId);
             signalMessagingService.sendLeave(roomId, fromUserId, streamType);
         }
     }
@@ -105,8 +105,8 @@ public class SignalController {
         String roomId = screenPayload.roomId();
         String ownerId = getUSerId(header);
 
-        List<User> participants = roomsManagementService.getParticipants(roomId).stream()
-                .filter((participant) -> !participant.userId().equals(ownerId))
+        List<String> participants = roomsManagementService.getParticipants(roomId).stream()
+                .filter((participant) -> !participant.equals(ownerId))
                 .toList();
 
         ScreenSharing screenSharing = new ScreenSharing(roomId, ownerId);

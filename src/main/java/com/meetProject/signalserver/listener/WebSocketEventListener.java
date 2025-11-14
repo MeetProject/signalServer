@@ -1,6 +1,5 @@
 package com.meetProject.signalserver.listener;
 
-import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.service.RoomsManagementService;
 import com.meetProject.signalserver.service.UserManagementService;
 import org.springframework.context.event.EventListener;
@@ -21,10 +20,8 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnect(SessionConnectedEvent event) {
         String userId = event.getUser().getName();
 
-        User user = userManagementService.getUser(userId);
-
-        if (user != null) {
-            roomsManagementService.removeParticipantFromAllRooms(user);
+        if (userId != null) {
+            roomsManagementService.removeParticipantFromAllRooms(userId);
             userManagementService.removeUser(userId);
         }
     }
