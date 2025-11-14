@@ -1,7 +1,6 @@
 package com.meetProject.signalserver.listener;
 
 import com.meetProject.signalserver.constant.StreamType;
-import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.service.RoomsManagementService;
 import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
@@ -35,14 +34,8 @@ public class WebSocketEventListener {
             return;
         }
 
-        User user = userManagementService.getUser(userId);
-
-        if (user == null) {
-            return;
-        }
-
+        String roomId = userManagementService.getUserRoomStatus(userId);
         userManagementService.removeUser(userId);
-        String roomId = user.roomId();
         if (roomId == null) {
             return;
         }

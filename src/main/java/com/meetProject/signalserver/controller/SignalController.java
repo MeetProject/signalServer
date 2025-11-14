@@ -18,7 +18,6 @@ import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserManagementService;
 import com.meetProject.signalserver.util.WebSocketUtils;
-import java.security.Principal;
 import java.util.List;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -56,7 +55,7 @@ public class SignalController {
         String targetRoomId = joinPayload.roomId();
         String userId = WebSocketUtils.getUserId(header.getUser());
 
-        if(userManagementService.getUser(userId).roomId() != null) {
+        if(userManagementService.getUserRoomStatus(userId) != null) {
             throw new IllegalArgumentException("User already joined room");
         }
 
@@ -65,7 +64,7 @@ public class SignalController {
                 .toList();
         roomsManagementService.addParticipant(targetRoomId, userId);
         userManagementService.updateRoomStatus(userId, targetRoomId);
-        String screenOwnerId = getScreenOwner(joinPayload.roomId());
+        String screenOwnerId = screenSharingService.getScreenSharingOwnerId(targetRoomId);
         return new JoinResponse(SignalType.JOIN, targetRoomId, participants, screenOwnerId);
     }
 
@@ -92,9 +91,9 @@ public class SignalController {
         String fromUserId = WebSocketUtils.getUserId(header.getUser());
         StreamType streamType = leavePayload.streamType();
         String roomId = leavePayload.roomId();
-        String screenOwnerId = getScreenOwner(roomId);
 
-        if (screenOwnerId != null && screenOwnerId.equals(fromUserId)) {
+
+        if (userManagementService.getUser(fromUserId).roomId() != null) {
             screenSharingService.stopSharing(roomId);
             signalMessagingService.sendLeave(roomId, fromUserId, StreamType.SCREEN);
         }
@@ -120,14 +119,5 @@ public class SignalController {
         screenSharingService.startSharing(roomId, screenSharing);
         return new ScreenResponse(SignalType.SCREEN, ownerId, participants);
 
-    }
-
-
-    private String getScreenOwner(String roomId) {
-        ScreenSharing screenSharing = screenSharingService.getScreenSharing(roomId);
-        if(screenSharing == null) {
-            return null;
-        }
-        return screenSharing.ownerId();
     }
 }

@@ -26,6 +26,14 @@ public class UserManagementService {
         return users.get(id);
     }
 
+    public String getUserRoomStatus(String id) {
+        User user = users.get(id);
+        if (user == null) {
+            return null;
+        }
+        return user.roomId();
+    }
+
     public void updateRoomStatus(String id, String roomId) {
         User user = users.get(id);
         User updated = new User( user.userName(), user.profileColor(), user.userId(), roomId);

@@ -21,12 +21,13 @@ public class ScreenSharingService {
         activeScreenSharings.remove(roomId);
     }
 
-    public boolean isSharingActive(String roomId) {
-        return activeScreenSharings.containsKey(roomId);
-    }
 
-    public ScreenSharing getScreenSharing(String roomId) {
-        return activeScreenSharings.get(roomId);
+    public String getScreenSharingOwnerId(String roomId) {
+        ScreenSharing screenSharing = activeScreenSharings.get(roomId);
+        if(screenSharing == null) {
+            return null;
+        }
+        return screenSharing.ownerId();
     }
 
     public Boolean isScreenSharingId(String ownerId) {
