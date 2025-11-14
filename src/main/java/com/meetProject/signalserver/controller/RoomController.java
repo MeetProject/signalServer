@@ -5,10 +5,10 @@ import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.dto.CreateRoomResponse;
-import com.meetProject.signalserver.service.RoomsManagementService;
+import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
-import com.meetProject.signalserver.service.UserManagementService;
+import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 import java.util.ArrayList;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,34 +17,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RoomController {
-    private final RoomsManagementService roomsManagementService;
+    private final RoomsService roomsService;
     private final ScreenSharingService screenSharingService;
     private final SignalMessagingService signalMessagingService;
-    private final UserManagementService userManagementService;
+    private final UserService userService;
 
-    public RoomController(RoomsManagementService roomsManagementService, ScreenSharingService screenSharingService, SignalMessagingService signalMessagingService, UserManagementService userManagementService) {
-        this.roomsManagementService = roomsManagementService;
+    public RoomController(RoomsService roomsService, ScreenSharingService screenSharingService, SignalMessagingService signalMessagingService, UserService userService) {
+        this.roomsService = roomsService;
         this.screenSharingService = screenSharingService;
         this.signalMessagingService = signalMessagingService;
-        this.userManagementService = userManagementService;
+        this.userService = userService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/api/room/create")
     public CreateRoomResponse createRoom() {
         String roomId = RandomIdGenerator.randomId(RoomRule.ROOM_ID_LENGTH);
         Room room = new Room(roomId, new ArrayList<>());
-        roomsManagementService.createRoom(room);
+        roomsService.createRoom(room);
         return new CreateRoomResponse(SignalType.CREATE,roomId);
     }
 
     @PostMapping("/api/leave")
     public void forceLeave(@RequestParam String userId, @RequestParam String roomId) {
-        if(screenSharingService.isScreenSharingId(userId)) {
+        if(screenSharingService.isSharing(userId)) {
             screenSharingService.stopSharing(roomId);
             signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
         }
-        roomsManagementService.removeParticipant(roomId, userId);
-        userManagementService.updateRoomStatus(userId, roomId);
+        roomsService.removeParticipant(roomId, userId);
+        userService.updateRoomStatus(userId, roomId);
         signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
     }
 }

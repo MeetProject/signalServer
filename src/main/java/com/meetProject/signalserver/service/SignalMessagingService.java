@@ -22,7 +22,7 @@ public class SignalMessagingService {
     }
 
     public void sendSDP(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, SignalType type) {
-        Boolean isScreenSender = screenSharingService.isScreenSharingId(toUserId);
+        boolean isScreenSender = screenSharingService.isSharing(toUserId);
         SDPResponse answerResponse = new SDPResponse(type, fromUserId, fromUserSDP, streamType, isScreenSender);
         messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/" + type.name().toLowerCase(), answerResponse);
     }

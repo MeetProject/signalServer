@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RoomsManagementService {
+public class RoomsService {
     private final Map<String, Room> rooms = new ConcurrentHashMap<>();
 
     public void createRoom(Room room) {
@@ -49,7 +49,7 @@ public class RoomsManagementService {
         return room.getParticipants();
     }
 
-    public boolean isRoomNotExist(String roomId) {
-        return !rooms.containsKey(roomId);
+    public boolean exists(String roomId) {
+        return rooms.containsKey(roomId);
     }
 }

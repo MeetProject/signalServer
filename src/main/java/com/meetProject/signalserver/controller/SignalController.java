@@ -1,24 +1,21 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.SignalType;
-import com.meetProject.signalserver.constant.StreamType;
-import com.meetProject.signalserver.model.ScreenSharing;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
-import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.RegisterPayload;
 import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
-import com.meetProject.signalserver.service.RoomsManagementService;
-import com.meetProject.signalserver.service.ScreenSharingService;
+import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
+import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
+import com.meetProject.signalserver.orchestration.RegisterOrchestrationService;
+import com.meetProject.signalserver.orchestration.ScreenOrchestrationService;
 import com.meetProject.signalserver.service.SignalMessagingService;
-import com.meetProject.signalserver.service.UserManagementService;
 import com.meetProject.signalserver.util.WebSocketUtils;
-import java.util.List;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -27,45 +24,32 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class SignalController {
-    private final RoomsManagementService roomsManagementService;
-    private final UserManagementService userManagementService;
-    private final ScreenSharingService screenSharingService;
     private final SignalMessagingService signalMessagingService;
+    private final RegisterOrchestrationService registerService;
+    private final JoinOrchestrationService joinService;
+    private final ScreenOrchestrationService screenService;
+    private final LeaveOrchestrationService leaveService;
 
-    public SignalController(RoomsManagementService roomsManagementService,
-                            UserManagementService userManagementService, ScreenSharingService screenSharingService, SignalMessagingService signalMessagingService) {
-        this.roomsManagementService = roomsManagementService;
-        this.userManagementService = userManagementService;
-        this.screenSharingService = screenSharingService;
+    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService,  ScreenOrchestrationService screenService, RegisterOrchestrationService registerService) {
         this.signalMessagingService = signalMessagingService;
+        this.joinService = joinService;
+        this.leaveService = leaveService;
+        this.screenService = screenService;
+        this.registerService = registerService;
     }
 
     @MessageMapping("/register")
     @SendToUser("/queue/userId")
     public RegisterResponse register(@Payload RegisterPayload registerPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        User user = new User(registerPayload.userName(), registerPayload.userColor(), userId, null);
-        userManagementService.addUser(userId, user);
-        return new RegisterResponse(SignalType.REGISTER, userId);
+        return registerService.registerUser(userId, registerPayload.userName(), registerPayload.userColor());
     }
 
     @MessageMapping("/signal/join")
     @SendToUser("/queue/signal/join")
     public JoinResponse join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
-        String targetRoomId = joinPayload.roomId();
         String userId = WebSocketUtils.getUserId(header.getUser());
-
-        if(userManagementService.getUserRoomStatus(userId) != null) {
-            throw new IllegalArgumentException("User already joined room");
-        }
-
-        List<User> participants = roomsManagementService.getParticipants(targetRoomId).stream()
-                .map(userManagementService::getUser)
-                .toList();
-        roomsManagementService.addParticipant(targetRoomId, userId);
-        userManagementService.updateRoomStatus(userId, targetRoomId);
-        String screenOwnerId = screenSharingService.getScreenSharingOwnerId(targetRoomId);
-        return new JoinResponse(SignalType.JOIN, targetRoomId, participants, screenOwnerId);
+        return joinService.joinRoom(userId, joinPayload.roomId());
     }
 
     @MessageMapping("/signal/offer")
@@ -88,36 +72,14 @@ public class SignalController {
 
     @MessageMapping("/signal/leave")
     public void leave(@Payload LeavePayload leavePayload, SimpMessageHeaderAccessor header) {
-        String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        StreamType streamType = leavePayload.streamType();
-        String roomId = leavePayload.roomId();
-
-
-        if (userManagementService.getUser(fromUserId).roomId() != null) {
-            screenSharingService.stopSharing(roomId);
-            signalMessagingService.sendLeave(roomId, fromUserId, StreamType.SCREEN);
-        }
-
-        if (streamType.equals(StreamType.USER)) {
-            roomsManagementService.removeParticipant(roomId, fromUserId);
-            userManagementService.updateRoomStatus(fromUserId, null);
-            signalMessagingService.sendLeave(roomId, fromUserId, streamType);
-        }
+        System.out.println("leave " + leavePayload.roomId());
+        leaveService.leaveUser(WebSocketUtils.getUserId(header.getUser()), leavePayload.streamType());
     }
 
     @MessageMapping("/signal/screen")
     @SendToUser("/queue/signal/screen")
     public ScreenResponse screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
-        String roomId = screenPayload.roomId();
-        String ownerId = WebSocketUtils.getUserId(header.getUser());
-
-        List<String> participants = roomsManagementService.getParticipants(roomId).stream()
-                .filter((participant) -> !participant.equals(ownerId))
-                .toList();
-
-        ScreenSharing screenSharing = new ScreenSharing(roomId, ownerId);
-        screenSharingService.startSharing(roomId, screenSharing);
-        return new ScreenResponse(SignalType.SCREEN, ownerId, participants);
-
+        String UserId = WebSocketUtils.getUserId(header.getUser());
+        return screenService.shareScreen(screenPayload.roomId(), UserId);
     }
 }

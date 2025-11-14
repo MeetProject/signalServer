@@ -2,32 +2,32 @@ package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.model.dto.ChatPayload;
 import com.meetProject.signalserver.model.dto.EmojiPayload;
-import com.meetProject.signalserver.service.RoomsManagementService;
+import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.SignalMessagingService;
-import com.meetProject.signalserver.service.UserManagementService;
+import com.meetProject.signalserver.service.UserService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class RoomReactController {
-    private final UserManagementService userManagementService;
-    private final RoomsManagementService roomsManagementService;
+    private final UserService userService;
+    private final RoomsService roomsService;
     private final SignalMessagingService signalMessagingService;
 
-    public RoomReactController(UserManagementService userManagementService, RoomsManagementService roomsManagementService, SignalMessagingService signalMessagingService) {
-        this.userManagementService = userManagementService;
-        this.roomsManagementService = roomsManagementService;
+    public RoomReactController(UserService userService, RoomsService roomsService, SignalMessagingService signalMessagingService) {
+        this.userService = userService;
+        this.roomsService = roomsService;
         this.signalMessagingService = signalMessagingService;
     }
 
     @MessageMapping("/chat/send")
     public void sendChat(@Payload ChatPayload chatPayload) {
-        if (userManagementService.isUserNotExist(chatPayload.userId())) {
+        if (!userService.exists(chatPayload.userId())) {
             throw new IllegalArgumentException("User does not exist");
         }
 
-        if(roomsManagementService.isRoomNotExist(chatPayload.roomId())) {
+        if(!roomsService.exists(chatPayload.roomId())) {
             throw new IllegalArgumentException("Room does not exist");
         }
 
@@ -36,11 +36,11 @@ public class RoomReactController {
 
     @MessageMapping("/emoji")
     public void sendEmoji(@Payload EmojiPayload emojiPayload) {
-        if (userManagementService.isUserNotExist(emojiPayload.userId())) {
+        if (!userService.exists(emojiPayload.userId())) {
             throw new IllegalArgumentException("User does not exist");
         }
 
-        if(roomsManagementService.isRoomNotExist(emojiPayload.roomId())) {
+        if(!roomsService.exists(emojiPayload.roomId())) {
             throw new IllegalArgumentException("Room does not exist");
         }
 

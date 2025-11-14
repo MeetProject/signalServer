@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserManagementService {
+public class UserService {
     private final Map<String, User> users = new ConcurrentHashMap<>();
 
     public void addUser(String id, User user) {
@@ -17,17 +17,17 @@ public class UserManagementService {
         users.remove(id);
     }
 
-    public boolean isUserNotExist(String id) {
-        return !users.containsKey(id);
+    public boolean exists(String id) {
+        return users.containsKey(id);
     }
 
     public User getUser(String id) {
         return users.get(id);
     }
 
-    public String getUserRoomStatus(String id) {
+    public String getRoomId(String id) {
         User user = users.get(id);
-        if (user == null) {
+        if(user == null){
             return null;
         }
         return user.roomId();
@@ -35,6 +35,9 @@ public class UserManagementService {
 
     public void updateRoomStatus(String id, String roomId) {
         User user = users.get(id);
+        if(user == null){
+            return;
+        }
         User updated = new User( user.userName(), user.profileColor(), user.userId(), roomId);
         users.put(id, updated);
     }
