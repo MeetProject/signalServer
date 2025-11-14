@@ -1,6 +1,5 @@
 package com.meetProject.signalserver.service;
 
-import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

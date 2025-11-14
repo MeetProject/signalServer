@@ -24,10 +24,6 @@ public class RoomsManagementService {
             throw new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND);
         }
 
-        if(room.getParticipants().contains(userId)) {
-            throw new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_JOINED);
-        }
-
         room.addParticipant(userId);
     }
 
