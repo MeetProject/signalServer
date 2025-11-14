@@ -45,10 +45,6 @@ public class RoomsManagementService {
         }
     }
 
-    public void removeParticipantFromAllRooms(String userId) {
-        rooms.values().forEach(room -> room.removeParticipant(userId));
-    }
-
     public List<String> getParticipants(String roomId) {
         Room room = rooms.get(roomId);
         if (room == null) {

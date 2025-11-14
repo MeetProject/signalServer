@@ -1,5 +1,6 @@
 package com.meetProject.signalserver.service;
 
+import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,5 +24,11 @@ public class UserManagementService {
 
     public User getUser(String id) {
         return users.get(id);
+    }
+
+    public void updateRoomStatus(String id, String roomId) {
+        User user = users.get(id);
+        User updated = new User( user.userName(), user.profileColor(), user.userId(), roomId);
+        users.put(id, updated);
     }
 }

@@ -7,6 +7,7 @@ import com.meetProject.signalserver.model.dto.CreateRoomResponse;
 import com.meetProject.signalserver.service.RoomsManagementService;
 import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
+import com.meetProject.signalserver.service.UserManagementService;
 import java.util.ArrayList;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,11 +19,13 @@ public class RoomController {
     private final RoomsManagementService roomsManagementService;
     private final ScreenSharingService screenSharingService;
     private final SignalMessagingService signalMessagingService;
+    private final UserManagementService userManagementService;
 
-    public RoomController(RoomsManagementService roomsManagementService, ScreenSharingService screenSharingService, SignalMessagingService signalMessagingService) {
+    public RoomController(RoomsManagementService roomsManagementService, ScreenSharingService screenSharingService, SignalMessagingService signalMessagingService, UserManagementService userManagementService) {
         this.roomsManagementService = roomsManagementService;
         this.screenSharingService = screenSharingService;
         this.signalMessagingService = signalMessagingService;
+        this.userManagementService = userManagementService;
     }
 
     @PostMapping("/create")
@@ -40,6 +43,7 @@ public class RoomController {
             signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
         }
         roomsManagementService.removeParticipant(roomId, userId);
+        userManagementService.updateRoomStatus(userId, roomId);
         signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
     }
 }
