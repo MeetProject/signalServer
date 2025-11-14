@@ -1,8 +1,10 @@
 package com.meetProject.signalserver.service;
 
+import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.dto.ChatResponse;
+import com.meetProject.signalserver.model.dto.EmojiResponse;
 import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.SDPResponse;
@@ -38,5 +40,10 @@ public class SignalMessagingService {
     public void sendChat(String roomId, String userId, String message) {
         ChatResponse response = new ChatResponse(userId, message, System.currentTimeMillis());
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/chat", response);
+    }
+
+    public void sendEmoji(String roomId, String userId, Emoji emoji) {
+        EmojiResponse response = new EmojiResponse(userId, emoji);
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/emoji", response);
     }
 }

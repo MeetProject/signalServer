@@ -1,9 +1,7 @@
 package com.meetProject.signalserver.controller;
 
-import com.meetProject.signalserver.model.Room;
-import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ChatPayload;
-import com.meetProject.signalserver.model.dto.ChatResponse;
+import com.meetProject.signalserver.model.dto.EmojiPayload;
 import com.meetProject.signalserver.service.RoomsManagementService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserManagementService;
@@ -34,5 +32,18 @@ public class RoomReactController {
         }
 
         signalMessagingService.sendChat(chatPayload.roomId(), chatPayload.userId(), chatPayload.message());
+    }
+
+    @MessageMapping("/emoji")
+    public void sendEmoji(@Payload EmojiPayload emojiPayload) {
+        if (!userManagementService.isUserExist(emojiPayload.userId())) {
+            throw new IllegalArgumentException("User does not exist");
+        }
+
+        if(!roomsManagementService.isRoomExist(emojiPayload.roomId())) {
+            throw new IllegalArgumentException("Room does not exist");
+        }
+
+        signalMessagingService.sendEmoji(emojiPayload.roomId(), emojiPayload.userId(), emojiPayload.emoji());
     }
 }
