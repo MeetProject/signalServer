@@ -17,6 +17,10 @@ public class UserManagementService {
         users.remove(id);
     }
 
+    public boolean isUserExist(String id) {
+        return users.containsKey(id);
+    }
+
     public User getUser(String id) {
         return users.get(id);
     }

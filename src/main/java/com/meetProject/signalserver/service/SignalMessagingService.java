@@ -2,6 +2,7 @@ package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
+import com.meetProject.signalserver.model.dto.ChatResponse;
 import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.SDPResponse;
@@ -32,5 +33,10 @@ public class SignalMessagingService {
     public void sendLeave(String roomId, String userId, StreamType type) {
         LeaveResponse response = new LeaveResponse(SignalType.LEAVE, userId, type);
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", response);
+    }
+
+    public void sendChat(String roomId, String userId, String message) {
+        ChatResponse response = new ChatResponse(userId, message, System.currentTimeMillis());
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/chat", response);
     }
 }
