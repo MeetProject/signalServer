@@ -23,11 +23,11 @@ public class RoomReactController {
 
     @MessageMapping("/chat/send")
     public void sendChat(@Payload ChatPayload chatPayload) {
-        if (!userManagementService.isUserExist(chatPayload.userId())) {
+        if (userManagementService.isUserNotExist(chatPayload.userId())) {
             throw new IllegalArgumentException("User does not exist");
         }
 
-        if(!roomsManagementService.isRoomExist(chatPayload.roomId())) {
+        if(roomsManagementService.isRoomNotExist(chatPayload.roomId())) {
             throw new IllegalArgumentException("Room does not exist");
         }
 
@@ -36,11 +36,11 @@ public class RoomReactController {
 
     @MessageMapping("/emoji")
     public void sendEmoji(@Payload EmojiPayload emojiPayload) {
-        if (!userManagementService.isUserExist(emojiPayload.userId())) {
+        if (userManagementService.isUserNotExist(emojiPayload.userId())) {
             throw new IllegalArgumentException("User does not exist");
         }
 
-        if(!roomsManagementService.isRoomExist(emojiPayload.roomId())) {
+        if(roomsManagementService.isRoomNotExist(emojiPayload.roomId())) {
             throw new IllegalArgumentException("Room does not exist");
         }
 

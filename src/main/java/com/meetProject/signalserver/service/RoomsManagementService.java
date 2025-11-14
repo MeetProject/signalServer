@@ -57,7 +57,7 @@ public class RoomsManagementService {
         return room.getParticipants();
     }
 
-    public boolean isRoomExist(String roomId) {
-        return rooms.containsKey(roomId);
+    public boolean isRoomNotExist(String roomId) {
+        return !rooms.containsKey(roomId);
     }
 }

@@ -17,8 +17,8 @@ public class UserManagementService {
         users.remove(id);
     }
 
-    public boolean isUserExist(String id) {
-        return users.containsKey(id);
+    public boolean isUserNotExist(String id) {
+        return !users.containsKey(id);
     }
 
     public User getUser(String id) {
