@@ -28,7 +28,7 @@ public class ForceLeaveController {
 
     @PostMapping("/api/leave")
     public void forceLeave(@RequestParam String userId, @RequestParam String roomId) {
-        System.out.println("foreceLeave");
+        System.out.println("forceLeave");
         User user = userManagementService.getUser(userId);
 
         if(screenSharingService.isScreenSharingId(userId)) {

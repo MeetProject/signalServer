@@ -3,30 +3,25 @@ package com.meetProject.signalserver.controller;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.ScreenSharing;
-import com.meetProject.signalserver.model.dto.ForceLeavePayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
-import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.LeavePayload;
-import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.JoinPayload;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.RegisterPayload;
-import com.meetProject.signalserver.model.dto.SDPResponse;
 import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.service.RoomsManagementService;
 import com.meetProject.signalserver.service.ScreenSharingService;
+import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserManagementService;
 import java.security.Principal;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
@@ -35,119 +30,104 @@ public class SignalController {
     private final RoomsManagementService roomsManagementService;
     private final UserManagementService userManagementService;
     private final ScreenSharingService screenSharingService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final SignalMessagingService signalMessagingService;
 
-    public SignalController(SimpMessagingTemplate messagingTemplate, RoomsManagementService roomsManagementService,
-                            UserManagementService userManagementService, ScreenSharingService screenSharingService) {
-        this.messagingTemplate = messagingTemplate;
+    public SignalController(RoomsManagementService roomsManagementService,
+                            UserManagementService userManagementService, ScreenSharingService screenSharingService, SignalMessagingService signalMessagingService) {
         this.roomsManagementService = roomsManagementService;
         this.userManagementService = userManagementService;
         this.screenSharingService = screenSharingService;
+        this.signalMessagingService = signalMessagingService;
     }
 
     @MessageMapping("/register")
     @SendToUser("/queue/userId")
     public RegisterResponse register(@Payload RegisterPayload registerPayload, SimpMessageHeaderAccessor headers) {
-        Principal principal = headers.getUser();
-        if (principal == null) {
-            throw new RuntimeException("Principal is null");
-        }
-
-        String userId = principal.getName();
+        String userId = getUSerId(headers);
         User user = new User(registerPayload.userName(), registerPayload.userColor(), userId);
         userManagementService.addUser(userId, user);
-        return new RegisterResponse(SignalType.REGISTER, principal.getName());
+        return new RegisterResponse(SignalType.REGISTER, userId);
     }
 
     @MessageMapping("/signal/join")
     @SendToUser("/queue/signal/join")
     public JoinResponse join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor headers) {
         String targetRoomId = joinPayload.roomId();
-        String userId = Objects.requireNonNull(headers.getUser()).getName();
+        String userId = getUSerId(headers);
 
         List<User> participants = roomsManagementService.getParticipants(targetRoomId);
-
         User user = userManagementService.getUser(userId);
         roomsManagementService.addParticipant(targetRoomId, user);
-        ScreenSharing screenSharing = screenSharingService.getScreenSharing(joinPayload.roomId());
-        String screenOwnerId = screenSharing == null ? null : screenSharing.ownerId();
+        String screenOwnerId = getScreenOwner(joinPayload.roomId());
         return new JoinResponse(SignalType.JOIN, targetRoomId, participants, screenOwnerId);
     }
 
     @MessageMapping("/signal/offer")
     public void offer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
-        String toUserId = sdpPayload.toUserId();
-        StreamType streamType = sdpPayload.streamType();
-        String fromUserId = header.getUser().getName();
-        Boolean isScreenSender = screenSharingService.isScreenSharingId(toUserId);
-
-        SDPResponse offerResponse = new SDPResponse(SignalType.OFFER, fromUserId, sdpPayload.fromUserSDP(), streamType, isScreenSender);
-        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/offer", offerResponse);
+        String fromUserId = getUSerId(header);
+        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.OFFER);
     }
 
     @MessageMapping("/signal/answer")
     public void answer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
-        String fromUserId = header.getUser().getName();
-        String toUserId = sdpPayload.toUserId();
-        String fromUserSDP = sdpPayload.fromUserSDP();
-        StreamType streamType = sdpPayload.streamType();
-
-        Boolean isScreenSender = screenSharingService.isScreenSharingId(toUserId);
-
-        SDPResponse answerResponse = new SDPResponse(SignalType.ANSWER, fromUserId, fromUserSDP, streamType, isScreenSender);
-        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/answer", answerResponse);
+        String fromUserId = getUSerId(header);
+        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.ANSWER);
     }
 
     @MessageMapping("/signal/ice")
     public void ice(@Payload IcePayload icePayload, SimpMessageHeaderAccessor header) {
-        String fromUserId = header.getUser().getName();
-        String fromCandidate =  icePayload.fromCandidate();
-        StreamType streamType = icePayload.streamType();
-        String toUserId = icePayload.toUserId();
-        IceResponse iceResponse = new IceResponse(SignalType.ICE, fromUserId, fromCandidate, streamType);
-        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/ice", iceResponse);
+        String fromUserId = getUSerId(header);
+        signalMessagingService.sendICE(icePayload.toUserId(), fromUserId, icePayload.fromCandidate(), icePayload.streamType());
     }
 
     @MessageMapping("/signal/leave")
     public void leave(@Payload LeavePayload leavePayload, SimpMessageHeaderAccessor header) {
-        String fromUserId = Objects.requireNonNull(header.getUser()).getName();
+        String fromUserId = getUSerId(header);
         StreamType streamType = leavePayload.streamType();
         String roomId = leavePayload.roomId();
+        String screenOwnerId = getScreenOwner(roomId);
 
-        if(streamType.equals(StreamType.SCREEN)) {
-            ScreenSharing screenSharing = screenSharingService.getScreenSharing(roomId);
-            if(screenSharing.ownerId().equals(fromUserId)) {
-                screenSharingService.stopSharing(roomId);
-                LeaveResponse leaveResponse = new LeaveResponse(SignalType.LEAVE, fromUserId, streamType);
-                messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", leaveResponse);
-            }
-            return;
-        }
-
-        User user = userManagementService.getUser(fromUserId);
-
-        if(screenSharingService.isScreenSharingId(fromUserId)) {
+        if (screenOwnerId != null && screenOwnerId.equals(fromUserId)) {
             screenSharingService.stopSharing(roomId);
-            LeaveResponse response = new LeaveResponse(SignalType.LEAVE, fromUserId, StreamType.SCREEN);
-            messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", response);
+            signalMessagingService.sendLeave(roomId, fromUserId, StreamType.SCREEN);
         }
-        roomsManagementService.removeParticipant(roomId, user);
-        LeaveResponse leaveResponse = new LeaveResponse(SignalType.LEAVE, fromUserId, streamType);
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", leaveResponse);
+
+        if (streamType.equals(StreamType.USER)) {
+            User user = userManagementService.getUser(fromUserId);
+            roomsManagementService.removeParticipant(roomId, user);
+            signalMessagingService.sendLeave(roomId, fromUserId, streamType);
+        }
     }
 
     @MessageMapping("/signal/screen")
     @SendToUser("/queue/signal/screen")
     public ScreenResponse screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
         String roomId = screenPayload.roomId();
-        String ownerId = header.getUser().getName();
+        String ownerId = getUSerId(header);
 
-        List<User> participants = roomsManagementService.getParticipants(roomId).stream().filter((participant) -> !participant.userId().equals(ownerId))
+        List<User> participants = roomsManagementService.getParticipants(roomId).stream()
+                .filter((participant) -> !participant.userId().equals(ownerId))
                 .toList();
 
         ScreenSharing screenSharing = new ScreenSharing(roomId, ownerId);
         screenSharingService.startSharing(roomId, screenSharing);
         return new ScreenResponse(SignalType.SCREEN, ownerId, participants);
 
+    }
+
+    private String getUSerId(SimpMessageHeaderAccessor headers) {
+        Principal principal = headers.getUser();
+        if (principal == null) {
+            throw new RuntimeException("Principal is null");
+        }
+        return principal.getName();
+    }
+
+    private String getScreenOwner(String roomId) {
+        ScreenSharing screenSharing = screenSharingService.getScreenSharing(roomId);
+        if(screenSharing == null) {
+            return null;
+        }
+        return screenSharing.ownerId();
     }
 }
