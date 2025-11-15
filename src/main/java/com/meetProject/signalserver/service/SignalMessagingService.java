@@ -9,6 +9,7 @@ import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.LeaveResponse;
+import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPResponse;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -24,8 +25,12 @@ public class SignalMessagingService {
         this.screenSharingService = screenSharingService;
     }
 
+    public void sendRegister(String userId, RegisterResponse response) {
+        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/userId", response);
+    }
+
     public void sendJoin(String userId, JoinResponse joinResponse) {
-        messagingTemplate.convertAndSendToUser(userId, "queue/signal/join", joinResponse);
+        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/join", joinResponse);
     }
 
     public void sendSDP(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, SignalType type) {

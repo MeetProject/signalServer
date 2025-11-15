@@ -4,12 +4,9 @@ import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
-import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.RegisterPayload;
-import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
-import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.orchestration.RegisterOrchestrationService;
@@ -38,11 +35,10 @@ public class SignalController {
         this.registerService = registerService;
     }
 
-    @MessageMapping("/register")
-    @SendToUser("/queue/userId")
-    public RegisterResponse register(@Payload RegisterPayload registerPayload, SimpMessageHeaderAccessor header) {
+    @MessageMapping("/signal/register")
+    public void register(@Payload RegisterPayload registerPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        return registerService.registerUser(userId, registerPayload.userName(), registerPayload.userColor());
+        registerService.registerUser(userId, registerPayload.userName(), registerPayload.userColor());
     }
 
     @MessageMapping("/signal/join")

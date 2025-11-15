@@ -1,25 +1,37 @@
 package com.meetProject.signalserver.orchestration;
 
+import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.RegisterResponse;
+import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RegisterOrchestrationService {
     private final UserService userService;
+    private final SignalMessagingService signalMessagingService;
 
-    public RegisterOrchestrationService(UserService userService) {
+    public RegisterOrchestrationService(UserService userService,  SignalMessagingService signalMessagingService) {
         this.userService = userService;
+        this.signalMessagingService = signalMessagingService;
     }
 
-    public RegisterResponse registerUser(String userId, String userName, String userProfileColor) {
-        if(userService.getUser(userId) != null){
-            throw new IllegalArgumentException("user already exists");
+    public void registerUser(String userId, String userName, String userProfileColor) {
+        try {
+            if(userService.getUser(userId) != null){
+                throw new IllegalArgumentException("user already exists");
+            }
+            User user = new User(userName, userProfileColor, userId, null);
+            userService.addUser(userId, user);
+            RegisterResponse response = new RegisterResponse(SignalType.REGISTER, userId);
+            signalMessagingService.sendRegister(userId, response);
+        } catch (Exception ex) {
+            ErrorResponse response = new ErrorResponse(SignalType.ERROR, ErrorCode.E001, ex.getMessage());
+            signalMessagingService.sendError(userId, response);
         }
-        User user = new User(userName, userProfileColor, userId, null);
-        userService.addUser(userId, user);
-        return new RegisterResponse(SignalType.REGISTER, userId);
+
     }
 }
