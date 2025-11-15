@@ -1,7 +1,9 @@
 package com.meetProject.signalserver.orchestration;
 
+import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.ScreenSharingService;
@@ -42,7 +44,8 @@ public class JoinOrchestrationService {
             signalMessagingService.sendJoin(userId, response);
 
         } catch(Exception e){
-            signalMessagingService.sendError(userId, e.getMessage());
+            ErrorResponse response = new ErrorResponse(SignalType.ERROR, ErrorCode.E001, e.getMessage());
+            signalMessagingService.sendError(userId, response);
         }
 
     }

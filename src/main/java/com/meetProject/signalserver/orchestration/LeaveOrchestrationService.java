@@ -1,6 +1,9 @@
 package com.meetProject.signalserver.orchestration;
 
+import com.meetProject.signalserver.constant.ErrorCode;
+import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
+import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
@@ -39,7 +42,8 @@ public class LeaveOrchestrationService {
                 signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
             }
         } catch(Exception e){
-            signalMessagingService.sendError(userId, e.getMessage());
+            ErrorResponse response = new ErrorResponse(SignalType.ERROR, ErrorCode.E001, e.getMessage());
+            signalMessagingService.sendError(userId, response);
         }
     }
 

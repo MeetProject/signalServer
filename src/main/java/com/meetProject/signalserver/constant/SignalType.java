@@ -9,4 +9,5 @@ public enum SignalType {
     ICE,
     LEAVE,
     SCREEN,
+    ERROR,
 }
