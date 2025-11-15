@@ -22,20 +22,38 @@ public class LeaveOrchestrationService {
     }
 
     public void leaveUser(String userId, StreamType streamType) {
-        String roomId = userService.getRoomId(userId);
-        if(roomId == null) {
-            throw new IllegalArgumentException("Room Id is null");
-        }
+        try {
+            String roomId = userService.getRoomId(userId);
+            if(roomId == null) {
+                throw new IllegalArgumentException("Room Id is null");
+            }
 
-        if(screenSharingService.isSharing(userId)) {
-            screenSharingService.stopSharing(roomId);
-            signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
-        }
+            if(screenSharingService.isSharing(userId)) {
+                screenSharingService.stopSharing(roomId);
+                signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
+            }
 
-        if(streamType.equals(StreamType.USER)) {
+            if(streamType.equals(StreamType.USER)) {
+                roomsService.removeParticipant(roomId, userId);
+                userService.updateRoomStatus(userId, null);
+                signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
+            }
+        } catch(Exception e){
+            signalMessagingService.sendError(userId, e.getMessage());
+        }
+    }
+
+    public void forceLeave(String userId, String roomId) {
+        try {
+            if(screenSharingService.isSharing(userId)) {
+                screenSharingService.stopSharing(roomId);
+                signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
+            }
             roomsService.removeParticipant(roomId, userId);
-            userService.updateRoomStatus(userId, null);
+            userService.updateRoomStatus(userId, roomId);
             signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
+        } catch(Exception e){
+            System.out.println(e.getMessage());
         }
     }
 }

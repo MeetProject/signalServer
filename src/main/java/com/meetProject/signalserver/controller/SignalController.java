@@ -46,10 +46,9 @@ public class SignalController {
     }
 
     @MessageMapping("/signal/join")
-    @SendToUser("/queue/signal/join")
-    public JoinResponse join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
+    public void join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        return joinService.joinRoom(userId, joinPayload.roomId());
+        joinService.joinRoom(userId, joinPayload.roomId());
     }
 
     @MessageMapping("/signal/offer")
@@ -72,14 +71,14 @@ public class SignalController {
 
     @MessageMapping("/signal/leave")
     public void leave(@Payload LeavePayload leavePayload, SimpMessageHeaderAccessor header) {
-        System.out.println("leave " + leavePayload.roomId());
-        leaveService.leaveUser(WebSocketUtils.getUserId(header.getUser()), leavePayload.streamType());
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        leaveService.leaveUser(userId, leavePayload.streamType());
     }
 
     @MessageMapping("/signal/screen")
     @SendToUser("/queue/signal/screen")
-    public ScreenResponse screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
+    public void screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
         String UserId = WebSocketUtils.getUserId(header.getUser());
-        return screenService.shareScreen(screenPayload.roomId(), UserId);
+        screenService.shareScreen(UserId, screenPayload.roomId());
     }
 }
