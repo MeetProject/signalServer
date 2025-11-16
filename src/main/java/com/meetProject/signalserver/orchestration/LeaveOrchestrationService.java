@@ -31,15 +31,10 @@ public class LeaveOrchestrationService {
                 throw new IllegalArgumentException("Room Id is null");
             }
 
-            if(screenSharingService.isSharing(userId)) {
-                screenSharingService.stopSharing(roomId);
-                signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
-            }
-
-            if(streamType.equals(StreamType.USER)) {
-                roomsService.removeParticipant(roomId, userId);
-                userService.updateRoomStatus(userId, null);
-                signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
+            if(streamType == StreamType.SCREEN) {
+                stopScreenShare(userId, roomId);
+            } else {
+                leaveUser(userId, roomId);
             }
         } catch(Exception e){
             ErrorResponse response = new ErrorResponse(SignalType.ERROR, ErrorCode.E001, e.getMessage());
@@ -49,15 +44,29 @@ public class LeaveOrchestrationService {
 
     public void forceLeave(String userId, String roomId) {
         try {
-            if(screenSharingService.isSharing(userId)) {
-                screenSharingService.stopSharing(roomId);
-                signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
-            }
-            roomsService.removeParticipant(roomId, userId);
-            userService.updateRoomStatus(userId, roomId);
-            signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
+            leaveUser(userId, roomId);
         } catch(Exception e){
             System.out.println(e.getMessage());
         }
+    }
+
+    private void leaveUser(String userId, String roomId) {
+        if(!screenSharingService.isSharing(userId, roomId)) {
+            stopScreenShare(userId, roomId);
+        }
+
+        roomsService.removeParticipant(roomId, userId);
+        userService.updateRoomStatus(userId, null);
+        signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
+    }
+
+    private void stopScreenShare(String userId, String roomId) {
+        if(!screenSharingService.isSharing(userId, roomId)) {
+            throw new IllegalArgumentException("화면 공유자 상태가 아닙니다.");
+        }
+
+        screenSharingService.stopSharing(roomId);
+        signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
+
     }
 }

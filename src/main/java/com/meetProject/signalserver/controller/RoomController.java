@@ -2,16 +2,12 @@ package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.RoomRule;
 import com.meetProject.signalserver.constant.SignalType;
-import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.dto.CreateRoomResponse;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.ScreenSharingService;
-import com.meetProject.signalserver.service.SignalMessagingService;
-import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.util.RandomIdGenerator;
-import java.util.ArrayList;
+import java.util.Collections;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +26,7 @@ public class RoomController {
     @PostMapping("/api/room/create")
     public CreateRoomResponse createRoom() {
         String roomId = RandomIdGenerator.randomId(RoomRule.ROOM_ID_LENGTH);
-        Room room = new Room(roomId, new ArrayList<>());
+        Room room = new Room(roomId, Collections.emptyList());
         roomsService.createRoom(room);
         return new CreateRoomResponse(SignalType.CREATE,roomId);
     }

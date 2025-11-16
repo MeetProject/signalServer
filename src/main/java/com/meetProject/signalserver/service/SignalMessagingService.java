@@ -3,6 +3,8 @@ package com.meetProject.signalserver.service;
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
+import com.meetProject.signalserver.constant.TopicType;
+import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ChatResponse;
 import com.meetProject.signalserver.model.dto.EmojiResponse;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
@@ -12,6 +14,7 @@ import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPResponse;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
+import com.meetProject.signalserver.model.dto.TopicResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,51 +22,62 @@ import org.springframework.stereotype.Service;
 public class SignalMessagingService {
     private final SimpMessagingTemplate messagingTemplate;
     private final ScreenSharingService screenSharingService;
+    private final UserService userService;
 
-    public SignalMessagingService(SimpMessagingTemplate messagingTemplate, ScreenSharingService screenSharingService) {
+    public SignalMessagingService(SimpMessagingTemplate messagingTemplate, ScreenSharingService screenSharingService, UserService userService) {
         this.messagingTemplate = messagingTemplate;
         this.screenSharingService = screenSharingService;
+        this.userService = userService;
     }
 
     public void sendRegister(String userId, RegisterResponse response) {
-        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/userId", response);
+        sendSignal(userId, SignalType.REGISTER, response);
     }
 
     public void sendJoin(String userId, JoinResponse joinResponse) {
-        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/join", joinResponse);
+        sendSignal(userId, SignalType.JOIN, joinResponse);
     }
 
     public void sendSDP(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, SignalType type) {
-        boolean isScreenSender = screenSharingService.isSharing(toUserId);
+        User user = userService.getUser(toUserId);
+        boolean isScreenSender = screenSharingService.isSharing(toUserId, user.roomId());
         SDPResponse answerResponse = new SDPResponse(type, fromUserId, fromUserSDP, streamType, isScreenSender);
-        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/" + type.name().toLowerCase(), answerResponse);
+        sendSignal(toUserId, type, answerResponse);
     }
 
     public void sendICE(String toUserId, String fromUserId, String fromUserICE, StreamType streamType) {
         IceResponse iceResponse = new IceResponse(SignalType.ICE, fromUserId, fromUserICE, streamType);
-        messagingTemplate.convertAndSendToUser(toUserId, "/queue/signal/ice", iceResponse);
+        sendSignal(toUserId, SignalType.ICE, iceResponse);
     }
 
     public void sendLeave(String roomId, String userId, StreamType type) {
-        LeaveResponse response = new LeaveResponse(SignalType.LEAVE, userId, type);
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/leave", response);
+        LeaveResponse response = new LeaveResponse(userId, type);
+        sendTopic(roomId, response);
     }
 
     public void shareScreen(String userId, ScreenResponse screenResponse) {
-        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/screen", screenResponse);
+        sendSignal(userId, SignalType.SCREEN, screenResponse);
     }
 
     public void sendChat(String roomId, String userId, String message) {
         ChatResponse response = new ChatResponse(userId, message, System.currentTimeMillis());
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/chat", response);
+        sendTopic(roomId, response);
     }
 
     public void sendEmoji(String roomId, String userId, Emoji emoji) {
         EmojiResponse response = new EmojiResponse(userId, emoji);
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/emoji", response);
+        sendTopic(roomId, response);
     }
 
     public void sendError(String userId, ErrorResponse errorResponse) {
-        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/error", errorResponse);
+        sendSignal(userId, SignalType.ERROR, errorResponse);
+    }
+
+    private void sendSignal(String userId, SignalType type, Object payload) {
+        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/" + type.name().toLowerCase(), payload);
+    }
+
+    private void sendTopic(String roomId, TopicResponse payload) {
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + payload.getType().name().toLowerCase(), payload);
     }
 }
