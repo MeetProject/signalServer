@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.SignalType;
+import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
@@ -38,7 +39,8 @@ public class SignalController {
     @MessageMapping("/signal/register")
     public void register(@Payload RegisterPayload registerPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        registerService.registerUser(userId, registerPayload.userName(), registerPayload.userColor());
+        User user = new User(registerPayload.userName(), registerPayload.userColor(), userId, null);
+        registerService.registerUser(user);
     }
 
     @MessageMapping("/signal/join")

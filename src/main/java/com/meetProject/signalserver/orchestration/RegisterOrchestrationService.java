@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
@@ -19,18 +20,17 @@ public class RegisterOrchestrationService {
         this.signalMessagingService = signalMessagingService;
     }
 
-    public void registerUser(String userId, String userName, String userProfileColor) {
+    public void registerUser(User user) {
         try {
-            if(userService.getUser(userId) != null){
-                throw new IllegalArgumentException("user already exists");
+            if(userService.getUser(user.userId()) != null){
+                throw new IllegalArgumentException(ErrorMessage.USER_ALREADY_EXISTS);
             }
-            User user = new User(userName, userProfileColor, userId, null);
             userService.addUser(user);
-            RegisterResponse response = new RegisterResponse(SignalType.REGISTER, userId);
-            signalMessagingService.sendRegister(userId, response);
+            RegisterResponse response = new RegisterResponse(SignalType.REGISTER, user.userId());
+            signalMessagingService.sendRegister(user.userId(), response);
         } catch (Exception ex) {
             ErrorResponse response = new ErrorResponse(ErrorCode.E001, ex.getMessage());
-            signalMessagingService.sendError(userId, response);
+            signalMessagingService.sendError(user.userId(), response);
         }
 
     }

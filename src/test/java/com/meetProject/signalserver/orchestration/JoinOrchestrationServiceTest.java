@@ -19,7 +19,6 @@ public class JoinOrchestrationServiceTest {
 
     private UserService userService;
     private RoomsService roomsService;
-    private ScreenSharingService screenSharingService;
     private SignalMessagingService signalMessagingService;
     private JoinOrchestrationService joinService;
 
@@ -27,7 +26,7 @@ public class JoinOrchestrationServiceTest {
     void setUp() {
         userService = new UserService();
         roomsService = new RoomsService();
-        screenSharingService = new ScreenSharingService();
+        ScreenSharingService screenSharingService = new ScreenSharingService();
         signalMessagingService = mock(SignalMessagingService.class);
 
 
