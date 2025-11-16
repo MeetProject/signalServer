@@ -52,4 +52,8 @@ public class RoomsService {
     public boolean exists(String roomId) {
         return rooms.containsKey(roomId);
     }
+
+    public Room getRoom(String roomId) {
+        return rooms.get(roomId);
+    }
 }
