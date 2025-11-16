@@ -3,6 +3,7 @@ package com.meetProject.signalserver.orchestration;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.service.RoomsService;
@@ -53,7 +54,7 @@ public class ScreenSharingOrchestrationServiceTest {
         screenService.shareScreen("user1Id", "roomId");
         screenService.shareScreen("user2Id", "roomId");
 
-        verify(signalMessagingService, times(1)).sendError(eq("user2Id"), argThat(response -> response.message().contains("이미 화면 공유 중")));
+        verify(signalMessagingService, times(1)).sendError(eq("user2Id"), argThat(response -> response.message().equals(ErrorMessage.ROOM_ALREADY_SCREEN_SHARING)));
     }
 
 }
