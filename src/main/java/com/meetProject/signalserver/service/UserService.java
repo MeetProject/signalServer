@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final Map<String, User> users = new ConcurrentHashMap<>();
 
-    public void addUser(String id, User user) {
-        users.put(id, user);
+    public void addUser(User user) {
+        users.put(user.userId(), user);
     }
 
     public void removeUser(String id) {

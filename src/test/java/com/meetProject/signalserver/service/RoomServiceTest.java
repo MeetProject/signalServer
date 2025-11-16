@@ -2,7 +2,7 @@ package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.model.Room;
 import java.util.ArrayList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +24,8 @@ public class RoomServiceTest {
         roomService.createRoom(room);
 
         Room r = roomService.getRoom("room1");
-        assertNotNull(r);
-        assertEquals(room, r);
+        assertThat(r).isNotNull();
+        assertThat(r).isEqualTo(room);
     }
 
     @Test
@@ -37,9 +37,9 @@ public class RoomServiceTest {
         roomService.addParticipant("room1", "user1");
         Room r = roomService.getRoom("room1");
 
-        assertNotNull(r);
-        assertEquals(1, r.getParticipants().size());
-        assertEquals(List.of("user1"), r.getParticipants());
+        assertThat(r).isNotNull();
+        assertThat(r.getParticipants().size()).isEqualTo(1);
+        assertThat(r.getParticipants()).isEqualTo(List.of("user1"));
     }
 
     @Test
@@ -51,9 +51,9 @@ public class RoomServiceTest {
         roomService.removeParticipant("room1", "user1");
         Room r = roomService.getRoom("room1");
 
-        assertNotNull(r);
-        assertEquals(1, r.getParticipants().size());
-        assertEquals(List.of("user2"), r.getParticipants());
+        assertThat(r).isNotNull();
+        assertThat(r.getParticipants().size()).isEqualTo(1);
+        assertThat(r.getParticipants()).isEqualTo(List.of("user2"));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class RoomServiceTest {
         Room room = new Room("room1", new ArrayList<>(List.of("user1", "user2")));
         roomService.createRoom(room);
 
-        assertTrue(roomService.exists("room1"));
-        assertFalse(roomService.exists("room2"));
+        assertThat(roomService.exists("room1")).isTrue();
+        assertThat(roomService.exists("room2")).isFalse();
     }
 }

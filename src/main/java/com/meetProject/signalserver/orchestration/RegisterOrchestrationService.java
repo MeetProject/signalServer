@@ -25,7 +25,7 @@ public class RegisterOrchestrationService {
                 throw new IllegalArgumentException("user already exists");
             }
             User user = new User(userName, userProfileColor, userId, null);
-            userService.addUser(userId, user);
+            userService.addUser(user);
             RegisterResponse response = new RegisterResponse(SignalType.REGISTER, userId);
             signalMessagingService.sendRegister(userId, response);
         } catch (Exception ex) {
