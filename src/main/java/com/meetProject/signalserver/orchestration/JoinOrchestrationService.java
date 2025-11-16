@@ -1,7 +1,6 @@
 package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
-import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.JoinResponse;
@@ -40,11 +39,11 @@ public class JoinOrchestrationService {
                     .toList();
 
             roomsService.addParticipant(roomId, userId);
-            JoinResponse response = new JoinResponse(SignalType.JOIN, roomId, participants, screenOwnerId);
+            JoinResponse response = new JoinResponse(roomId, participants, screenOwnerId);
             signalMessagingService.sendJoin(userId, response);
 
         } catch(Exception e){
-            ErrorResponse response = new ErrorResponse(SignalType.ERROR, ErrorCode.E001, e.getMessage());
+            ErrorResponse response = new ErrorResponse(ErrorCode.E001, e.getMessage());
             signalMessagingService.sendError(userId, response);
         }
 

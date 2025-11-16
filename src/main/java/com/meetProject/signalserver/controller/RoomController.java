@@ -1,7 +1,6 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.RoomRule;
-import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.dto.CreateRoomResponse;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
@@ -28,7 +27,7 @@ public class RoomController {
         String roomId = RandomIdGenerator.randomId(RoomRule.ROOM_ID_LENGTH);
         Room room = new Room(roomId, Collections.emptyList());
         roomsService.createRoom(room);
-        return new CreateRoomResponse(SignalType.CREATE,roomId);
+        return new CreateRoomResponse(roomId);
     }
 
     @PostMapping("/api/leave")

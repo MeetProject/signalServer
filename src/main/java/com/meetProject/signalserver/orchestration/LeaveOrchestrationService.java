@@ -1,7 +1,6 @@
 package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
-import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
@@ -37,7 +36,7 @@ public class LeaveOrchestrationService {
                 leaveUser(userId, roomId);
             }
         } catch(Exception e){
-            ErrorResponse response = new ErrorResponse(SignalType.ERROR, ErrorCode.E001, e.getMessage());
+            ErrorResponse response = new ErrorResponse(ErrorCode.E001, e.getMessage());
             signalMessagingService.sendError(userId, response);
         }
     }
@@ -51,7 +50,7 @@ public class LeaveOrchestrationService {
     }
 
     private void leaveUser(String userId, String roomId) {
-        if(!screenSharingService.isSharing(userId, roomId)) {
+        if(screenSharingService.isSharing(userId, roomId)) {
             stopScreenShare(userId, roomId);
         }
 

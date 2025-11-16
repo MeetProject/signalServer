@@ -3,7 +3,6 @@ package com.meetProject.signalserver.service;
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
-import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ChatResponse;
 import com.meetProject.signalserver.model.dto.EmojiResponse;
@@ -14,6 +13,7 @@ import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPResponse;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
+import com.meetProject.signalserver.model.dto.SignalResponse;
 import com.meetProject.signalserver.model.dto.TopicResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -24,30 +24,32 @@ public class SignalMessagingService {
     private final ScreenSharingService screenSharingService;
     private final UserService userService;
 
-    public SignalMessagingService(SimpMessagingTemplate messagingTemplate, ScreenSharingService screenSharingService, UserService userService) {
+    public SignalMessagingService(SimpMessagingTemplate messagingTemplate, ScreenSharingService screenSharingService,
+                                  UserService userService) {
         this.messagingTemplate = messagingTemplate;
         this.screenSharingService = screenSharingService;
         this.userService = userService;
     }
 
     public void sendRegister(String userId, RegisterResponse response) {
-        sendSignal(userId, SignalType.REGISTER, response);
+        sendSignal(userId, response);
     }
 
     public void sendJoin(String userId, JoinResponse joinResponse) {
-        sendSignal(userId, SignalType.JOIN, joinResponse);
+        sendSignal(userId, joinResponse);
     }
 
-    public void sendSDP(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, SignalType type) {
+    public void sendSDP(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType,
+                        SignalType type) {
         User user = userService.getUser(toUserId);
         boolean isScreenSender = screenSharingService.isSharing(toUserId, user.roomId());
         SDPResponse answerResponse = new SDPResponse(type, fromUserId, fromUserSDP, streamType, isScreenSender);
-        sendSignal(toUserId, type, answerResponse);
+        sendSignal(toUserId, answerResponse);
     }
 
     public void sendICE(String toUserId, String fromUserId, String fromUserICE, StreamType streamType) {
-        IceResponse iceResponse = new IceResponse(SignalType.ICE, fromUserId, fromUserICE, streamType);
-        sendSignal(toUserId, SignalType.ICE, iceResponse);
+        IceResponse iceResponse = new IceResponse(fromUserId, fromUserICE, streamType);
+        sendSignal(toUserId, iceResponse);
     }
 
     public void sendLeave(String roomId, String userId, StreamType type) {
@@ -56,7 +58,7 @@ public class SignalMessagingService {
     }
 
     public void shareScreen(String userId, ScreenResponse screenResponse) {
-        sendSignal(userId, SignalType.SCREEN, screenResponse);
+        sendSignal(userId, screenResponse);
     }
 
     public void sendChat(String roomId, String userId, String message) {
@@ -70,14 +72,15 @@ public class SignalMessagingService {
     }
 
     public void sendError(String userId, ErrorResponse errorResponse) {
-        sendSignal(userId, SignalType.ERROR, errorResponse);
+        sendSignal(userId, errorResponse);
     }
 
-    private void sendSignal(String userId, SignalType type, Object payload) {
-        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/" + type.name().toLowerCase(), payload);
+    private void sendSignal(String userId, SignalResponse payload) {
+        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/" + payload.getType().name().toLowerCase(), payload);
     }
 
     private void sendTopic(String roomId, TopicResponse payload) {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + payload.getType().name().toLowerCase(), payload);
     }
+
 }

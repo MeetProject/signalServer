@@ -29,7 +29,7 @@ public class RegisterOrchestrationService {
             RegisterResponse response = new RegisterResponse(SignalType.REGISTER, userId);
             signalMessagingService.sendRegister(userId, response);
         } catch (Exception ex) {
-            ErrorResponse response = new ErrorResponse(SignalType.ERROR, ErrorCode.E001, ex.getMessage());
+            ErrorResponse response = new ErrorResponse(ErrorCode.E001, ex.getMessage());
             signalMessagingService.sendError(userId, response);
         }
 
