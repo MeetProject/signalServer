@@ -10,7 +10,6 @@ import com.meetProject.signalserver.model.dto.SDPPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.orchestration.RegisterOrchestrationService;
 import com.meetProject.signalserver.orchestration.ScreenOrchestrationService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.util.WebSocketUtils;
@@ -23,24 +22,15 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class SignalController {
     private final SignalMessagingService signalMessagingService;
-    private final RegisterOrchestrationService registerService;
     private final JoinOrchestrationService joinService;
     private final ScreenOrchestrationService screenService;
     private final LeaveOrchestrationService leaveService;
 
-    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService,  ScreenOrchestrationService screenService, RegisterOrchestrationService registerService) {
+    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService,  ScreenOrchestrationService screenService) {
         this.signalMessagingService = signalMessagingService;
         this.joinService = joinService;
         this.leaveService = leaveService;
         this.screenService = screenService;
-        this.registerService = registerService;
-    }
-
-    @MessageMapping("/signal/register")
-    public void register(@Payload RegisterPayload registerPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        User user = new User(registerPayload.userName(), registerPayload.userColor(), userId, null);
-        registerService.registerUser(user);
     }
 
     @MessageMapping("/signal/join")

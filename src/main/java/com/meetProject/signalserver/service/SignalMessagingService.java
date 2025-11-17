@@ -31,10 +31,6 @@ public class SignalMessagingService {
         this.userService = userService;
     }
 
-    public void sendRegister(String userId, RegisterResponse response) {
-        sendSignal(userId, response);
-    }
-
     public void sendJoin(String userId, JoinResponse joinResponse) {
         sendSignal(userId, joinResponse);
     }

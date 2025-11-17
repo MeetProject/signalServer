@@ -38,7 +38,7 @@ public class UserService {
         if(user == null){
             return;
         }
-        User updated = new User( user.userName(), user.profileColor(), user.userId(), roomId);
+        User updated = new User(user.userId(), user.userName(), user.profileColor(), roomId);
         users.put(id, updated);
     }
 }
