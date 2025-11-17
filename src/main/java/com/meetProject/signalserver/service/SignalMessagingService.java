@@ -10,11 +10,11 @@ import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.LeaveResponse;
-import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPResponse;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.model.dto.SignalResponse;
 import com.meetProject.signalserver.model.dto.TopicResponse;
+import com.meetProject.signalserver.util.RandomIdGenerator;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -58,12 +58,12 @@ public class SignalMessagingService {
     }
 
     public void sendChat(String roomId, String userId, String message) {
-        ChatResponse response = new ChatResponse(userId, message, System.currentTimeMillis());
+        ChatResponse response = new ChatResponse(RandomIdGenerator.uuidGenerator(), userId, message, System.currentTimeMillis());
         sendTopic(roomId, response);
     }
 
     public void sendEmoji(String roomId, String userId, Emoji emoji) {
-        EmojiResponse response = new EmojiResponse(userId, emoji);
+        EmojiResponse response = new EmojiResponse(RandomIdGenerator.uuidGenerator(), userId, emoji, System.currentTimeMillis());
         sendTopic(roomId, response);
     }
 
