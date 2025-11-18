@@ -4,4 +4,5 @@ public enum TopicType {
     LEAVE,
     CHAT,
     EMOJI,
+    DEVICE,
 }

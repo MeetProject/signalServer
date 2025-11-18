@@ -1,11 +1,10 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.SignalType;
-import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.DevicePayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
-import com.meetProject.signalserver.model.dto.RegisterPayload;
 import com.meetProject.signalserver.model.dto.SDPPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
@@ -42,13 +41,13 @@ public class SignalController {
     @MessageMapping("/signal/offer")
     public void offer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
         String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.OFFER);
+        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.OFFER, sdpPayload.mediaOption());
     }
 
     @MessageMapping("/signal/answer")
     public void answer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
         String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.ANSWER);
+        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.ANSWER, sdpPayload.mediaOption());
     }
 
     @MessageMapping("/signal/ice")
@@ -66,7 +65,7 @@ public class SignalController {
     @MessageMapping("/signal/screen")
     @SendToUser("/queue/signal/screen")
     public void screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
-        String UserId = WebSocketUtils.getUserId(header.getUser());
-        screenService.shareScreen(UserId, screenPayload.roomId());
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        screenService.shareScreen(userId, screenPayload.roomId());
     }
 }

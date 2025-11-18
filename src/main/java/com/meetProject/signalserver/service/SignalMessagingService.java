@@ -3,8 +3,10 @@ package com.meetProject.signalserver.service;
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
+import com.meetProject.signalserver.model.MediaOption;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ChatResponse;
+import com.meetProject.signalserver.model.dto.DeviceResponse;
 import com.meetProject.signalserver.model.dto.EmojiResponse;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.IceResponse;
@@ -36,10 +38,10 @@ public class SignalMessagingService {
     }
 
     public void sendSDP(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType,
-                        SignalType type) {
+                        SignalType type, MediaOption mediaOption) {
         User user = userService.getUser(toUserId);
         boolean isScreenSender = screenSharingService.isSharing(toUserId, user.roomId());
-        SDPResponse answerResponse = new SDPResponse(type, fromUserId, fromUserSDP, streamType, isScreenSender);
+        SDPResponse answerResponse = new SDPResponse(type, fromUserId, fromUserSDP, streamType, isScreenSender, mediaOption);
         sendSignal(toUserId, answerResponse);
     }
 
@@ -64,6 +66,11 @@ public class SignalMessagingService {
 
     public void sendEmoji(String roomId, String userId, Emoji emoji) {
         EmojiResponse response = new EmojiResponse(RandomIdGenerator.uuidGenerator(), userId, emoji, System.currentTimeMillis());
+        sendTopic(roomId, response);
+    }
+
+    public void sendDevice(String roomId, String userId, MediaOption mediaOption) {
+        DeviceResponse response = new DeviceResponse(userId, mediaOption);
         sendTopic(roomId, response);
     }
 
