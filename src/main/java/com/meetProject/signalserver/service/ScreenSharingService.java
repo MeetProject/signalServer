@@ -30,8 +30,7 @@ public class ScreenSharingService {
         return screenSharing.ownerId();
     }
 
-    public boolean isSharing(String userId) {
-        return activeScreenSharings.values().stream()
-                .anyMatch(screen -> screen.ownerId().equals(userId));
+    public boolean isSharing(String userId, String roomId) {
+        return activeScreenSharings.containsKey(roomId) && activeScreenSharings.get(roomId).ownerId().equals(userId);
     }
 }

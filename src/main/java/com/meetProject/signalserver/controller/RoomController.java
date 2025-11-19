@@ -1,16 +1,14 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.RoomRule;
-import com.meetProject.signalserver.constant.SignalType;
-import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.dto.CreateRoomResponse;
+import com.meetProject.signalserver.model.dto.ValidateRoomResponse;
+import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.ScreenSharingService;
-import com.meetProject.signalserver.service.SignalMessagingService;
-import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.util.RandomIdGenerator;
-import java.util.ArrayList;
+import java.util.Collections;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,33 +16,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RoomController {
     private final RoomsService roomsService;
-    private final ScreenSharingService screenSharingService;
-    private final SignalMessagingService signalMessagingService;
-    private final UserService userService;
+    private final LeaveOrchestrationService leaveService;
 
-    public RoomController(RoomsService roomsService, ScreenSharingService screenSharingService, SignalMessagingService signalMessagingService, UserService userService) {
+    public RoomController(RoomsService roomsService, LeaveOrchestrationService leaveService) {
         this.roomsService = roomsService;
-        this.screenSharingService = screenSharingService;
-        this.signalMessagingService = signalMessagingService;
-        this.userService = userService;
+        this.leaveService = leaveService;
+
     }
 
     @PostMapping("/api/room/create")
     public CreateRoomResponse createRoom() {
         String roomId = RandomIdGenerator.randomId(RoomRule.ROOM_ID_LENGTH);
-        Room room = new Room(roomId, new ArrayList<>());
+        Room room = new Room(roomId, Collections.emptyList());
         roomsService.createRoom(room);
-        return new CreateRoomResponse(SignalType.CREATE,roomId);
+        return new CreateRoomResponse(roomId);
+    }
+
+    @GetMapping("/api/room/validate")
+    public ValidateRoomResponse validateRoom(@RequestParam String roomId) {
+        boolean isValidRoom = roomsService.exists(roomId) && roomsService.getParticipants(roomId).size() < RoomRule.MAX_ROOM_PARTICIPANTS;
+        return new ValidateRoomResponse(isValidRoom);
     }
 
     @PostMapping("/api/leave")
     public void forceLeave(@RequestParam String userId, @RequestParam String roomId) {
-        if(screenSharingService.isSharing(userId)) {
-            screenSharingService.stopSharing(roomId);
-            signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
-        }
-        roomsService.removeParticipant(roomId, userId);
-        userService.updateRoomStatus(userId, roomId);
-        signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
+        leaveService.forceLeave(userId, roomId);
     }
 }

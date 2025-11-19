@@ -1,3 +1,3 @@
 package com.meetProject.signalserver.model.dto;
 
-public record ChatPayload(String userId, String roomId, String message) {}
+public record ChatPayload(String roomId, String message) {}

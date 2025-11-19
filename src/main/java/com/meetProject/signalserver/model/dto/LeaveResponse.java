@@ -1,6 +1,19 @@
 package com.meetProject.signalserver.model.dto;
 
-import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
+import com.meetProject.signalserver.constant.TopicType;
+import com.meetProject.signalserver.util.RandomIdGenerator;
 
-public record LeaveResponse (SignalType type, String fromUserId, StreamType streamType) {}
+public record LeaveResponse (String fromUserId, StreamType streamType) implements TopicResponse{
+    private static final String id = RandomIdGenerator.uuidGenerator();
+    private static final TopicType type = TopicType.LEAVE;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+    @Override
+    public TopicType getType() {
+        return type;
+    }
+}

@@ -1,6 +1,8 @@
 package com.meetProject.signalserver.orchestration;
 
+import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.StreamType;
+import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
@@ -22,20 +24,48 @@ public class LeaveOrchestrationService {
     }
 
     public void leaveUser(String userId, StreamType streamType) {
-        String roomId = userService.getRoomId(userId);
-        if(roomId == null) {
-            throw new IllegalArgumentException("Room Id is null");
+        try {
+            String roomId = userService.getRoomId(userId);
+            if(roomId == null) {
+                throw new IllegalArgumentException("Room Id is null");
+            }
+
+            if(streamType == StreamType.SCREEN) {
+                stopScreenShare(userId, roomId);
+            } else {
+                leaveUser(userId, roomId);
+            }
+        } catch(Exception e){
+            ErrorResponse response = new ErrorResponse(ErrorCode.E001, e.getMessage());
+            signalMessagingService.sendError(userId, response);
+        }
+    }
+
+    public void forceLeave(String userId, String roomId) {
+        try {
+            leaveUser(userId, roomId);
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void leaveUser(String userId, String roomId) {
+        if(screenSharingService.isSharing(userId, roomId)) {
+            stopScreenShare(userId, roomId);
         }
 
-        if(screenSharingService.isSharing(userId)) {
-            screenSharingService.stopSharing(roomId);
-            signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
+        roomsService.removeParticipant(roomId, userId);
+        userService.updateRoomStatus(userId, null);
+        signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
+    }
+
+    private void stopScreenShare(String userId, String roomId) {
+        if(!screenSharingService.isSharing(userId, roomId)) {
+            throw new IllegalArgumentException("화면 공유자 상태가 아닙니다.");
         }
 
-        if(streamType.equals(StreamType.USER)) {
-            roomsService.removeParticipant(roomId, userId);
-            userService.updateRoomStatus(userId, null);
-            signalMessagingService.sendLeave(roomId, userId, StreamType.USER);
-        }
+        screenSharingService.stopSharing(roomId);
+        signalMessagingService.sendLeave(roomId, userId, StreamType.SCREEN);
+
     }
 }

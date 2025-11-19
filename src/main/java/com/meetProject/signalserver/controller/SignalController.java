@@ -1,18 +1,14 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.constant.SignalType;
+import com.meetProject.signalserver.model.dto.DevicePayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
-import com.meetProject.signalserver.model.dto.JoinResponse;
-import com.meetProject.signalserver.model.dto.RegisterPayload;
-import com.meetProject.signalserver.model.dto.RegisterResponse;
 import com.meetProject.signalserver.model.dto.SDPPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
-import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.orchestration.RegisterOrchestrationService;
 import com.meetProject.signalserver.orchestration.ScreenOrchestrationService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.util.WebSocketUtils;
@@ -25,43 +21,33 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class SignalController {
     private final SignalMessagingService signalMessagingService;
-    private final RegisterOrchestrationService registerService;
     private final JoinOrchestrationService joinService;
     private final ScreenOrchestrationService screenService;
     private final LeaveOrchestrationService leaveService;
 
-    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService,  ScreenOrchestrationService screenService, RegisterOrchestrationService registerService) {
+    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService,  ScreenOrchestrationService screenService) {
         this.signalMessagingService = signalMessagingService;
         this.joinService = joinService;
         this.leaveService = leaveService;
         this.screenService = screenService;
-        this.registerService = registerService;
-    }
-
-    @MessageMapping("/register")
-    @SendToUser("/queue/userId")
-    public RegisterResponse register(@Payload RegisterPayload registerPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        return registerService.registerUser(userId, registerPayload.userName(), registerPayload.userColor());
     }
 
     @MessageMapping("/signal/join")
-    @SendToUser("/queue/signal/join")
-    public JoinResponse join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
+    public void join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        return joinService.joinRoom(userId, joinPayload.roomId());
+        joinService.joinRoom(userId, joinPayload.roomId());
     }
 
     @MessageMapping("/signal/offer")
     public void offer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
         String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.OFFER);
+        signalMessagingService.sendOffer(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), sdpPayload.mediaOption());
     }
 
     @MessageMapping("/signal/answer")
     public void answer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
         String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.ANSWER);
+        signalMessagingService.sendAnswer(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), sdpPayload.mediaOption());
     }
 
     @MessageMapping("/signal/ice")
@@ -72,14 +58,14 @@ public class SignalController {
 
     @MessageMapping("/signal/leave")
     public void leave(@Payload LeavePayload leavePayload, SimpMessageHeaderAccessor header) {
-        System.out.println("leave " + leavePayload.roomId());
-        leaveService.leaveUser(WebSocketUtils.getUserId(header.getUser()), leavePayload.streamType());
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        leaveService.leaveUser(userId, leavePayload.streamType());
     }
 
     @MessageMapping("/signal/screen")
     @SendToUser("/queue/signal/screen")
-    public ScreenResponse screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
-        String UserId = WebSocketUtils.getUserId(header.getUser());
-        return screenService.shareScreen(screenPayload.roomId(), UserId);
+    public void screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        screenService.shareScreen(userId, screenPayload.roomId());
     }
 }
