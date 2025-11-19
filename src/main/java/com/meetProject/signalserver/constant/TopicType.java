@@ -5,4 +5,5 @@ public enum TopicType {
     CHAT,
     EMOJI,
     DEVICE,
+    HANDUP,
 }

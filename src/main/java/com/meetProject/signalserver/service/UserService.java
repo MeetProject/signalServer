@@ -38,7 +38,16 @@ public class UserService {
         if(user == null){
             return;
         }
-        User updated = new User(user.userId(), user.userName(), user.profileColor(), roomId);
+        User updated = new User(user.userId(), user.userName(), user.profileColor(), roomId, user.isHandUp());
+        users.put(id, updated);
+    }
+
+    public void updateUserHandUpStatus(String id, boolean isHandUp) {
+        User user = users.get(id);
+        if(user == null){
+            return;
+        }
+        User updated = new User(user.userId(), user.userName(), user.profileColor(), user.roomId(), isHandUp);
         users.put(id, updated);
     }
 }

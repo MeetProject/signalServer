@@ -21,7 +21,7 @@ public class UserController {
     @PostMapping("/api/user/register")
     public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterPayload payload) {
         String userId =  RandomIdGenerator.uuidGenerator();
-        User user = new User(userId, payload.userName(), payload.userColor(), null);
+        User user = new User(userId, payload.userName(), payload.userColor(), null, false);
         userService.addUser(user);
         return ResponseEntity.ok(new RegisterResponse(userId));
     }

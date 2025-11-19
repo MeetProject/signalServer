@@ -9,6 +9,7 @@ import com.meetProject.signalserver.model.dto.ChatResponse;
 import com.meetProject.signalserver.model.dto.DeviceResponse;
 import com.meetProject.signalserver.model.dto.EmojiResponse;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
+import com.meetProject.signalserver.model.dto.HandUpResponse;
 import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.LeaveResponse;
@@ -68,18 +69,23 @@ public class SignalMessagingService {
 
     public void sendChat(String roomId, String userId, String message) {
         System.out.println(userId);
-        ChatResponse response = new ChatResponse(RandomIdGenerator.uuidGenerator(), userId, message, System.currentTimeMillis());
+        ChatResponse response = new ChatResponse(userId, message, System.currentTimeMillis());
         sendTopic(roomId, response);
     }
 
     public void sendEmoji(String roomId, String userId, Emoji emoji) {
         System.out.println(userId);
-        EmojiResponse response = new EmojiResponse(RandomIdGenerator.uuidGenerator(), userId, emoji, System.currentTimeMillis());
+        EmojiResponse response = new EmojiResponse(userId, emoji, System.currentTimeMillis());
         sendTopic(roomId, response);
     }
 
     public void sendDevice(String roomId, String userId, MediaOption mediaOption) {
         DeviceResponse response = new DeviceResponse(userId, mediaOption);
+        sendTopic(roomId, response);
+    }
+
+    public void sendHandUp(String roomId, String userId, boolean isHandUp) {
+        HandUpResponse response = new HandUpResponse(userId, isHandUp);
         sendTopic(roomId, response);
     }
 

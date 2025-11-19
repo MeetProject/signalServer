@@ -3,6 +3,7 @@ package com.meetProject.signalserver.controller;
 import com.meetProject.signalserver.model.dto.ChatPayload;
 import com.meetProject.signalserver.model.dto.DevicePayload;
 import com.meetProject.signalserver.model.dto.EmojiPayload;
+import com.meetProject.signalserver.model.dto.HandUpPayload;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
@@ -15,10 +16,12 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class RoomReactController {
     private final RoomsService roomsService;
+    private final UserService userService;
     private final SignalMessagingService signalMessagingService;
 
     public RoomReactController(UserService userService, RoomsService roomsService, SignalMessagingService signalMessagingService) {
         this.roomsService = roomsService;
+        this.userService = userService;
         this.signalMessagingService = signalMessagingService;
     }
 
@@ -47,5 +50,15 @@ public class RoomReactController {
         }
         String userId = WebSocketUtils.getUserId(header.getUser());
         signalMessagingService.sendDevice(devicePayload.roomId(), userId, devicePayload.mediaOption());
+    }
+
+    @MessageMapping("/handUp")
+    public void sendHandUp(@Payload HandUpPayload handUpPayload, SimpMessageHeaderAccessor header) {
+        if(!roomsService.exists(handUpPayload.roomId())) {
+            throw new IllegalArgumentException("Room does not exist");
+        }
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        userService.updateUserHandUpStatus(userId, handUpPayload.value());
+        signalMessagingService.sendHandUp(handUpPayload.roomId(), userId, handUpPayload.value());
     }
 }
