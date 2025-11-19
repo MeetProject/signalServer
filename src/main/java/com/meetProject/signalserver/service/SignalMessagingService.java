@@ -12,7 +12,8 @@ import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.IceResponse;
 import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.LeaveResponse;
-import com.meetProject.signalserver.model.dto.SDPResponse;
+import com.meetProject.signalserver.model.dto.AnswerResponse;
+import com.meetProject.signalserver.model.dto.OfferResponse;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.model.dto.SignalResponse;
 import com.meetProject.signalserver.model.dto.TopicResponse;
@@ -37,11 +38,17 @@ public class SignalMessagingService {
         sendSignal(userId, joinResponse);
     }
 
-    public void sendSDP(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType,
-                        SignalType type, MediaOption mediaOption) {
+    public void sendOffer(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, MediaOption mediaOption) {
+        User user = userService.getUser(fromUserId);
+        boolean isScreenSender = screenSharingService.isSharing(fromUserId, user.roomId());
+        OfferResponse response = new OfferResponse(fromUserId, user, fromUserSDP, streamType, isScreenSender, mediaOption);
+        sendSignal(toUserId, response);
+    }
+
+    public void sendAnswer(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, MediaOption mediaOption) {
         User user = userService.getUser(toUserId);
         boolean isScreenSender = screenSharingService.isSharing(toUserId, user.roomId());
-        SDPResponse answerResponse = new SDPResponse(type, fromUserId, fromUserSDP, streamType, isScreenSender, mediaOption);
+        AnswerResponse answerResponse = new AnswerResponse(fromUserId, fromUserSDP, streamType, isScreenSender, mediaOption);
         sendSignal(toUserId, answerResponse);
     }
 
@@ -60,11 +67,13 @@ public class SignalMessagingService {
     }
 
     public void sendChat(String roomId, String userId, String message) {
+        System.out.println(userId);
         ChatResponse response = new ChatResponse(RandomIdGenerator.uuidGenerator(), userId, message, System.currentTimeMillis());
         sendTopic(roomId, response);
     }
 
     public void sendEmoji(String roomId, String userId, Emoji emoji) {
+        System.out.println(userId);
         EmojiResponse response = new EmojiResponse(RandomIdGenerator.uuidGenerator(), userId, emoji, System.currentTimeMillis());
         sendTopic(roomId, response);
     }

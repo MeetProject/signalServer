@@ -41,13 +41,13 @@ public class SignalController {
     @MessageMapping("/signal/offer")
     public void offer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
         String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.OFFER, sdpPayload.mediaOption());
+        signalMessagingService.sendOffer(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), sdpPayload.mediaOption());
     }
 
     @MessageMapping("/signal/answer")
     public void answer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
         String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendSDP(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), SignalType.ANSWER, sdpPayload.mediaOption());
+        signalMessagingService.sendAnswer(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), sdpPayload.mediaOption());
     }
 
     @MessageMapping("/signal/ice")
