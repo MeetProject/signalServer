@@ -33,7 +33,7 @@ public class JoinOrchestrationServiceTest {
         joinService = new JoinOrchestrationService(userService, roomsService, screenSharingService, signalMessagingService);
 
         // 테스트용 초기 유저와 방 생성
-        User user1 = new User("user", "#000000", "userId", null);
+        User user1 = new User("userId", "user", "#000000", null);
 
         userService.addUser(user1);
 

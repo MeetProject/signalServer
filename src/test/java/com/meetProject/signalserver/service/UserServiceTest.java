@@ -18,7 +18,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("사용자 추가")
     void addUser() {
-        User user = new User("user1", "#000000", "userId", "room1");
+        User user = new User("userId", "user", "#000000", "room1");
         userService.addUser(user);
 
         User u = userService.getUser("userId");
@@ -41,7 +41,7 @@ public class UserServiceTest {
     @Test
     @DisplayName("사용자 방 변경")
     void updateUserRoomStatus() {
-        User user = new User("user1", "#000000", "userId", "room1");
+        User user = new User("userId", "user", "#000000", "room1");
         userService.addUser(user);
 
         userService.updateRoomStatus("userId", "room2");
