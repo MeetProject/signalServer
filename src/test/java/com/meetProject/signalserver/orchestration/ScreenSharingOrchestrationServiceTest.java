@@ -31,8 +31,8 @@ public class ScreenSharingOrchestrationServiceTest {
         signalMessagingService = mock(SignalMessagingService.class);
         screenService = new ScreenOrchestrationService(roomsService, screenSharingService, signalMessagingService);
 
-        User user1 = new User("user1", "#000000", "user1Id", "roomId");
-        User user2 = new User("user2", "#000000", "user2Id", "roomId");
+        User user1 = new User("user1", "#000000", "user1Id", "roomId", false);
+        User user2 = new User("user2", "#000000", "user2Id", "roomId", false);
 
         userService.addUser(user1);
         userService.addUser(user2);

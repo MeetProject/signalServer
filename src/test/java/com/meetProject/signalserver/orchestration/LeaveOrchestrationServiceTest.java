@@ -33,7 +33,7 @@ public class LeaveOrchestrationServiceTest {
         leaveService = new LeaveOrchestrationService(userService, roomService, screenSharingService,
                 signalMessagingService);
 
-        User user = new User("user1Id", "#000000", "user1", "room1");
+        User user = new User("user1Id", "#000000", "user1", "room1", false);
         userService.addUser(user);
         Room room = new Room("room1", new ArrayList<>());
         room.addParticipant("user1");
