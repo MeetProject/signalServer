@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
@@ -27,7 +28,7 @@ public class LeaveOrchestrationService {
         try {
             String roomId = userService.getRoomId(userId);
             if(roomId == null) {
-                throw new IllegalArgumentException("Room Id is null");
+                throw new IllegalArgumentException(ErrorMessage.ROOM_NULL);
             }
 
             if(streamType == StreamType.SCREEN) {
@@ -61,7 +62,7 @@ public class LeaveOrchestrationService {
 
     private void stopScreenShare(String userId, String roomId) {
         if(!screenSharingService.isSharing(userId, roomId)) {
-            throw new IllegalArgumentException("화면 공유자 상태가 아닙니다.");
+            throw new IllegalArgumentException(ErrorMessage.NOT_SCREEN_SHARING);
         }
 
         screenSharingService.stopSharing(roomId);

@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ErrorResponse;
 import com.meetProject.signalserver.model.dto.JoinResponse;
@@ -28,7 +29,7 @@ public class JoinOrchestrationService {
     public void joinRoom(String userId, String roomId) {
         try {
             if(userService.getUser(userId) == null){
-                throw new IllegalArgumentException("User not found");
+                throw new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND);
             }
 
             userService.updateRoomStatus(userId, roomId);

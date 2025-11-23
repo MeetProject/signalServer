@@ -1,7 +1,6 @@
 package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.constant.Emoji;
-import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.MediaOption;
 import com.meetProject.signalserver.model.User;
@@ -18,7 +17,6 @@ import com.meetProject.signalserver.model.dto.OfferResponse;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.model.dto.SignalResponse;
 import com.meetProject.signalserver.model.dto.TopicResponse;
-import com.meetProject.signalserver.util.RandomIdGenerator;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 

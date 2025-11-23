@@ -1,7 +1,5 @@
 package com.meetProject.signalserver.controller;
 
-import com.meetProject.signalserver.constant.SignalType;
-import com.meetProject.signalserver.model.dto.DevicePayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
