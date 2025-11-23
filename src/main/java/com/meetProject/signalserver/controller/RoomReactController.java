@@ -1,5 +1,6 @@
 package com.meetProject.signalserver.controller;
 
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.dto.ChatPayload;
 import com.meetProject.signalserver.model.dto.DevicePayload;
 import com.meetProject.signalserver.model.dto.EmojiPayload;
@@ -27,38 +28,36 @@ public class RoomReactController {
 
     @MessageMapping("/chat/send")
     public void sendChat(@Payload ChatPayload chatPayload, SimpMessageHeaderAccessor header) {
-        if(!roomsService.exists(chatPayload.roomId())) {
-            throw new IllegalArgumentException("Room does not exist");
-        }
+        RoomValidate(chatPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
         signalMessagingService.sendChat(chatPayload.roomId(), userId, chatPayload.message());
     }
 
     @MessageMapping("/emoji")
     public void sendEmoji(@Payload EmojiPayload emojiPayload, SimpMessageHeaderAccessor header) {
-        if(!roomsService.exists(emojiPayload.roomId())) {
-            throw new IllegalArgumentException("Room does not exist");
-        }
+        RoomValidate(emojiPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
         signalMessagingService.sendEmoji(emojiPayload.roomId(), userId, emojiPayload.emoji());
     }
 
     @MessageMapping("/device")
     public void sendDevice(@Payload DevicePayload devicePayload, SimpMessageHeaderAccessor header) {
-        if(!roomsService.exists(devicePayload.roomId())) {
-            throw new IllegalArgumentException("Room does not exist");
-        }
+        RoomValidate(devicePayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
         signalMessagingService.sendDevice(devicePayload.roomId(), userId, devicePayload.mediaOption());
     }
 
     @MessageMapping("/handUp")
     public void sendHandUp(@Payload HandUpPayload handUpPayload, SimpMessageHeaderAccessor header) {
-        if(!roomsService.exists(handUpPayload.roomId())) {
-            throw new IllegalArgumentException("Room does not exist");
-        }
+        RoomValidate(handUpPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
         userService.updateUserHandUpStatus(userId, handUpPayload.value());
         signalMessagingService.sendHandUp(handUpPayload.roomId(), userId, handUpPayload.value());
+    }
+
+    private void RoomValidate(String roomId) {
+        if(!roomsService.exists(roomId)) {
+            throw new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND);
+        }
     }
 }
