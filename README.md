@@ -3,26 +3,60 @@
 이 레포는 WebRTC P2P 연결을 위한 시그널링 서버(Signaling Server)를 Spring Boot 기반 WebSocket으로 구현한 프로젝트입니다.<br>
 클라이언트 간 직접 미디어를 주고받기 위해 필요한 SDP(offer/answer)와 ICE Candidate를 교환하는 중간 역할을 담당합니다.<br>
 <br>
-본 프로젝트에서는 별도의 데이터베이스를 연결하지 않고 로컬 단위에서 실행가능을 목표로 진행합니다.<br>
+본 프로젝트는 순수 WebRTC + Custom Signaling으로 구현되며, 데이터베이스 없이 “로컬/메모리 기반” 운영을 목표로 합니다.<br>
 
 ## 역할
-- 클라이언트 연결 관리 및 userId 발급
-- WebRTC 신호 메시지 전달 (Join/Offer/Answer/ICE)
-- 화면 공유 참가자 관리
-- 채팅, 손들기 브로드캐스트
+- WebSocket 연결 관리 및 사용자(UserId) 발급
+- 방(roomId) 단위 참가자 관리
+- WebRTC Signal 메시지 전달 (join, offer, answer, ice)
+- 화면 공유 스트림 ID 발급 및 참여자 중계
+- 채팅/손들기 이벤트 브로드캐스트
+- 마이크, 비디오 전원 이벤트 브로드캐스트
+- 연결 종료 시 자동 정리 (disconnect / refresh / close)
+
+## 전체 구조
+클라이언트가 WebSocket 연결 후 STOMP 프로토콜로 메시지를 publish/subscribe하며,
+서버는 이를 SimpleBroker 또는 1:1 직접 전송 방식으로 전달합니다.
+
+```scss
+Client
+ └── STOMP (WebSocket)
+        ↓
+SignalController
+ ├── JoinOrchestrationService
+ ├── LeaveOrchestrationService
+ ├── ScreenOrchestrationService
+ └── SignalMessagingService
+        ↓
+MessageBroker (SimpleBroker)
+        ↓
+Client (Single / Broadcast)
+```
 
 ## 주요 기능
+### 사용자 등록
+- 클라이언트는 특정 roomId로 join 요청
+- 서버는 uuid 기반 userId 생성 및 반환
+- 반환 경로: /user/queue/userId
+
 ### 방 관리
 - 사용자는 특정 roomId로 입장(join)
 - 서버는 해당 방의 참가자 목록을 관리
 
-### Offer / Answer 교환
+### Offer / Answer 중계
 - 참여자가 생성한 offer를 서버는 대상 사용자에게 전달
 - 대상 사용자는 peerConnection을 생성하고 answer를 다시 서버로 전송
 - 대상 사용자가 생성한 peerConnection에 대한 Answer를 서버는 보낸 사용자에게 전달
+- offer 전달 시 참가자의 정보도 포함해 전달
 
 ### ICE Candidate 중계
-- 양쪽 PeerConnection에서 생성된 ICE 후보를 상대에게 전달
+- PeerConnection에서 생성된 ICE 후보를 실시간 전달
+- 상대 PeerConnection에 candidate 즉시 추가 가능
+
+### 화면 공유 관리
+- 기존 join이 아닌 /app/signal/screen 으로 처리
+- 화면 공유용 새로운 "screenId" 발급
+- 본인을 제외한 모든 참여자에게 화면 공유 offer 발송
 
 ### 채팅, 리액션 관리
 - 사용자는 같은 방에 있는 모든 사용자에게 전송 가능
