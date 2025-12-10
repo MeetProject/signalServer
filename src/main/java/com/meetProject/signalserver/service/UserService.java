@@ -17,10 +17,6 @@ public class UserService {
         users.remove(id);
     }
 
-    public boolean exists(String id) {
-        return users.containsKey(id);
-    }
-
     public User getUser(String id) {
         return users.get(id);
     }

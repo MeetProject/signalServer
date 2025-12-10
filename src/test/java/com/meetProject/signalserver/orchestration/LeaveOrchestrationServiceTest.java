@@ -10,6 +10,7 @@ import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.WebSocketUserService;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +29,8 @@ public class LeaveOrchestrationServiceTest {
         userService = new UserService();
         RoomsService roomService = new RoomsService();
         screenSharingService = new ScreenSharingService();
-        SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate,
-                screenSharingService, userService);
+        WebSocketUserService webSocketUserService = new WebSocketUserService();
+        SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate, webSocketUserService);
         leaveService = new LeaveOrchestrationService(userService, roomService, screenSharingService,
                 signalMessagingService);
 

@@ -1,6 +1,8 @@
 package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.constant.Emoji;
+import com.meetProject.signalserver.constant.ErrorCode;
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.MediaOption;
 import com.meetProject.signalserver.model.User;
@@ -25,14 +27,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SignalMessagingService {
     private final SimpMessagingTemplate messagingTemplate;
-    private final ScreenSharingService screenSharingService;
-    private final UserService userService;
+    private final WebSocketUserService webSocketUserService;
 
-    public SignalMessagingService(SimpMessagingTemplate messagingTemplate, ScreenSharingService screenSharingService,
-                                  UserService userService) {
+    public SignalMessagingService(SimpMessagingTemplate messagingTemplate, WebSocketUserService webSocketUserService) {
         this.messagingTemplate = messagingTemplate;
-        this.screenSharingService = screenSharingService;
-        this.userService = userService;
+        this.webSocketUserService = webSocketUserService;
     }
 
     public void sendJoin(String userId, String roomId, List<User> users, MediaOption mediaOption) {
@@ -43,18 +42,19 @@ public class SignalMessagingService {
         sendTopic(roomId, participantResponse);
     }
 
-    public void sendOffer(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, MediaOption mediaOption) {
-        User user = userService.getUser(fromUserId);
-        boolean isScreenSender = screenSharingService.isSharing(fromUserId, user.roomId());
-        OfferResponse response = new OfferResponse(fromUserId, user, fromUserSDP, streamType, isScreenSender, mediaOption);
-        sendSignal(toUserId, response);
+    public void sendOffer(String userId, String roomId, String sdp) {
+        if(!webSocketUserService.isUserConnected("mediaServer")) {
+            ErrorResponse errorResponse = new ErrorResponse(ErrorCode.E002, ErrorMessage.NOT_CONNECT_MEDIA_SERVER);
+            sendError(userId, errorResponse);
+            return;
+        }
+        OfferResponse response = new OfferResponse(userId, roomId, sdp);
+        sendSignal("mediaServer", response);
     }
 
-    public void sendAnswer(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, MediaOption mediaOption) {
-        User user = userService.getUser(toUserId);
-        boolean isScreenSender = screenSharingService.isSharing(toUserId, user.roomId());
-        AnswerResponse answerResponse = new AnswerResponse(fromUserId, fromUserSDP, streamType, isScreenSender, mediaOption);
-        sendSignal(toUserId, answerResponse);
+    public void sendAnswer(String userId, String sdp) {
+        AnswerResponse answerResponse = new AnswerResponse(sdp);
+        sendSignal(userId, answerResponse);
     }
 
     public void sendICE(String toUserId, String fromUserId, String fromUserICE, StreamType streamType) {

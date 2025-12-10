@@ -11,4 +11,6 @@ public class ErrorMessage {
 
     public static final String ROOM_ALREADY_SCREEN_SHARING = "이미 화면 공유 중 입니다.";
     public static final String NOT_SCREEN_SHARING = "화면 공유 상태가 아닙니다.";
+
+    public static final String NOT_CONNECT_MEDIA_SERVER = "미디어 서버가 닫혀서 연결할 수 없습니다.";
 }

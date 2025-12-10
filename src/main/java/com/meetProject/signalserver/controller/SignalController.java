@@ -1,9 +1,10 @@
 package com.meetProject.signalserver.controller;
 
+import com.meetProject.signalserver.model.dto.AnswerPayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
-import com.meetProject.signalserver.model.dto.SDPPayload;
+import com.meetProject.signalserver.model.dto.OfferPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
@@ -37,15 +38,14 @@ public class SignalController {
     }
 
     @MessageMapping("/signal/offer")
-    public void offer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
-        String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendOffer(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), sdpPayload.mediaOption());
+    public void offer(@Payload OfferPayload offerPayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        signalMessagingService.sendOffer(userId, offerPayload.roomId(), offerPayload.sdp());
     }
 
     @MessageMapping("/signal/answer")
-    public void answer(@Payload SDPPayload sdpPayload, SimpMessageHeaderAccessor header) {
-        String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendAnswer(sdpPayload.toUserId(), fromUserId, sdpPayload.fromUserSDP(), sdpPayload.streamType(), sdpPayload.mediaOption());
+    public void answer(@Payload AnswerPayload answerPayload, SimpMessageHeaderAccessor header) {
+        signalMessagingService.sendAnswer(answerPayload.userId(), answerPayload.sdp());
     }
 
     @MessageMapping("/signal/ice")
