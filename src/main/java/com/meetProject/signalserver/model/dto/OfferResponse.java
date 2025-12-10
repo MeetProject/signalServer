@@ -6,7 +6,7 @@ public record OfferResponse(String userId, String roomId, String sdp) implements
     private final static SignalType type = SignalType.OFFER;
 
     @Override
-    public SignalType getType() {
+    public SignalType getSignalType() {
         return type;
     }
 }

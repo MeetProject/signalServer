@@ -2,7 +2,6 @@ package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.model.dto.AnswerPayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
-import com.meetProject.signalserver.model.dto.LeavePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
 import com.meetProject.signalserver.model.dto.OfferPayload;
 import com.meetProject.signalserver.model.dto.ScreenPayload;
@@ -55,9 +54,9 @@ public class SignalController {
     }
 
     @MessageMapping("/signal/leave")
-    public void leave(@Payload LeavePayload leavePayload, SimpMessageHeaderAccessor header) {
+    public void leave(SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        leaveService.leaveUser(userId, leavePayload.streamType());
+        leaveService.leaveUser(userId);
     }
 
     @MessageMapping("/signal/screen")

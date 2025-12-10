@@ -13,7 +13,7 @@ public record HandUpResponse (String userId, boolean value) implements TopicResp
         return id;
     }
     @Override
-    public TopicType getType() {
+    public TopicType getTopicType() {
         return type;
     }
 }

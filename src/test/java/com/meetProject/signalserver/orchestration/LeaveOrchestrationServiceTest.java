@@ -31,8 +31,7 @@ public class LeaveOrchestrationServiceTest {
         screenSharingService = new ScreenSharingService();
         WebSocketUserService webSocketUserService = new WebSocketUserService();
         SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate, webSocketUserService);
-        leaveService = new LeaveOrchestrationService(userService, roomService, screenSharingService,
-                signalMessagingService);
+        leaveService = new LeaveOrchestrationService(userService, roomService, signalMessagingService);
 
         User user = new User("user1Id", "#000000", "user1", "room1", false);
         userService.addUser(user);
@@ -44,7 +43,7 @@ public class LeaveOrchestrationServiceTest {
     @Test
     @DisplayName("화면 공유 안한 사용자 나가기 테스트")
     void leaveUserWithNoneScreenShare() {
-        leaveService.leaveUser("user1Id", StreamType.USER);
+        leaveService.leaveUser("user1Id");
         assertThat(userService.getUser("user1Id").roomId()).isNull();
     }
 
@@ -52,7 +51,7 @@ public class LeaveOrchestrationServiceTest {
     @DisplayName("화면 공유 사용자 나가기 테스트")
     void leaveUserWithScreenShare() {
         screenSharingService.startSharing("room1", "user1Id");
-        leaveService.leaveUser("user1Id", StreamType.USER);
+        leaveService.leaveUser("user1Id");
 
         assertThat(userService.getUser("user1Id").roomId()).isNull();
         assertThat(screenSharingService.isSharing("room1", "user1Id")).isEqualTo(false);

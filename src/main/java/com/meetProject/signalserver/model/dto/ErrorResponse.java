@@ -7,7 +7,7 @@ public record ErrorResponse(ErrorCode code, String message) implements SignalRes
     private final static SignalType TYPE = SignalType.ERROR;
 
     @Override
-    public SignalType getType() {
+    public SignalType getSignalType() {
         return TYPE;
     }
 }

@@ -12,7 +12,7 @@ public record ChatResponse(String userId, String message, long timestamp) implem
         return id;
     }
     @Override
-    public TopicType getType() {
+    public TopicType getTopicType() {
         return type;
     }
 }

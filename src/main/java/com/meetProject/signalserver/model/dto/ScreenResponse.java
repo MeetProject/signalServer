@@ -7,7 +7,7 @@ public record ScreenResponse(String screenId, List<String> participants ) implem
     private final static SignalType TYPE = SignalType.SCREEN;
 
     @Override
-    public SignalType getType() {
+    public SignalType getSignalType() {
         return TYPE;
     }
 }

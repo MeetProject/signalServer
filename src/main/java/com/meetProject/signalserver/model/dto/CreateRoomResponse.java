@@ -6,7 +6,7 @@ public record CreateRoomResponse(String roomId) implements SignalResponse {
     private final static SignalType TYPE = SignalType.CREATE;
 
     @Override
-    public SignalType getType() {
+    public SignalType getSignalType() {
         return TYPE;
     }
 }

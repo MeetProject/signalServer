@@ -14,7 +14,7 @@ public record DeviceResponse(String userId, MediaOption mediaOption) implements 
     }
 
     @Override
-    public TopicType getType() {
+    public TopicType getTopicType() {
         return type;
     }
 }

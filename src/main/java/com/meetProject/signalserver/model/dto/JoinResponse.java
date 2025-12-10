@@ -8,7 +8,7 @@ public record JoinResponse(String roomId, List<User> participants) implements Si
     private final static SignalType TYPE = SignalType.JOIN;
 
     @Override
-    public SignalType getType() {
+    public SignalType getSignalType() {
         return TYPE;
     }
 }

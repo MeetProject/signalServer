@@ -12,7 +12,7 @@ public record ParticipantResponse(String userId, MediaOption mediaOption) implem
         return id;
     }
 
-    public TopicType getType() {
+    public TopicType getTopicType() {
         return type;
     }
 }

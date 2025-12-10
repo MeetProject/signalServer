@@ -7,7 +7,7 @@ public record IceResponse (String userId, String ice) implements SignalResponse 
     private final static SignalType TYPE = SignalType.ICE;
 
     @Override
-    public SignalType getType() {
+    public SignalType getSignalType() {
         return TYPE;
     }
 }

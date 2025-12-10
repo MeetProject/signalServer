@@ -13,7 +13,7 @@ public record EmojiResponse(String userId, Emoji emoji, long timestamp) implemen
         return id;
     }
     @Override
-    public TopicType getType() {
+    public TopicType getTopicType() {
         return type;
     }
 }

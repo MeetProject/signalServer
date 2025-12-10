@@ -3,7 +3,6 @@ package com.meetProject.signalserver.service;
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.MediaOption;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ChatResponse;
@@ -69,9 +68,10 @@ public class SignalMessagingService {
         sendSignal("mediaServer", iceResponse);
     }
 
-    public void sendLeave(String roomId, String userId, StreamType type) {
-        LeaveResponse response = new LeaveResponse(userId, type);
+    public void sendLeave(String userId, String roomId) {
+        LeaveResponse response = new LeaveResponse(userId);
         sendTopic(roomId, response);
+        sendSignal("mediaServer", response);
     }
 
     public void shareScreen(String userId, ScreenResponse screenResponse) {
@@ -105,11 +105,11 @@ public class SignalMessagingService {
     }
 
     private void sendSignal(String userId, SignalResponse payload) {
-        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/" + payload.getType().name().toLowerCase(), payload);
+        messagingTemplate.convertAndSendToUser(userId, "/queue/signal/" + payload.getSignalType().name().toLowerCase(), payload);
     }
 
     private void sendTopic(String roomId, TopicResponse payload) {
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + payload.getType().name().toLowerCase(), payload);
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + payload.getTopicType().name().toLowerCase(), payload);
     }
 
 }
