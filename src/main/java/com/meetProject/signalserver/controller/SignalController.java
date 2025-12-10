@@ -33,7 +33,7 @@ public class SignalController {
     @MessageMapping("/signal/join")
     public void join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        joinService.joinRoom(userId, joinPayload.roomId());
+        joinService.joinRoom(userId, joinPayload.roomId(), joinPayload.mediaOption());
     }
 
     @MessageMapping("/signal/offer")

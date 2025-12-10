@@ -1,3 +1,5 @@
 package com.meetProject.signalserver.model.dto;
 
-public record JoinPayload(String roomId) {}
+import com.meetProject.signalserver.model.MediaOption;
+
+public record JoinPayload(String roomId, MediaOption mediaOption) {}

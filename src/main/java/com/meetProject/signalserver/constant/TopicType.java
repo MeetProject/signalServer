@@ -6,4 +6,5 @@ public enum TopicType {
     EMOJI,
     DEVICE,
     HANDUP,
+    PARTICIPANT,
 }

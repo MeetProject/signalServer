@@ -14,9 +14,11 @@ import com.meetProject.signalserver.model.dto.JoinResponse;
 import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.AnswerResponse;
 import com.meetProject.signalserver.model.dto.OfferResponse;
+import com.meetProject.signalserver.model.dto.ParticipantResponse;
 import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.model.dto.SignalResponse;
 import com.meetProject.signalserver.model.dto.TopicResponse;
+import java.util.List;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +35,12 @@ public class SignalMessagingService {
         this.userService = userService;
     }
 
-    public void sendJoin(String userId, JoinResponse joinResponse) {
+    public void sendJoin(String userId, String roomId, List<User> users, MediaOption mediaOption) {
+        JoinResponse joinResponse = new JoinResponse(roomId, users);
         sendSignal(userId, joinResponse);
+
+        ParticipantResponse participantResponse = new ParticipantResponse(userId, mediaOption);
+        sendTopic(roomId, participantResponse);
     }
 
     public void sendOffer(String toUserId, String fromUserId, String fromUserSDP, StreamType streamType, MediaOption mediaOption) {
