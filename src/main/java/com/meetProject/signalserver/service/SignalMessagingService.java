@@ -57,9 +57,16 @@ public class SignalMessagingService {
         sendSignal(userId, answerResponse);
     }
 
-    public void sendICE(String toUserId, String fromUserId, String fromUserICE, StreamType streamType) {
-        IceResponse iceResponse = new IceResponse(fromUserId, fromUserICE, streamType);
-        sendSignal(toUserId, iceResponse);
+    public void sendICE(String userId, String targetId, String ice) {
+
+        if(userId.equals("mediaServer")) {
+            IceResponse iceResponse = new IceResponse(null, ice);
+            sendSignal(targetId, iceResponse);
+            return;
+        }
+
+        IceResponse iceResponse = new IceResponse(targetId, ice);
+        sendSignal("mediaServer", iceResponse);
     }
 
     public void sendLeave(String roomId, String userId, StreamType type) {

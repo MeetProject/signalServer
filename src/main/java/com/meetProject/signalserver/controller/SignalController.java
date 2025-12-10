@@ -50,8 +50,8 @@ public class SignalController {
 
     @MessageMapping("/signal/ice")
     public void ice(@Payload IcePayload icePayload, SimpMessageHeaderAccessor header) {
-        String fromUserId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendICE(icePayload.toUserId(), fromUserId, icePayload.fromCandidate(), icePayload.streamType());
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        signalMessagingService.sendICE(userId, icePayload.userId(), icePayload.ice());
     }
 
     @MessageMapping("/signal/leave")
