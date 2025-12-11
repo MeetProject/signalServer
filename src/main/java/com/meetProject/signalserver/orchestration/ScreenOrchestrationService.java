@@ -21,19 +21,8 @@ public class ScreenOrchestrationService {
         this.signalMessagingService = signalMessagingService;
     }
 
-    public void shareScreen(String userId, String roomId){
-        try {
-            List<String> participants = roomsService.getParticipants(roomId).stream()
-                    .filter((participant) -> !participant.equals(userId))
-                    .toList();
-            screenSharingService.startSharing(roomId, userId);
-            ScreenResponse response = new ScreenResponse(userId, participants);
-            signalMessagingService.shareScreen(userId, response);
-        } catch(Exception e){
-            ErrorResponse response = new ErrorResponse(ErrorCode.E001, e.getMessage());
-            signalMessagingService.sendError(userId, response);
-        }
-
+    public void shareScreen(String userId, String trackId){
+            signalMessagingService.shareScreen(userId, trackId);
     }
 
 }

@@ -74,8 +74,9 @@ public class SignalMessagingService {
         sendSignal("mediaServer", response);
     }
 
-    public void shareScreen(String userId, ScreenResponse screenResponse) {
-        sendSignal(userId, screenResponse);
+    public void shareScreen(String userId, String trackId) {
+        ScreenResponse screenResponse = new ScreenResponse(userId, trackId);
+        sendSignal("mediaServer", screenResponse);
     }
 
     public void sendChat(String roomId, String userId, String message) {

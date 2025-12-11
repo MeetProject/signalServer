@@ -63,6 +63,6 @@ public class SignalController {
     @SendToUser("/queue/signal/screen")
     public void screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        screenService.shareScreen(userId, screenPayload.roomId());
+        screenService.shareScreen(userId, screenPayload.trackId());
     }
 }
