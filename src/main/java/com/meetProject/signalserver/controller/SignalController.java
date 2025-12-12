@@ -9,6 +9,7 @@ import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.orchestration.ScreenOrchestrationService;
 import com.meetProject.signalserver.service.SignalMessagingService;
+import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.util.WebSocketUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -22,12 +23,14 @@ public class SignalController {
     private final JoinOrchestrationService joinService;
     private final ScreenOrchestrationService screenService;
     private final LeaveOrchestrationService leaveService;
+    private final UserService userService;
 
-    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService,  ScreenOrchestrationService screenService) {
+    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService,  ScreenOrchestrationService screenService, UserService userService) {
         this.signalMessagingService = signalMessagingService;
         this.joinService = joinService;
         this.leaveService = leaveService;
         this.screenService = screenService;
+        this.userService = userService;
     }
 
     @MessageMapping("/signal/join")
@@ -39,12 +42,14 @@ public class SignalController {
     @MessageMapping("/signal/offer")
     public void offer(@Payload OfferPayload offerPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendOffer(userId, offerPayload.roomId(), offerPayload.sdp());
+        String roomId = userService.getRoomId(userId);
+        signalMessagingService.sendOffer(userId, offerPayload.userId(), roomId, offerPayload.sdp());
     }
 
     @MessageMapping("/signal/answer")
     public void answer(@Payload AnswerPayload answerPayload, SimpMessageHeaderAccessor header) {
-        signalMessagingService.sendAnswer(answerPayload.userId(), answerPayload.sdp());
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        signalMessagingService.sendAnswer(userId, answerPayload.userId(), answerPayload.sdp());
     }
 
     @MessageMapping("/signal/ice")

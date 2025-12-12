@@ -41,30 +41,36 @@ public class SignalMessagingService {
         sendTopic(roomId, participantResponse);
     }
 
-    public void sendOffer(String userId, String roomId, String sdp) {
+    public void sendOffer(String senderId, String targetId, String roomId, String sdp) {
         if(!webSocketUserService.isUserConnected("mediaServer")) {
             ErrorResponse errorResponse = new ErrorResponse(ErrorCode.E002, ErrorMessage.NOT_CONNECT_MEDIA_SERVER);
-            sendError(userId, errorResponse);
+            sendError(senderId, errorResponse);
             return;
         }
-        OfferResponse response = new OfferResponse(userId, roomId, sdp);
+        OfferResponse response = new OfferResponse(targetId, roomId, sdp);
+
+        if(senderId.equals("mediaServer")) {
+            sendSignal(senderId, response);
+            return;
+        }
         sendSignal("mediaServer", response);
     }
 
-    public void sendAnswer(String userId, String sdp) {
-        AnswerResponse answerResponse = new AnswerResponse(sdp);
-        sendSignal(userId, answerResponse);
+    public void sendAnswer(String senderId, String targetId, String sdp) {
+        AnswerResponse answerResponse = new AnswerResponse(targetId, sdp);
+        if(senderId.equals("mediaServer")) {
+            sendSignal(senderId, answerResponse);
+            return;
+        }
+        sendSignal("mediaServer", answerResponse);
     }
 
-    public void sendICE(String userId, String targetId, String ice) {
-
-        if(userId.equals("mediaServer")) {
-            IceResponse iceResponse = new IceResponse(null, ice);
+    public void sendICE(String senderId, String targetId, String ice) {
+        IceResponse iceResponse = new IceResponse(targetId, ice);
+        if(senderId.equals("mediaServer")) {
             sendSignal(targetId, iceResponse);
             return;
         }
-
-        IceResponse iceResponse = new IceResponse(targetId, ice);
         sendSignal("mediaServer", iceResponse);
     }
 

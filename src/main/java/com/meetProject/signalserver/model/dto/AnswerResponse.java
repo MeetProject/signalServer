@@ -2,7 +2,7 @@ package com.meetProject.signalserver.model.dto;
 
 import com.meetProject.signalserver.constant.SignalType;
 
-public record AnswerResponse(String sdp) implements SignalResponse {
+public record AnswerResponse(String userId, String sdp) implements SignalResponse {
     private final static SignalType type = SignalType.ANSWER;
     @Override
     public SignalType getSignalType() {
