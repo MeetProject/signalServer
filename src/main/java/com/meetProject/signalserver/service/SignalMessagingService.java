@@ -34,7 +34,7 @@ public class SignalMessagingService {
     }
 
     public void sendJoin(String userId, String roomId, List<User> users, MediaOption mediaOption) {
-        JoinResponse joinResponse = new JoinResponse(roomId, users);
+        JoinResponse joinResponse = new JoinResponse(userId, roomId, users);
         sendSignal(userId, joinResponse);
 
         ParticipantResponse participantResponse = new ParticipantResponse(userId, mediaOption);
@@ -50,7 +50,7 @@ public class SignalMessagingService {
         OfferResponse response = new OfferResponse(targetId, roomId, sdp);
 
         if(senderId.equals("mediaServer")) {
-            sendSignal(senderId, response);
+            sendSignal(targetId, response);
             return;
         }
         sendSignal("mediaServer", response);
@@ -59,7 +59,7 @@ public class SignalMessagingService {
     public void sendAnswer(String senderId, String targetId, String sdp) {
         AnswerResponse answerResponse = new AnswerResponse(targetId, sdp);
         if(senderId.equals("mediaServer")) {
-            sendSignal(senderId, answerResponse);
+            sendSignal(targetId, answerResponse);
             return;
         }
         sendSignal("mediaServer", answerResponse);
