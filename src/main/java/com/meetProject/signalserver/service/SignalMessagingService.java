@@ -4,6 +4,7 @@ import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.MediaOption;
+import com.meetProject.signalserver.model.TrackInfo;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.dto.ChatResponse;
 import com.meetProject.signalserver.model.dto.DeviceResponse;
@@ -16,10 +17,11 @@ import com.meetProject.signalserver.model.dto.LeaveResponse;
 import com.meetProject.signalserver.model.dto.AnswerResponse;
 import com.meetProject.signalserver.model.dto.OfferResponse;
 import com.meetProject.signalserver.model.dto.ParticipantResponse;
-import com.meetProject.signalserver.model.dto.ScreenResponse;
 import com.meetProject.signalserver.model.dto.SignalResponse;
 import com.meetProject.signalserver.model.dto.TopicResponse;
+import com.meetProject.signalserver.model.dto.TrackResponse;
 import java.util.List;
+import java.util.Map;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -42,47 +44,39 @@ public class SignalMessagingService {
     }
 
     public void sendOffer(String senderId, String targetId, String roomId, String sdp) {
-        if(!webSocketUserService.isUserConnected("mediaServer")) {
-            ErrorResponse errorResponse = new ErrorResponse(ErrorCode.E002, ErrorMessage.NOT_CONNECT_MEDIA_SERVER);
-            sendError(senderId, errorResponse);
-            return;
-        }
-        OfferResponse response = new OfferResponse(targetId, roomId, sdp);
-
-        if(senderId.equals("mediaServer")) {
-            sendSignal(targetId, response);
-            return;
-        }
-        sendSignal("mediaServer", response);
+        withMediaServerConnected(senderId, () -> {
+            OfferResponse response = new OfferResponse(targetId, roomId, sdp);
+            sendSignalConsideringSender(senderId, targetId, response);
+        });
     }
 
     public void sendAnswer(String senderId, String targetId, String sdp) {
-        AnswerResponse answerResponse = new AnswerResponse(targetId, sdp);
-        if(senderId.equals("mediaServer")) {
-            sendSignal(targetId, answerResponse);
-            return;
-        }
-        sendSignal("mediaServer", answerResponse);
+        withMediaServerConnected(senderId, () -> {
+            AnswerResponse answerResponse = new AnswerResponse(targetId, sdp);
+            sendSignalConsideringSender(senderId, targetId, answerResponse);
+        });
     }
 
     public void sendICE(String senderId, String targetId, String ice) {
-        IceResponse iceResponse = new IceResponse(targetId, ice);
-        if(senderId.equals("mediaServer")) {
-            sendSignal(targetId, iceResponse);
-            return;
-        }
-        sendSignal("mediaServer", iceResponse);
+        withMediaServerConnected(senderId, () -> {
+            IceResponse iceResponse = new IceResponse(targetId, ice);
+            sendSignalConsideringSender(senderId, targetId, iceResponse);
+        });
+    }
+
+    public void sendTrack(String senderId, String userId, String roomId, Map<String, TrackInfo> trackInfo) {
+        withMediaServerConnected(senderId, () -> {
+            TrackResponse trackResponse = new TrackResponse(userId, roomId, trackInfo);
+            sendSignalConsideringSender(senderId, userId, trackResponse);
+        });
     }
 
     public void sendLeave(String userId, String roomId) {
-        LeaveResponse response = new LeaveResponse(userId);
-        sendTopic(roomId, response);
-        sendSignal("mediaServer", response);
-    }
-
-    public void shareScreen(String userId, String trackId) {
-        ScreenResponse screenResponse = new ScreenResponse(userId, trackId);
-        sendSignal("mediaServer", screenResponse);
+        withMediaServerConnected(userId, () -> {
+            LeaveResponse response = new LeaveResponse(userId);
+            sendTopic(roomId, response);
+            sendSignal("mediaServer", response);
+        });
     }
 
     public void sendChat(String roomId, String userId, String message) {
@@ -119,4 +113,23 @@ public class SignalMessagingService {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + payload.getTopicType().name().toLowerCase(), payload);
     }
 
+    private void withMediaServerConnected(String senderId, Runnable action) {
+        if (!webSocketUserService.isUserConnected("mediaServer")) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    ErrorCode.E002,
+                    ErrorMessage.NOT_CONNECT_MEDIA_SERVER
+            );
+            sendError(senderId, errorResponse);
+            return;
+        }
+        action.run();
+    }
+
+    private void sendSignalConsideringSender(String senderId, String targetId, SignalResponse response) {
+        if ("mediaServer".equals(senderId)) {
+            sendSignal(targetId, response);
+            return;
+        }
+        sendSignal("mediaServer", response);
+    }
 }

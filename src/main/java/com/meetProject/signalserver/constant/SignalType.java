@@ -6,7 +6,7 @@ public enum SignalType {
     ANSWER,
     OFFER,
     ICE,
-    SCREEN,
+    TRACK,
     ERROR,
     LEAVE,
 }

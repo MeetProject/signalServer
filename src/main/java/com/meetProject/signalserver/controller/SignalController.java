@@ -4,7 +4,7 @@ import com.meetProject.signalserver.model.dto.AnswerPayload;
 import com.meetProject.signalserver.model.dto.IcePayload;
 import com.meetProject.signalserver.model.dto.JoinPayload;
 import com.meetProject.signalserver.model.dto.OfferPayload;
-import com.meetProject.signalserver.model.dto.ScreenPayload;
+import com.meetProject.signalserver.model.dto.TrackPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.orchestration.ScreenOrchestrationService;
@@ -64,10 +64,11 @@ public class SignalController {
         leaveService.leaveUser(userId);
     }
 
-    @MessageMapping("/signal/screen")
-    @SendToUser("/queue/signal/screen")
-    public void screen(@Payload ScreenPayload screenPayload, SimpMessageHeaderAccessor header) {
+    @MessageMapping("/signal/track")
+    public void track(@Payload TrackPayload trackPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        screenService.shareScreen(userId, screenPayload.trackId());
+        String roomId = userService.getRoomId(userId);
+        signalMessagingService.sendTrack(userId, trackPayload.userId(), roomId, trackPayload.track());
     }
+
 }
