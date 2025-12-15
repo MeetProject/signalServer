@@ -41,15 +41,20 @@ public class SignalController {
 
     @MessageMapping("/signal/offer")
     public void offer(@Payload OfferPayload offerPayload, SimpMessageHeaderAccessor header) {
+        System.out.println("offer");
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = userService.getRoomId(userId);
+        System.out.println();
+        System.out.println("offer 받음"+userId);
+        System.out.println();
         signalMessagingService.sendOffer(userId, offerPayload.userId(), roomId, offerPayload.sdp());
     }
 
     @MessageMapping("/signal/answer")
     public void answer(@Payload AnswerPayload answerPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendAnswer(userId, answerPayload.userId(), answerPayload.sdp());
+        String roomId = userService.getRoomId(userId);
+        signalMessagingService.sendAnswer(userId, answerPayload.userId(), answerPayload.sdp(), roomId);
     }
 
     @MessageMapping("/signal/ice")
@@ -68,7 +73,7 @@ public class SignalController {
     public void track(@Payload TrackPayload trackPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = userService.getRoomId(userId);
-        signalMessagingService.sendTrack(userId, trackPayload.userId(), roomId, trackPayload.track());
+        signalMessagingService.sendTrack(userId, trackPayload.userId(), roomId, trackPayload.transceiver());
     }
 
 }

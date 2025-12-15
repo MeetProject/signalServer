@@ -25,7 +25,8 @@ public class JoinOrchestrationService {
 
     public void joinRoom(String userId, String roomId, MediaOption mediaOption) {
         try {
-            if(userService.getUser(userId) == null){
+            User user = userService.getUser(userId);
+            if(user == null){
                 throw new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND);
             }
 
@@ -36,7 +37,7 @@ public class JoinOrchestrationService {
                     .toList();
 
             roomsService.addParticipant(roomId, userId);
-            signalMessagingService.sendJoin(userId, roomId, participants, mediaOption);
+            signalMessagingService.sendJoin(userId, roomId, user, participants, mediaOption);
 
         } catch(Exception e){
             ErrorResponse response = new ErrorResponse(ErrorCode.E001, e.getMessage());

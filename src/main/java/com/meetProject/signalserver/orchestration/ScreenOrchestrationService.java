@@ -16,9 +16,4 @@ public class ScreenOrchestrationService {
         this.screenSharingService = screenSharingService;
         this.signalMessagingService = signalMessagingService;
     }
-
-    public void shareScreen(String userId, String trackId){
-            signalMessagingService.shareScreen(userId, trackId);
-    }
-
 }

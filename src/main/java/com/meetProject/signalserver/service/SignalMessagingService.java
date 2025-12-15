@@ -35,11 +35,11 @@ public class SignalMessagingService {
         this.webSocketUserService = webSocketUserService;
     }
 
-    public void sendJoin(String userId, String roomId, List<User> users, MediaOption mediaOption) {
+    public void sendJoin(String userId, String roomId, User user, List<User> users, MediaOption mediaOption) {
         JoinResponse joinResponse = new JoinResponse(userId, roomId, users);
         sendSignal(userId, joinResponse);
 
-        ParticipantResponse participantResponse = new ParticipantResponse(userId, mediaOption);
+        ParticipantResponse participantResponse = new ParticipantResponse(userId, user, mediaOption);
         sendTopic(roomId, participantResponse);
     }
 
@@ -50,9 +50,9 @@ public class SignalMessagingService {
         });
     }
 
-    public void sendAnswer(String senderId, String targetId, String sdp) {
+    public void sendAnswer(String senderId, String targetId, String sdp, String roomId) {
         withMediaServerConnected(senderId, () -> {
-            AnswerResponse answerResponse = new AnswerResponse(targetId, sdp);
+            AnswerResponse answerResponse = new AnswerResponse(targetId, sdp, roomId);
             sendSignalConsideringSender(senderId, targetId, answerResponse);
         });
     }
@@ -126,7 +126,7 @@ public class SignalMessagingService {
     }
 
     private void sendSignalConsideringSender(String senderId, String targetId, SignalResponse response) {
-        if ("mediaServer".equals(senderId)) {
+        if (senderId.equals("mediaServer")) {
             sendSignal(targetId, response);
             return;
         }
