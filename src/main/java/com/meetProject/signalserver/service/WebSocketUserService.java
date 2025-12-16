@@ -1,16 +1,30 @@
 package com.meetProject.signalserver.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 @Service
 public class WebSocketUserService {
 
-    @Autowired
-    private SimpUserRegistry userRegistry;
+    // userId -> WebSocketSession
+    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+
+    public void registerUser(String userId, WebSocketSession session) {
+        sessions.put(userId, session);
+    }
+
+    public void unregisterUser(String userId) {
+        sessions.remove(userId);
+    }
 
     public boolean isUserConnected(String userId) {
-        return userRegistry.getUser(userId) != null;
+        return sessions.containsKey(userId);
+    }
+
+    public WebSocketSession getSession(String userId) {
+        return sessions.get(userId);
     }
 }

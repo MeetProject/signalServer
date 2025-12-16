@@ -30,6 +30,8 @@ public class JoinOrchestrationService {
                 throw new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND);
             }
 
+            System.out.println(roomId + ": " + userId);
+
             userService.updateRoomStatus(userId, roomId);
 
             List<User> participants = roomsService.getParticipants(roomId).stream()
