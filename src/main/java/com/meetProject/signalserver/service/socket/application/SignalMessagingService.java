@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.service;
+package com.meetProject.signalserver.service.socket.application;
 
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.ErrorCode;
@@ -22,6 +22,9 @@ import com.meetProject.signalserver.model.socket.signal.OfferResponse;
 import com.meetProject.signalserver.model.socket.ParticipantResponse;
 import com.meetProject.signalserver.model.envelop.SignalEnvelope;
 import com.meetProject.signalserver.model.envelop.TopicEnvelope;
+import com.meetProject.signalserver.service.domain.UserService;
+import com.meetProject.signalserver.service.socket.infrastructure.SignallingSessionService;
+import com.meetProject.signalserver.service.socket.infrastructure.WebSocketUserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -39,20 +42,21 @@ public class SignalMessagingService {
         this.userService = userService;
     }
 
-    public void sendJoin(String userId, String roomId, User user, List<User> users, MediaOption mediaOption)
+    public void sendJoin(String userId, String roomId, List<User> users)
             throws IOException {
 
         checkMediaServerConnected(userId);
         JoinResponse joinResponse = new JoinResponse(userId, roomId, users);
         SignalEnvelope<JoinResponse> payload = new SignalEnvelope<>(SignalType.JOIN, joinResponse);
         sendSignal(userId, payload);
+    }
 
-        ParticipantResponse participantResponse = new ParticipantResponse(userId, roomId, user, mediaOption);
-        TopicEnvelope<ParticipantResponse> topicPayload = new TopicEnvelope<>(TopicType.PARTICIPANT, participantResponse);
+    public void sendParticipant(String userId, String roomId, User user, MediaOption mediaOption)
+            throws IOException {
+        ParticipantResponse response = new ParticipantResponse(userId, roomId, user, mediaOption);
+
+        TopicEnvelope<ParticipantResponse> topicPayload = new TopicEnvelope<>(TopicType.PARTICIPANT, response);
         sendTopic(userId, roomId, topicPayload);
-
-        SignalEnvelope<ParticipantResponse> participantPayload = new SignalEnvelope<>(SignalType.PARTICIPANT, participantResponse);
-        sendSignal(userId, participantPayload);
     }
 
     public void sendOffer(String targetId, String sdp, Map<String,TrackInfo> trackInfo) throws IOException {

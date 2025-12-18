@@ -5,7 +5,7 @@ import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.socket.topic.CreateRoomResponse;
 import com.meetProject.signalserver.model.rest.ValidateRoomResponse;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.service.RoomsService;
+import com.meetProject.signalserver.service.domain.RoomsService;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 import java.util.Collections;
 import org.springframework.web.bind.annotation.GetMapping;

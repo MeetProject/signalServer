@@ -7,7 +7,7 @@ import com.meetProject.signalserver.model.socket.signal.JoinPayload;
 import com.meetProject.signalserver.model.socket.signal.OfferPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.service.SignalMessagingService;
+import com.meetProject.signalserver.service.socket.application.SignalMessagingService;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
 

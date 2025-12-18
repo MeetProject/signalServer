@@ -1,7 +1,7 @@
 package com.meetProject.signalserver.listener;
 
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.domain.UserService;
 import com.meetProject.signalserver.util.WebSocketUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

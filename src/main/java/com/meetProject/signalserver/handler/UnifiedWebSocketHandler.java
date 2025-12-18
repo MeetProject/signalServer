@@ -2,8 +2,8 @@ package com.meetProject.signalserver.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.meetProject.signalserver.service.SignallingSessionService;
-import com.meetProject.signalserver.service.WebSocketUserService;
+import com.meetProject.signalserver.service.socket.infrastructure.SignallingSessionService;
+import com.meetProject.signalserver.service.socket.infrastructure.WebSocketUserService;
 import java.io.IOException;
 import java.util.Map;
 import org.springframework.lang.NonNull;

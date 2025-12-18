@@ -3,7 +3,7 @@ package com.meetProject.signalserver.listener;
 import static org.mockito.Mockito.*;
 
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.domain.UserService;
 import com.meetProject.signalserver.util.WebSocketUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

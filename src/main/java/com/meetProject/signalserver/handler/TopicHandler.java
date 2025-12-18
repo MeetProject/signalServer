@@ -6,8 +6,8 @@ import com.meetProject.signalserver.model.socket.topic.ChatPayload;
 import com.meetProject.signalserver.model.socket.topic.DevicePayload;
 import com.meetProject.signalserver.model.socket.topic.EmojiPayload;
 import com.meetProject.signalserver.model.socket.topic.HandUpPayload;
-import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.SignalMessagingService;
+import com.meetProject.signalserver.service.domain.RoomsService;
+import com.meetProject.signalserver.service.socket.application.SignalMessagingService;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
 

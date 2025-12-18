@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.service;
+package com.meetProject.signalserver.service.socket.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

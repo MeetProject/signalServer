@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.service;
+package com.meetProject.signalserver.service.domain;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.Room;

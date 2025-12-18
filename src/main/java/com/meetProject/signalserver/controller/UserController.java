@@ -3,7 +3,7 @@ package com.meetProject.signalserver.controller;
 import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.model.rest.RegisterPayload;
 import com.meetProject.signalserver.model.rest.RegisterResponse;
-import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.domain.UserService;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

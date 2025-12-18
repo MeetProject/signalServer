@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.model.Room;
+import com.meetProject.signalserver.service.domain.RoomsService;
 import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.*;
 
