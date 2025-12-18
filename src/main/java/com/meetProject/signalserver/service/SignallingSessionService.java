@@ -12,6 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
 public class SignallingSessionService {
     private final ConcurrentMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Object sendLock = new Object();
 
     public void addSession(String userId, WebSocketSession session) {
         sessions.put(userId, session);
@@ -25,25 +26,27 @@ public class SignallingSessionService {
         return sessions.get(userId);
     }
 
-    private void send(WebSocketSession session, Object payload) {
-        if(session == null || !session.isOpen()) {
-            return;
-        }
+    private void send(WebSocketSession session, Object payload) throws IOException {
+        synchronized (sendLock) {
+            if(session == null || !session.isOpen()) {
+                return;
+            }
 
-        try {
-            byte[] bytes = objectMapper.writeValueAsBytes(payload);
-            session.sendMessage(new BinaryMessage(bytes, true));
-        } catch (IOException e) {
-            System.err.println("Failed to send message to session " + session.getId() + ": " + e.getMessage());
+            try {
+                byte[] bytes = objectMapper.writeValueAsBytes(payload);
+                session.sendMessage(new BinaryMessage(bytes, true));
+            } catch (IOException e) {
+                System.err.println("Failed to send message to session " + session.getId() + ": " + e.getMessage());
+            }
         }
     }
 
-    public void sendToUser(String userId, Object payload) {
+    public void sendToUser(String userId, Object payload) throws IOException {
         WebSocketSession session = getSession(userId);
         send(session, payload);
     }
 
-    public void sendToRoom(String userId, String roomId, Object payload) {
+    public void sendToRoom(String userId, String roomId, Object payload) throws IOException {
         for(WebSocketSession session : sessions.values()) {
             Object attr = session.getAttributes().get("userId");
             if (!(attr instanceof String participantId)) {

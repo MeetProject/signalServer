@@ -4,10 +4,11 @@ import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.MediaOption;
 import com.meetProject.signalserver.model.User;
-import com.meetProject.signalserver.model.dto.ErrorResponse;
+import com.meetProject.signalserver.model.socket.signal.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
+import java.io.IOException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class JoinOrchestrationService {
         this.signalMessagingService = signalMessagingService;
     }
 
-    public void joinRoom(String userId, String roomId, MediaOption mediaOption) {
+    public void joinRoom(String userId, String roomId, MediaOption mediaOption) throws IOException {
         try {
             User user = userService.getUser(userId);
             if(user == null){

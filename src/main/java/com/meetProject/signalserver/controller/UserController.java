@@ -1,8 +1,8 @@
 package com.meetProject.signalserver.controller;
 
 import com.meetProject.signalserver.model.User;
-import com.meetProject.signalserver.model.dto.RegisterPayload;
-import com.meetProject.signalserver.model.dto.RegisterResponse;
+import com.meetProject.signalserver.model.rest.RegisterPayload;
+import com.meetProject.signalserver.model.rest.RegisterResponse;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 import org.springframework.http.ResponseEntity;

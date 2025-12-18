@@ -1,12 +1,12 @@
 package com.meetProject.signalserver.constant;
 
 public enum SignalType {
-    CREATE,
+    PARTICIPANT,
     JOIN,
     ANSWER,
     OFFER,
     ICE,
-    TRACK,
+    NEGOTIATION,
     ERROR,
     LEAVE,
 }
