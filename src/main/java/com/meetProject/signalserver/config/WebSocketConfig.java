@@ -1,44 +1,27 @@
 package com.meetProject.signalserver.config;
 
-import com.meetProject.signalserver.handler.UnifiedWebSocketHandler;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
-import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final UnifiedWebSocketHandler unifiedWebSocketHandler;
-    private final UserIdHandshakeHandler userIdHandshakeHandler;
-
-    @Autowired
-    public WebSocketConfig(UnifiedWebSocketHandler unifiedWebSocketHandler, UserIdHandshakeHandler userIdHandshakeHandler) {
-        this.unifiedWebSocketHandler = unifiedWebSocketHandler;
-        this.userIdHandshakeHandler = userIdHandshakeHandler;
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setHandshakeHandler(new UserIdHandshakeHandler())
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(unifiedWebSocketHandler, "/ws")
-                .setHandshakeHandler(userIdHandshakeHandler)
-                .setAllowedOriginPatterns("*");
-
-    }
-
-    @Bean
-    public ServletServerContainerFactoryBean createWebSocketContainer() {
-        ServletServerContainerFactoryBean container =
-                new ServletServerContainerFactoryBean();
-
-        container.setMaxTextMessageBufferSize(1024 * 1024 * 100);
-        container.setMaxBinaryMessageBufferSize(1024 * 1024 * 100);
-
-        return container;
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/topic", "/queue");
+        registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
     }
 }

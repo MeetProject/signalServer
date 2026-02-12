@@ -2,11 +2,11 @@ package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.socket.signal.ErrorResponse;
-import com.meetProject.signalserver.service.domain.RoomsService;
-import com.meetProject.signalserver.service.socket.application.SignalMessagingService;
-import com.meetProject.signalserver.service.domain.UserService;
-import java.io.IOException;
+import com.meetProject.signalserver.constant.StreamType;
+import com.meetProject.signalserver.model.dto.ErrorResponse;
+import com.meetProject.signalserver.service.RoomsService;
+import com.meetProject.signalserver.service.SignalMessagingService;
+import com.meetProject.signalserver.service.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +21,7 @@ public class LeaveOrchestrationService {
         this.signalMessagingService = signalMessagingService;
     }
 
-    public void leaveUser(String userId) throws IOException {
+    public void leaveUser(String userId) {
         try {
             String roomId = userService.getRoomId(userId);
             if(roomId == null) {
@@ -43,7 +43,7 @@ public class LeaveOrchestrationService {
         }
     }
 
-    private void leaveUser(String userId, String roomId) throws IOException {
+    private void leaveUser(String userId, String roomId) {
         roomsService.removeParticipant(roomId, userId);
         userService.updateRoomStatus(userId, null);
         signalMessagingService.sendLeave(userId, roomId);
