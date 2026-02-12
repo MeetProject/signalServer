@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.controller;
+package com.meetProject.signalserver.controller.websocket;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.dto.ChatPayload;
