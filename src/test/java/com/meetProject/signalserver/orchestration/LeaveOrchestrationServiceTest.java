@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.Room;
-import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;

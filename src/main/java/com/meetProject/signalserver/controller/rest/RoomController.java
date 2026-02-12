@@ -2,8 +2,8 @@ package com.meetProject.signalserver.controller.rest;
 
 import com.meetProject.signalserver.constant.RoomRule;
 import com.meetProject.signalserver.model.Room;
-import com.meetProject.signalserver.model.dto.CreateRoomResponse;
-import com.meetProject.signalserver.model.dto.ValidateRoomResponse;
+import com.meetProject.signalserver.model.dto.rest.RoomSessionDto.CreateRoomResponse;
+import com.meetProject.signalserver.model.dto.rest.RoomSessionDto.ValidateRoomResponse;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.util.RandomIdGenerator;

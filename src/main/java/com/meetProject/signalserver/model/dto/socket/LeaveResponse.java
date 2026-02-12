@@ -1,7 +1,9 @@
-package com.meetProject.signalserver.model.dto;
+package com.meetProject.signalserver.model.dto.socket;
 
 import com.meetProject.signalserver.constant.SignalType;
 import com.meetProject.signalserver.constant.TopicType;
+import com.meetProject.signalserver.model.dto.common.SignalResponse;
+import com.meetProject.signalserver.model.dto.common.TopicResponse;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 
 public record LeaveResponse (String userId) implements TopicResponse, SignalResponse {

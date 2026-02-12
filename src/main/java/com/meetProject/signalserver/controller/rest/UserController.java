@@ -1,12 +1,11 @@
 package com.meetProject.signalserver.controller.rest;
 
-import com.meetProject.signalserver.model.User;
-import com.meetProject.signalserver.model.dto.RegisterPayload;
-import com.meetProject.signalserver.model.dto.RegisterResponse;
+import com.meetProject.signalserver.model.dto.common.User;
+import com.meetProject.signalserver.model.dto.rest.UserSessionDto.RegisterPayload;
+import com.meetProject.signalserver.model.dto.rest.UserSessionDto.RegisterResponse;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

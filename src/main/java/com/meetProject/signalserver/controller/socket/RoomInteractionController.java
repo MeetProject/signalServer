@@ -1,10 +1,10 @@
-package com.meetProject.signalserver.controller.websocket;
+package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.ChatPayload;
-import com.meetProject.signalserver.model.dto.DevicePayload;
-import com.meetProject.signalserver.model.dto.EmojiPayload;
-import com.meetProject.signalserver.model.dto.HandUpPayload;
+import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ChatPayload;
+import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.DevicePayload;
+import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.EmojiPayload;
+import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.HandUpPayload;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
@@ -15,12 +15,12 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class RoomReactController {
+public class RoomInteractionController {
     private final RoomsService roomsService;
     private final UserService userService;
     private final SignalMessagingService signalMessagingService;
 
-    public RoomReactController(UserService userService, RoomsService roomsService, SignalMessagingService signalMessagingService) {
+    public RoomInteractionController(UserService userService, RoomsService roomsService, SignalMessagingService signalMessagingService) {
         this.roomsService = roomsService;
         this.userService = userService;
         this.signalMessagingService = signalMessagingService;

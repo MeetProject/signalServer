@@ -1,6 +1,6 @@
 package com.meetProject.signalserver.service;
 
-import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.common.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

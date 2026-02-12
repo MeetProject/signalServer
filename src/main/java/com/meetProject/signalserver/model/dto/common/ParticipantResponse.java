@@ -1,8 +1,6 @@
-package com.meetProject.signalserver.model.dto;
+package com.meetProject.signalserver.model.dto.common;
 
 import com.meetProject.signalserver.constant.TopicType;
-import com.meetProject.signalserver.model.MediaOption;
-import com.meetProject.signalserver.model.User;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 
 public record ParticipantResponse(String userId, User user, MediaOption mediaOption) implements TopicResponse {

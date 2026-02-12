@@ -1,6 +1,6 @@
-package com.meetProject.signalserver.controller.websocket;
+package com.meetProject.signalserver.controller.socket;
 
-import com.meetProject.signalserver.model.dto.JoinPayload;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.SignalMessagingService;
@@ -12,13 +12,13 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class SignalController {
+public class RoomSessionController {
     private final SignalMessagingService signalMessagingService;
     private final JoinOrchestrationService joinService;
     private final LeaveOrchestrationService leaveService;
     private final UserService userService;
 
-    public SignalController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService, UserService userService) {
+    public RoomSessionController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService, UserService userService) {
         this.signalMessagingService = signalMessagingService;
         this.joinService = joinService;
         this.leaveService = leaveService;

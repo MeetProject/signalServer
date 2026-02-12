@@ -2,9 +2,9 @@ package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.MediaOption;
-import com.meetProject.signalserver.model.User;
-import com.meetProject.signalserver.model.dto.ErrorResponse;
+import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.User;
+import com.meetProject.signalserver.model.dto.common.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;

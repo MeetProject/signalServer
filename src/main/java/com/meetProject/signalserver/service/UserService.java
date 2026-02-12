@@ -1,6 +1,6 @@
 package com.meetProject.signalserver.service;
 
-import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.common.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
