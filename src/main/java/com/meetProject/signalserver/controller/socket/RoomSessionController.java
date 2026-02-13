@@ -28,7 +28,7 @@ public class RoomSessionController {
     @MessageMapping("/signal/join")
     public void join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        joinService.joinRoom(userId, joinPayload.roomId(), joinPayload.mediaOption());
+        joinService.joinRoom(userId, joinPayload);
     }
 
 

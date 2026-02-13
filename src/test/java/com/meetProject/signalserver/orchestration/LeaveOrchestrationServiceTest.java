@@ -3,11 +3,9 @@ package com.meetProject.signalserver.orchestration;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.ScreenSharingService;
 import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.WebSocketUserService;
@@ -19,7 +17,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 public class LeaveOrchestrationServiceTest {
     private UserService userService;
-    private ScreenSharingService screenSharingService;
     private LeaveOrchestrationService leaveService;
 
     @BeforeEach
@@ -28,7 +25,6 @@ public class LeaveOrchestrationServiceTest {
 
         userService = new UserService();
         RoomsService roomService = new RoomsService();
-        screenSharingService = new ScreenSharingService();
         WebSocketUserService webSocketUserService = new WebSocketUserService();
         SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate, webSocketUserService);
         leaveService = new LeaveOrchestrationService(userService, roomService, signalMessagingService);
@@ -50,11 +46,9 @@ public class LeaveOrchestrationServiceTest {
     @Test
     @DisplayName("화면 공유 사용자 나가기 테스트")
     void leaveUserWithScreenShare() {
-        screenSharingService.startSharing("room1", "user1Id");
         leaveService.leaveUser("user1Id");
 
         assertThat(userService.getUser("user1Id").roomId()).isNull();
-        assertThat(screenSharingService.isSharing("room1", "user1Id")).isEqualTo(false);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.meetProject.signalserver.service;
 
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.dto.common.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,8 +33,9 @@ public class UserService {
     public void updateRoomStatus(String id, String roomId) {
         User user = users.get(id);
         if(user == null){
-            return;
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND);
         }
+
         User updated = new User(user.userId(), user.userName(), user.profileColor(), roomId, user.isHandUp());
         users.put(id, updated);
     }
