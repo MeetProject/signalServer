@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.service.message;
 
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesResponse;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
 import com.meetProject.signalserver.model.dto.common.User;
@@ -30,6 +31,10 @@ public class SignalMessagingService {
     public void sendCapabilitiesToUser(CapabilitiesResponse response) {
         UserCapabilityResponse payload = new UserCapabilityResponse(response.correlationId(), response.capabilities());
         sendSignal(response.userId(), payload);
+    }
+
+    public void sendDtls(DtlsResponse response) {
+        UserDtlsResponse payload = new UserDtlsResponse(response.correlationId(), response.options(), response.direction());
     }
 
     public void sendError(String userId, ErrorResponse errorResponse) {
