@@ -28,4 +28,9 @@ public class MediaSessionController {
     public void dtlsConnect(@Payload DtlsConnectResponse dtlsConnectResponse) {
         signalMessagingService.sendDtlsConnect(dtlsConnectResponse);
     }
+
+    @MessageMapping("/media/rtls")
+    public void rtls(@Payload RtlsResponse rtlsResponse) {
+        signalMessagingService.sendRtls(rtlsResponse);
+    }
 }

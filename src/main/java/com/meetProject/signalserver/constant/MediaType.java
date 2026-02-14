@@ -4,5 +4,6 @@ public enum MediaType {
     CAPABILITIES,
     DTLS,
     DTLSCONNECT,
+    RTLS,
     PARAMS,
 }

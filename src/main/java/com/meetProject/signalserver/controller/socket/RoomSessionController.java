@@ -47,6 +47,13 @@ public class RoomSessionController {
         mediaMessagingService.sendDtlsConnect(payload);
     }
 
+    @MessageMapping("/signal/rtls")
+    public void rtls(@Payload UserRtlsPayload rtlsPayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        RtlsRequestPayload payload = new RtlsRequestPayload(rtlsPayload.correlationId(), userId, rtlsPayload.appData(), rtlsPayload.rtpParameters(), rtlsPayload.transportId());
+        mediaMessagingService.sendRtls(payload);
+    }
+
     @MessageMapping("/signal/join")
     public void join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());

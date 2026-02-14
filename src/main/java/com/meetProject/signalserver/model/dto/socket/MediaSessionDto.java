@@ -1,8 +1,10 @@
 package com.meetProject.signalserver.model.dto.socket;
 
 import com.meetProject.signalserver.constant.DtlsDirection;
+import com.meetProject.signalserver.model.dto.common.AppData;
 import com.meetProject.signalserver.model.dto.common.MediaPayload;
 import com.meetProject.signalserver.model.dto.common.RtpCapabilities;
+import com.meetProject.signalserver.model.dto.common.RtpParameters;
 import com.meetProject.signalserver.model.dto.common.TransportOptions;
 import com.meetProject.signalserver.model.dto.common.TransportOptions.DtlsParameters;
 
@@ -15,4 +17,7 @@ public class MediaSessionDto {
 
     public record DtlsConnectPayload(String correlationId, String userId, DtlsParameters dtlsParameters) implements MediaPayload {}
     public record DtlsConnectResponse(String correlationId, String UserId) {}
+
+    public record RtlsRequestPayload(String correlationId, String userId, AppData appData, RtpParameters rtpParameters, String transportId) implements MediaPayload {}
+    public record RtlsResponse(String correlationId, String userId, String producerId) {}
 }

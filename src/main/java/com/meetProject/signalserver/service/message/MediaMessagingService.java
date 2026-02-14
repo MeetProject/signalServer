@@ -5,6 +5,7 @@ import com.meetProject.signalserver.model.dto.common.MediaPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,10 @@ public class MediaMessagingService {
 
     public void sendDtlsConnect(DtlsConnectPayload payload) {
         sendMedia(MediaType.DTLSCONNECT, payload);
+    }
+
+    public void sendRtls(RtlsRequestPayload payload) {
+        sendMedia(MediaType.RTLS, payload);
     }
 
     private void sendMedia(MediaType type, MediaPayload payload) {
