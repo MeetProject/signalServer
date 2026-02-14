@@ -1,10 +1,12 @@
 package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesResponse;
-import com.meetProject.signalserver.service.SignalMessagingService;
+import com.meetProject.signalserver.service.message.SignalMessagingService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Controller;
 
+@Controller
 public class MediaSessionController {
     private final SignalMessagingService signalMessagingService;
 

@@ -5,8 +5,8 @@ import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserCapabilityPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.message.MediaMessagingService;
 import com.meetProject.signalserver.util.WebSocketUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class RoomSessionController {
-    private final SignalMessagingService signalMessagingService;
+    private final MediaMessagingService mediaMessagingService;
     private final JoinOrchestrationService joinService;
     private final LeaveOrchestrationService leaveService;
     private final UserService userService;
 
-    public RoomSessionController(SignalMessagingService signalMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService, UserService userService) {
-        this.signalMessagingService = signalMessagingService;
+    public RoomSessionController(MediaMessagingService mediaMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService, UserService userService) {
+        this.mediaMessagingService = mediaMessagingService;
         this.joinService = joinService;
         this.leaveService = leaveService;
         this.userService = userService;
@@ -31,7 +31,7 @@ public class RoomSessionController {
     public void capabilities(@Payload UserCapabilityPayload capabilityPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         CapabilitiesRequestPayload payload = new CapabilitiesRequestPayload(capabilityPayload.correlationId(),userId);
-        signalMessagingService.sendCapabilitiesToServer(payload);
+        mediaMessagingService.sendCapabilitiesToServer(payload);
     }
 
     @MessageMapping("/signal/join")

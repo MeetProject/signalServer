@@ -8,7 +8,6 @@ import com.meetProject.signalserver.model.dto.common.MediaOption;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

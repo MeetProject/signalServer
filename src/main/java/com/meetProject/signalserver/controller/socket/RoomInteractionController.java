@@ -6,8 +6,8 @@ import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.DevicePa
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.EmojiPayload;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.HandUpPayload;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.message.TopicMessagingService;
 import com.meetProject.signalserver.util.WebSocketUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -18,33 +18,33 @@ import org.springframework.stereotype.Controller;
 public class RoomInteractionController {
     private final RoomsService roomsService;
     private final UserService userService;
-    private final SignalMessagingService signalMessagingService;
+    private final TopicMessagingService topicMessagingService;
 
-    public RoomInteractionController(UserService userService, RoomsService roomsService, SignalMessagingService signalMessagingService) {
+    public RoomInteractionController(UserService userService, RoomsService roomsService, TopicMessagingService topicMessagingService) {
         this.roomsService = roomsService;
         this.userService = userService;
-        this.signalMessagingService = signalMessagingService;
+        this.topicMessagingService = topicMessagingService;
     }
 
     @MessageMapping("/chat/send")
     public void sendChat(@Payload ChatPayload chatPayload, SimpMessageHeaderAccessor header) {
         RoomValidate(chatPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendChat(chatPayload.roomId(), userId, chatPayload.message());
+        topicMessagingService.sendChat(chatPayload.roomId(), userId, chatPayload.message());
     }
 
     @MessageMapping("/emoji")
     public void sendEmoji(@Payload EmojiPayload emojiPayload, SimpMessageHeaderAccessor header) {
         RoomValidate(emojiPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendEmoji(emojiPayload.roomId(), userId, emojiPayload.emoji());
+        topicMessagingService.sendEmoji(emojiPayload.roomId(), userId, emojiPayload.emoji());
     }
 
     @MessageMapping("/device")
     public void sendDevice(@Payload DevicePayload devicePayload, SimpMessageHeaderAccessor header) {
         RoomValidate(devicePayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
-        signalMessagingService.sendDevice(devicePayload.roomId(), userId, devicePayload.mediaOption());
+        topicMessagingService.sendDevice(devicePayload.roomId(), userId, devicePayload.mediaOption());
     }
 
     @MessageMapping("/handUp")
@@ -52,7 +52,7 @@ public class RoomInteractionController {
         RoomValidate(handUpPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
         userService.updateUserHandUpStatus(userId, handUpPayload.value());
-        signalMessagingService.sendHandUp(handUpPayload.roomId(), userId, handUpPayload.value());
+        topicMessagingService.sendHandUp(handUpPayload.roomId(), userId, handUpPayload.value());
     }
 
     private void RoomValidate(String roomId) {

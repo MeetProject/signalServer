@@ -6,9 +6,8 @@ import static org.mockito.Mockito.*;
 import com.meetProject.signalserver.model.Room;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
-import com.meetProject.signalserver.service.WebSocketUserService;
+import com.meetProject.signalserver.service.message.SignalMessagingService;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,8 +24,8 @@ public class LeaveOrchestrationServiceTest {
 
         userService = new UserService();
         RoomsService roomService = new RoomsService();
-        WebSocketUserService webSocketUserService = new WebSocketUserService();
-        SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate, webSocketUserService);
+        //WebSocketUserService webSocketUserService = new WebSocketUserService();
+        SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate);
         leaveService = new LeaveOrchestrationService(userService, roomService, signalMessagingService);
 
         User user = new User("user1Id", "#000000", "user1", "room1", false);

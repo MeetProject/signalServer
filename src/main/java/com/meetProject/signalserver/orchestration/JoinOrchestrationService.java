@@ -2,13 +2,12 @@ package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.common.MediaOption;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.message.SignalMessagingService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

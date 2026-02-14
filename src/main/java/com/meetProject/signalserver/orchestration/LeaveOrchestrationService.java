@@ -4,8 +4,8 @@ import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
+import com.meetProject.signalserver.service.message.SignalMessagingService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,6 +45,6 @@ public class LeaveOrchestrationService {
     private void leaveUser(String userId, String roomId) {
         roomsService.removeParticipant(roomId, userId);
         userService.updateRoomStatus(userId, null);
-        signalMessagingService.sendLeave(userId, roomId);
+        //signalMessagingService.sendLeave(userId, roomId);
     }
 }
