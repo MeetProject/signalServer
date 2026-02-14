@@ -1,10 +1,7 @@
 package com.meetProject.signalserver.controller.socket;
 
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserCapabilityPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserDtlsPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.UserService;
@@ -41,6 +38,13 @@ public class RoomSessionController {
         String userId = WebSocketUtils.getUserId(header.getUser());
         DtlsRequestPayload payload = new DtlsRequestPayload(dtlsPayload.correlationId(), userId, dtlsPayload.direction());
         mediaMessagingService.sendDtls(payload);
+    }
+
+    @MessageMapping("/signal/dtls/connect")
+    public void dtlsConnect(@Payload UserDtlsConnectPayload transportConnectPayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        DtlsConnectPayload payload = new DtlsConnectPayload(transportConnectPayload.correlationId(), userId, transportConnectPayload.dtlsParameters());
+        mediaMessagingService.sendDtlsConnect(payload);
     }
 
     @MessageMapping("/signal/join")

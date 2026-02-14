@@ -4,26 +4,26 @@ import java.util.Map;
 
 import java.util.List;
 
-public class RtpCapabilitiesDto {
-    private List<RtpCodecCapabilityDto> codecs;
-    private List<RtpHeaderExtensionDto> headerExtensions;
+public class RtpCapabilities {
+    private List<RtpCodecCapability> codecs;
+    private List<RtpHeaderExtension> headerExtensions;
 
-    public static class RtpCodecCapabilityDto {
+    public static class RtpCodecCapability {
         private String kind;
         private String mimeType;
         private Integer preferredPayloadType;
         private Integer clockRate;
         private Integer channels;
         private Map<String, Object> parameters;
-        private List<RtcpFeedbackDto> rtcpFeedback;
+        private List<RtcpFeedback> rtcpFeedback;
     }
 
-    public static class RtcpFeedbackDto {
+    public static class RtcpFeedback {
         private String type;
         private String parameter;
     }
 
-    public static class RtpHeaderExtensionDto {
+    public static class RtpHeaderExtension {
         private String kind;
         private String uri;
         private Integer preferredId;
