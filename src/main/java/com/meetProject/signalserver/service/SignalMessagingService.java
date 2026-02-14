@@ -3,8 +3,12 @@ package com.meetProject.signalserver.service;
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
+import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.MediaPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
 import com.meetProject.signalserver.model.dto.common.User;
@@ -28,7 +32,6 @@ public class SignalMessagingService {
 
     public void sendJoin(User user, JoinPayload joinPayload, List<User> participants) {
         String userId = user.userId();
-        System.out.println(joinPayload);
 
         String roomId = joinPayload.roomId();
         String correlationId = joinPayload.correlationId();
@@ -39,6 +42,15 @@ public class SignalMessagingService {
 
         ParticipantResponse participantResponse = new ParticipantResponse(user, mediaOption);
         sendTopic(roomId, TopicType.PARTICIPANT, participantResponse);
+    }
+
+    public void sendCapabilitiesToServer(CapabilitiesRequestPayload payload) {
+        sendMedia(MediaType.CAPABILITIES, payload);
+    }
+
+    public void sendCapabilitiesToUser(CapabilitiesResponse response) {
+        UserCapabilityResponse payload = new UserCapabilityResponse(response.correlationId(), response.capabilities());
+        sendSignal(response.userId(), payload);
     }
 
     public void sendLeave(String userId, String roomId) {
@@ -81,6 +93,10 @@ public class SignalMessagingService {
 
     private void sendTopic(String roomId, TopicType type, TopicResponse payload) {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + type.name().toLowerCase(), payload);
+    }
+
+    private void sendMedia(MediaType type, MediaPayload payload) {
+        messagingTemplate.convertAndSendToUser("mediaServer","/media/" + type.name().toLowerCase(), payload);
     }
 
     private void withMediaServerConnected(String senderId, Runnable action) {

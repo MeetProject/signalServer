@@ -1,6 +1,8 @@
 package com.meetProject.signalserver.controller.socket;
 
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserCapabilityPayload;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.SignalMessagingService;
@@ -23,6 +25,13 @@ public class RoomSessionController {
         this.joinService = joinService;
         this.leaveService = leaveService;
         this.userService = userService;
+    }
+
+    @MessageMapping("/signal/capabilities")
+    public void capabilities(@Payload UserCapabilityPayload capabilityPayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        CapabilitiesRequestPayload payload = new CapabilitiesRequestPayload(capabilityPayload.correlationId(),userId);
+        signalMessagingService.sendCapabilitiesToServer(payload);
     }
 
     @MessageMapping("/signal/join")
