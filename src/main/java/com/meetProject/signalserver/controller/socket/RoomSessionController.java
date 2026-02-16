@@ -1,5 +1,6 @@
 package com.meetProject.signalserver.controller.socket;
 
+import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
@@ -29,29 +30,59 @@ public class RoomSessionController {
     @MessageMapping("/signal/capabilities")
     public void capabilities(@Payload UserCapabilityPayload capabilityPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        CapabilitiesRequestPayload payload = new CapabilitiesRequestPayload(capabilityPayload.correlationId(),userId);
+        String roomId = userService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        CapabilitiesRequestPayload payload = new CapabilitiesRequestPayload(capabilityPayload.correlationId(),userId, roomId);
         mediaMessagingService.sendCapabilities(payload);
     }
 
     @MessageMapping("/signal/dtls")
     public void dtls(@Payload UserDtlsPayload dtlsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        DtlsRequestPayload payload = new DtlsRequestPayload(dtlsPayload.correlationId(), userId, dtlsPayload.direction());
+        String roomId = userService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        DtlsRequestPayload payload = new DtlsRequestPayload(dtlsPayload.correlationId(), userId, roomId, dtlsPayload.direction());
         mediaMessagingService.sendDtls(payload);
     }
 
     @MessageMapping("/signal/dtls/connect")
     public void dtlsConnect(@Payload UserDtlsConnectPayload transportConnectPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        DtlsConnectPayload payload = new DtlsConnectPayload(transportConnectPayload.correlationId(), userId, transportConnectPayload.dtlsParameters());
+        String roomId = userService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        DtlsConnectPayload payload = new DtlsConnectPayload(transportConnectPayload.correlationId(), userId, roomId, transportConnectPayload.dtlsParameters());
         mediaMessagingService.sendDtlsConnect(payload);
     }
 
     @MessageMapping("/signal/rtls")
     public void rtls(@Payload UserRtlsPayload rtlsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        RtlsRequestPayload payload = new RtlsRequestPayload(rtlsPayload.correlationId(), userId, rtlsPayload.appData(), rtlsPayload.rtpParameters(), rtlsPayload.transportId());
+        String roomId = userService.getRoomId(userId);
+
+        RtlsRequestPayload payload = new RtlsRequestPayload(rtlsPayload.correlationId(), userId, roomId, rtlsPayload.appData(), rtlsPayload.rtpParameters(), rtlsPayload.transportId());
         mediaMessagingService.sendRtls(payload);
+    }
+
+    @MessageMapping("/signal/consumerParams")
+    public void consumerParams(@Payload UserConsumerParamsPayload consumerParamsPayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        String roomId = userService.getRoomId(userId);
+
+        ConsumerParamsRequestPayload payload = new ConsumerParamsRequestPayload(consumerParamsPayload.correlationId(), userId, roomId,
+                consumerParamsPayload.producerId(), consumerParamsPayload.rtpCapabilities(), consumerParamsPayload.transportId());
+        mediaMessagingService.sendConsumerParams(payload);
     }
 
     @MessageMapping("/signal/join")

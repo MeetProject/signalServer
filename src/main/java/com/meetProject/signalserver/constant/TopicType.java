@@ -7,4 +7,5 @@ public enum TopicType {
     DEVICE,
     HANDUP,
     PARTICIPANT,
+    RTLS
 }

@@ -3,6 +3,7 @@ package com.meetProject.signalserver.service.message;
 import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.model.dto.common.MediaPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
@@ -31,6 +32,10 @@ public class MediaMessagingService {
 
     public void sendRtls(RtlsRequestPayload payload) {
         sendMedia(MediaType.RTLS, payload);
+    }
+
+    public void sendConsumerParams(ConsumerParamsRequestPayload payload) {
+        sendMedia(MediaType.PARAMS, payload);
     }
 
     private void sendMedia(MediaType type, MediaPayload payload) {

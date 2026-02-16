@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.service.message;
 
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesResponse;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
@@ -50,11 +51,16 @@ public class SignalMessagingService {
         sendSignal(response.userId(), payload);
     }
 
+    public void sendConsumerParams(ConsumerParamsResponse response) {
+        UserConsumerParamsResponse payload = new UserConsumerParamsResponse(response.correlationId(), response.consumerParams());
+        sendSignal(response.userId(), payload);
+    }
+
     public void sendError(String userId, ErrorResponse errorResponse) {
         sendSignal(userId, errorResponse);
     }
 
     private void sendSignal(String userId, SignalResponse payload) {
-        messagingTemplate.convertAndSendToUser(userId, "/queue/replies/" + payload.correlationId(), payload);
+        messagingTemplate.convertAndSendToUser(userId, "/queue/replies", payload);
     }
 }

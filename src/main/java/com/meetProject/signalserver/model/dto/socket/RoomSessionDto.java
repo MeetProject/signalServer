@@ -2,6 +2,7 @@ package com.meetProject.signalserver.model.dto.socket;
 
 import com.meetProject.signalserver.constant.DtlsDirection;
 import com.meetProject.signalserver.model.dto.common.AppData;
+import com.meetProject.signalserver.model.dto.common.ConsumerParams;
 import com.meetProject.signalserver.model.dto.common.MediaOption;
 import com.meetProject.signalserver.model.dto.common.RtpCapabilities;
 import com.meetProject.signalserver.model.dto.common.RtpParameters;
@@ -23,6 +24,9 @@ public class RoomSessionDto {
 
     public record UserRtlsPayload(String correlationId, AppData appData, RtpParameters rtpParameters, String transportId) {}
     public record UserRtlsResponse(String correlationId, String producerId) implements SignalResponse {}
+
+    public record UserConsumerParamsPayload(String correlationId, String producerId, RtpCapabilities rtpCapabilities, String transportId) {}
+    public record UserConsumerParamsResponse(String correlationId, ConsumerParams consumerParams) implements SignalResponse {}
 
     public record JoinPayload(String roomId, String correlationId, String produceId, MediaOption mediaOption) {}
     public record JoinResponse(String correlationId, List<User> participants) implements SignalResponse {}

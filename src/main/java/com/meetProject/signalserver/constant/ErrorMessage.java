@@ -2,6 +2,7 @@ package com.meetProject.signalserver.constant;
 
 public class ErrorMessage {
     public static final String USER_NOT_FOUND = "존재하지 않는 사용자입니다.";
+    public static final String USER_NOT_JOINED = "참여 중인 방이 없습니다.";
 
     public static final String ROOM_NULL = "방 id를 입력해주세요.";
     public static final String ROOM_ALREADY_EXISTS = "이미 존재하는 방 입니다.";

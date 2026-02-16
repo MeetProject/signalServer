@@ -2,6 +2,7 @@ package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
 import com.meetProject.signalserver.service.message.SignalMessagingService;
+import com.meetProject.signalserver.service.message.TopicMessagingService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
@@ -9,9 +10,11 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class MediaSessionController {
     private final SignalMessagingService signalMessagingService;
+    private final TopicMessagingService topicMessagingService;
 
-    public MediaSessionController(SignalMessagingService signalMessagingService) {
+    public MediaSessionController(SignalMessagingService signalMessagingService, TopicMessagingService topicMessagingService) {
         this.signalMessagingService = signalMessagingService;
+        this.topicMessagingService = topicMessagingService;
     }
 
     @MessageMapping("/media/capabilities")
@@ -32,5 +35,11 @@ public class MediaSessionController {
     @MessageMapping("/media/rtls")
     public void rtls(@Payload RtlsResponse rtlsResponse) {
         signalMessagingService.sendRtls(rtlsResponse);
+        topicMessagingService.sendProducerId(rtlsResponse);
+    }
+
+    @MessageMapping("/media/consumerParams")
+    public void consumerParams(@Payload ConsumerParamsResponse consumerParamsResponse) {
+        signalMessagingService.sendConsumerParams(consumerParamsResponse);
     }
 }

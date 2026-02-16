@@ -8,6 +8,14 @@ import com.meetProject.signalserver.util.RandomIdGenerator;
 
 public class RoomInteractionDto {
     public record ParticipantResponse(User user, MediaOption mediaOption) implements TopicResponse {
+        @Override
+        public String id() {
+            return null;
+        }
+    }
+
+    public record ProducerResponse(String producerId) implements TopicResponse {
+        @Override
         public String id() {
             return null;
         }

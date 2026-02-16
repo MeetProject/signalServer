@@ -6,11 +6,13 @@ import com.meetProject.signalserver.model.dto.common.MediaOption;
 import com.meetProject.signalserver.model.dto.common.TopicResponse;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.LeaveResponse;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ChatResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.DeviceResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.EmojiResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.HandUpResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ParticipantResponse;
+import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ProducerResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,11 @@ public class TopicMessagingService {
 
     public TopicMessagingService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
+    }
+
+    public void sendProducerId(RtlsResponse rtlsResponse) {
+        ProducerResponse response = new ProducerResponse(rtlsResponse.producerId());
+        sendTopic(rtlsResponse.roomId(), TopicType.RTLS, response);
     }
 
     public void sendJoin(User user, JoinPayload joinPayload) {
