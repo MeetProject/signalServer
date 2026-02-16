@@ -9,12 +9,13 @@ public class Participant {
     private final User user;
     private boolean isHandUp;
     private MediaOption mediaOption;
-    private final Set<String> producerIds = new ConcurrentSkipListSet<>();
+    private final Set<String> producerIds;
 
-    public Participant(User user, MediaOption mediaOption) {
+    public Participant(User user, MediaOption mediaOption, List<String> producerId) {
         this.user = user;
         this.isHandUp = false;
         this.mediaOption = mediaOption;
+        this.producerIds = new ConcurrentSkipListSet<>(producerId);
     }
 
     public void setMediaOption(MediaOption mediaOption) {

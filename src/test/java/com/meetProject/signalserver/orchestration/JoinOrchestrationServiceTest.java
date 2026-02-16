@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.Participant;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import com.meetProject.signalserver.service.RoomsService;
@@ -37,20 +38,18 @@ public class JoinOrchestrationServiceTest {
     @Test
     @DisplayName("유저 방 참여 시나리오 테스트")
     void joinUserSuccessfully() {
-        String userId = "user-123";
-        String roomId = "room-abc";
-        String correlationId = "corr-789";
-
-        User user = new User(userId, "nickname", "#000000", null, false);
-        JoinPayload joinPayload = new JoinPayload(roomId, correlationId, new MediaOption(true, true));
+        String userId = "user1";
+        String roomId = "room1";
+        User user = new User(userId, "user1", "#000000", null);
+        MediaOption mediaOption = new MediaOption(true, true);
+        JoinPayload joinPayload = new JoinPayload(roomId, "correlationId", mediaOption, List.of());
 
         when(userService.getUser(userId)).thenReturn(user);
-        when(roomsService.getParticipants(roomId)).thenReturn(List.of(userId));
+        when(roomsService.getParticipants(roomId)).thenReturn(List.of());
 
         joinService.joinRoom(userId, joinPayload);
 
-        verify(roomsService).addParticipant(roomId, userId);
-
+        verify(roomsService).addParticipant(eq(roomId), any(Participant.class));
         verify(signalMessagingService, times(1)).sendJoin(
                 eq(user),
                 eq(joinPayload),
@@ -65,13 +64,13 @@ public class JoinOrchestrationServiceTest {
         String roomId = "room-abc";
         String correlationId = "corr-789";
 
-        User user = new User(userId, "nickname", "#000000", roomId, false); // roomId가 이미 할당됨
+        User user = new User(userId, "nickname", "#000000", roomId); // roomId가 이미 할당됨
         when(userService.getUser(userId)).thenReturn(user);
 
         doThrow(new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_JOINED))
                 .when(userService).updateRoomStatus(userId, roomId);
 
-        JoinPayload joinPayload = new JoinPayload(roomId, correlationId, new MediaOption(true, true));
+        JoinPayload joinPayload = new JoinPayload(roomId, correlationId, new MediaOption(true, true), List.of());
         joinService.joinRoom(userId, joinPayload);
 
         verify(signalMessagingService, times(1)).sendError(
@@ -87,12 +86,12 @@ public class JoinOrchestrationServiceTest {
         String roomId = "room-abc";
         String correlationId = "corr-789";
 
-        when(userService.getUser(userId)).thenReturn(new User(userId, "nick", "#000", null, false));
+        when(userService.getUser(userId)).thenReturn(new User(userId, "nick", "#000", null));
 
         doThrow(new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND))
-                .when(roomsService).addParticipant(eq(roomId), anyString());
+                .when(roomsService).addParticipant(eq(roomId), any());
 
-        JoinPayload joinPayload = new JoinPayload(roomId, correlationId, new MediaOption(true, true));
+        JoinPayload joinPayload = new JoinPayload(roomId, correlationId, new MediaOption(true, true), List.of());
         joinService.joinRoom(userId, joinPayload);
 
         verify(signalMessagingService, times(1)).sendError(

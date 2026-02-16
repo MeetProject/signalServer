@@ -2,7 +2,6 @@ package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.common.MediaOption;
 import com.meetProject.signalserver.model.dto.common.Participant;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
@@ -35,8 +34,7 @@ public class JoinOrchestrationService {
             String roomId = joinPayload.roomId();
             userService.updateRoomStatus(userId, roomId);
 
-            Participant participant = new Participant(user, joinPayload.mediaOption());
-
+            Participant participant = new Participant(user, joinPayload.mediaOption(), joinPayload.producers());
 
             List<Participant> participants = roomsService.getParticipants(roomId).stream().toList();
             roomsService.addParticipant(roomId, participant);

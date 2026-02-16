@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.meetProject.signalserver.model.Room;
+import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.Participant;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;
-import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,10 +30,11 @@ public class LeaveOrchestrationServiceTest {
         SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate);
         leaveService = new LeaveOrchestrationService(userService, roomService, signalMessagingService);
 
-        User user = new User("user1Id", "#000000", "user1", "room1", false);
+        User user = new User("user1Id", "#000000", "user1", "room1");
+        Participant participant = new Participant(user, new MediaOption(true, true), List.of());
         userService.addUser(user);
-        Room room = new Room("room1", new ArrayList<>());
-        room.addParticipant("user1");
+        Room room = new Room("room1");
+        room.addParticipant(participant);
         roomService.createRoom(room);
     }
 
