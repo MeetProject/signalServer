@@ -8,13 +8,14 @@ import com.meetProject.signalserver.model.dto.common.RtpCapabilities;
 import com.meetProject.signalserver.model.dto.common.RtpParameters;
 import com.meetProject.signalserver.model.dto.common.TransportOptions;
 import com.meetProject.signalserver.model.dto.common.TransportOptions.DtlsParameters;
+import java.util.List;
 
 public class MediaSessionDto {
     public record CapabilitiesRequestPayload(String correlationId, String userId, String roomId) implements MediaPayload {}
     public record CapabilitiesResponse(String correlationId, String userId, RtpCapabilities capabilities) {}
 
     public record DtlsRequestPayload(String correlationId, String userId, String roomId, DtlsDirection direction) implements MediaPayload {}
-    public record DtlsResponse(String correlationId, String userId, TransportOptions options, DtlsDirection direction) {}
+    public record DtlsResponse(String correlationId, String userId, TransportOptions options, DtlsDirection direction, List<String> producers) {}
 
     public record DtlsConnectPayload(String correlationId, String userId, String roomId, DtlsParameters dtlsParameters) implements MediaPayload {}
     public record DtlsConnectResponse(String correlationId, String UserId) {}

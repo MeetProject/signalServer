@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.RoomRule;
+import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.Participant;
+import com.meetProject.signalserver.model.dto.common.User;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,14 +18,17 @@ public class RoomTest {
 
     @BeforeEach
     void setUp() {
-        room = new Room("room1", List.of("user1", "user2"));
+        room = new Room("room1");
+        room.addParticipant(new Participant(new User("test1", "test1", "#ffffff", null), new MediaOption(true, true)));
+        room.addParticipant(new Participant(new User("test2", "test2", "#ffffff", null), new MediaOption(true, true)));
     }
 
     @Test
     @DisplayName("Room 생성 및 초기 참가자 확인")
     void testRoomCreation() {
         assertThat(room.getRoomId()).isEqualTo("room1");
-        assertThat(room.getParticipants()).containsExactlyInAnyOrder("user1", "user2");
+        List<String> id = room.getParticipants().stream().map(participant -> participant.getUser().userId()).toList();
+        assertThat(id).containsExactlyInAnyOrder("user1", "user2");
     }
 
     @Test

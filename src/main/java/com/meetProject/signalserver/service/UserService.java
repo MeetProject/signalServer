@@ -36,16 +36,7 @@ public class UserService {
             throw new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND);
         }
 
-        User updated = new User(user.userId(), user.userName(), user.profileColor(), roomId, user.isHandUp());
-        users.put(id, updated);
-    }
-
-    public void updateUserHandUpStatus(String id, boolean isHandUp) {
-        User user = users.get(id);
-        if(user == null){
-            return;
-        }
-        User updated = new User(user.userId(), user.userName(), user.profileColor(), user.roomId(), isHandUp);
+        User updated = new User(user.userId(), user.userName(), user.profileColor(), roomId);
         users.put(id, updated);
     }
 }

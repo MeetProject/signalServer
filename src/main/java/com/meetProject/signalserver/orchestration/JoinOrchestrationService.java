@@ -2,6 +2,8 @@ package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
+import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.Participant;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
@@ -29,22 +31,17 @@ public class JoinOrchestrationService {
             if(user == null){
                 throw new IllegalArgumentException(ErrorMessage.USER_NOT_FOUND);
             }
-            System.out.println(1);
 
             String roomId = joinPayload.roomId();
-
             userService.updateRoomStatus(userId, roomId);
-            System.out.println(2);
+
+            Participant participant = new Participant(user, joinPayload.mediaOption());
 
 
-            List<User> participants = roomsService.getParticipants(roomId).stream()
-                    .map(userService::getUser)
-                    .toList();
+            List<Participant> participants = roomsService.getParticipants(roomId).stream().toList();
+            roomsService.addParticipant(roomId, participant);
 
-            roomsService.addParticipant(roomId, userId);
-            System.out.println(3);
             signalMessagingService.sendJoin(user, joinPayload, participants);
-
         } catch(Exception e){
             ErrorResponse response = new ErrorResponse(ErrorCode.E001, e.getMessage());
             signalMessagingService.sendError(userId, response);

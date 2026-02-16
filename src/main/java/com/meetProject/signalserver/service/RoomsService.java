@@ -2,6 +2,8 @@ package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.model.Room;
+import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.Participant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,17 +20,13 @@ public class RoomsService {
         rooms.put(room.getRoomId(), room);
     }
 
-    public void addParticipant(String roomId, String userId) {
+    public void addParticipant(String roomId, Participant participant) {
         Room room = rooms.get(roomId);
         if (room == null) {
             throw new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND);
         }
 
-        if(room.getParticipants().contains(userId)) {
-            throw new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_JOINED);
-        }
-
-        room.addParticipant(userId);
+        room.addParticipant(participant);
     }
 
     public void removeParticipant(String roomId, String userId) {
@@ -45,12 +43,12 @@ public class RoomsService {
         }
     }
 
-    public List<String> getParticipants(String roomId) {
+    public List<Participant> getParticipants(String roomId) {
         Room room = rooms.get(roomId);
         if (room == null) {
             throw new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND);
         }
-        return room.getParticipants();
+        return room.getParticipants().values().stream().toList();
     }
 
     public boolean exists(String roomId) {
@@ -59,5 +57,41 @@ public class RoomsService {
 
     public Room getRoom(String roomId) {
         return rooms.get(roomId);
+    }
+
+    public void handleHandUp(String roomId, String userId, boolean value) {
+        Participant participant = getParticipant(roomId, userId);
+        participant.setHandUp(value);
+    }
+
+    public void handleMediaOption(String roomId, String userId, MediaOption value) {
+        Participant participant = getParticipant(roomId, userId);
+        participant.setMediaOption(value);
+    }
+
+    public void addProducer(String roomId, String userId, String producerId) {
+        Participant participant = getParticipant(roomId, userId);
+        participant.addProducerId(producerId);
+    }
+
+    public void removeProducer(String roomId, String userId, String producerId) {
+        Participant participant = getParticipant(roomId, userId);
+        participant.removeProducerId(producerId);
+    }
+
+    private Participant getParticipant(String roomId, String userId) {
+        Room room = rooms.get(roomId);
+
+        if(room == null) {
+            throw new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND);
+        }
+
+        Participant participant = room.getParticipants().get(userId);
+
+        if(participant == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        return participant;
     }
 }

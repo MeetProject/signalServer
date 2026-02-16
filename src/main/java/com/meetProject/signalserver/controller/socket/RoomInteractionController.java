@@ -44,6 +44,9 @@ public class RoomInteractionController {
     public void sendDevice(@Payload DevicePayload devicePayload, SimpMessageHeaderAccessor header) {
         RoomValidate(devicePayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
+        String roomId = userService.getRoomId(userId);
+
+        roomsService.handleMediaOption(roomId, userId, devicePayload.mediaOption());
         topicMessagingService.sendDevice(devicePayload.roomId(), userId, devicePayload.mediaOption());
     }
 
@@ -51,7 +54,9 @@ public class RoomInteractionController {
     public void sendHandUp(@Payload HandUpPayload handUpPayload, SimpMessageHeaderAccessor header) {
         RoomValidate(handUpPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
-        userService.updateUserHandUpStatus(userId, handUpPayload.value());
+        String roomId = userService.getRoomId(userId);
+
+        roomsService.handleHandUp(roomId, userId, handUpPayload.value());
         topicMessagingService.sendHandUp(handUpPayload.roomId(), userId, handUpPayload.value());
     }
 

@@ -2,36 +2,38 @@ package com.meetProject.signalserver.model;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.RoomRule;
-import java.util.HashSet;
+import com.meetProject.signalserver.model.dto.common.Participant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
     private final String roomId;
-    private final Set<String> participants;
+    private final Map<String, Participant> participants = new ConcurrentHashMap<>();
 
-    public Room(String roomId,  List<String> participants) {
+    public Room(String roomId) {
         this.roomId = roomId;
-        this.participants = new HashSet<>(List.copyOf(participants));
     }
 
     public String getRoomId() {
         return roomId;
     }
 
-    public List<String> getParticipants() {
-        return List.copyOf(participants);
+    public HashMap<String, Participant> getParticipants() {
+        return new HashMap<>(participants);
     }
 
-    public void addParticipant(String participant) {
+    public void addParticipant(Participant participant) {
         if(participants.size() >= RoomRule.MAX_ROOM_PARTICIPANTS) {
             throw new IllegalArgumentException(ErrorMessage.ROOM_FULL);
         }
 
-        if(participants.contains(participant)) {
+        if(participants.get(participant.getUser().userId()) != null) {
             throw new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_JOINED);
         }
-        participants.add(participant);
+        participants.put(participant.getUser().userId(), participant);
     }
 
     public void removeParticipant(String participant) {

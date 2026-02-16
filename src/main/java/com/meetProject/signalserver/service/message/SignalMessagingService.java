@@ -1,5 +1,6 @@
 package com.meetProject.signalserver.service.message;
 
+import com.meetProject.signalserver.model.dto.common.Participant;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectResponse;
@@ -23,7 +24,7 @@ public class SignalMessagingService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendJoin(User user, JoinPayload joinPayload, List<User> participants) {
+    public void sendJoin(User user, JoinPayload joinPayload, List<Participant> participants) {
         String userId = user.userId();
 
         String correlationId = joinPayload.correlationId();
@@ -38,7 +39,7 @@ public class SignalMessagingService {
     }
 
     public void sendDtls(DtlsResponse response) {
-        UserDtlsResponse payload = new UserDtlsResponse(response.correlationId(), response.options(), response.direction());
+        UserDtlsResponse payload = new UserDtlsResponse(response.correlationId(), response.options(), response.direction(), response.producers());
         sendSignal(response.userId(), payload);
     }
 

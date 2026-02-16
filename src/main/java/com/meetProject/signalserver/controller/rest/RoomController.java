@@ -32,7 +32,7 @@ public class RoomController {
     @PostMapping
     public ResponseEntity<CreateRoomResponse> createRoom() {
         String roomId = RandomIdGenerator.randomId(RoomRule.ROOM_ID_LENGTH);
-        Room room = new Room(roomId, Collections.emptyList());
+        Room room = new Room(roomId);
         roomsService.createRoom(room);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CreateRoomResponse(roomId));

@@ -23,7 +23,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterPayload payload) {
         String userId =  RandomIdGenerator.uuidGenerator();
-        User user = new User(userId, payload.userName(), payload.userColor(), null, false);
+        User user = new User(userId, payload.userName(), payload.userColor(), null);
         userService.addUser(user);
         return ResponseEntity.ok(new RegisterResponse(userId));
     }
