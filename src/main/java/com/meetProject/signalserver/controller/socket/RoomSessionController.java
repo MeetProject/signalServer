@@ -71,6 +71,10 @@ public class RoomSessionController {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = userService.getRoomId(userId);
 
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
         RtlsRequestPayload payload = new RtlsRequestPayload(rtlsPayload.correlationId(), userId, roomId, rtlsPayload.appData(), rtlsPayload.rtpParameters(), rtlsPayload.transportId());
         mediaMessagingService.sendRtls(payload);
     }
@@ -80,9 +84,26 @@ public class RoomSessionController {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = userService.getRoomId(userId);
 
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
         ConsumerParamsRequestPayload payload = new ConsumerParamsRequestPayload(consumerParamsPayload.correlationId(), userId, roomId,
                 consumerParamsPayload.producerId(), consumerParamsPayload.rtpCapabilities(), consumerParamsPayload.transportId());
         mediaMessagingService.sendConsumerParams(payload);
+    }
+
+    @MessageMapping("/signal/resume")
+    public void resume(@Payload UserResumePayload resumePayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        String roomId = userService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        ResumeRequestPayload payload = new ResumeRequestPayload(resumePayload.correlationId(), userId, roomId, resumePayload.consumerId());
+        mediaMessagingService.sendResume(payload);
     }
 
     @MessageMapping("/signal/join")

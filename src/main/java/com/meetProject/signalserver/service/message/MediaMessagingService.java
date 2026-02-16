@@ -6,6 +6,7 @@ import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.Capabilitie
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ResumeRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,10 @@ public class MediaMessagingService {
 
     public void sendConsumerParams(ConsumerParamsRequestPayload payload) {
         sendMedia(MediaType.PARAMS, payload);
+    }
+
+    public void sendResume(ResumeRequestPayload payload) {
+        sendMedia(MediaType.RESUME, payload);
     }
 
     private void sendMedia(MediaType type, MediaPayload payload) {

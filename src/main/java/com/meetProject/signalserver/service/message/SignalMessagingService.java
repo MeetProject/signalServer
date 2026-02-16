@@ -4,6 +4,7 @@ import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.Capabilitie
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsResponse;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ResumeResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
@@ -53,6 +54,11 @@ public class SignalMessagingService {
 
     public void sendConsumerParams(ConsumerParamsResponse response) {
         UserConsumerParamsResponse payload = new UserConsumerParamsResponse(response.correlationId(), response.consumerParams());
+        sendSignal(response.userId(), payload);
+    }
+
+    public void sendResume(ResumeResponse response) {
+        UserResumeResponse payload = new UserResumeResponse(response.correlationId());
         sendSignal(response.userId(), payload);
     }
 

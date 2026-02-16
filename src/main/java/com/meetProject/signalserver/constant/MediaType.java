@@ -6,4 +6,5 @@ public enum MediaType {
     DTLSCONNECT,
     RTLS,
     PARAMS,
+    RESUME,
 }

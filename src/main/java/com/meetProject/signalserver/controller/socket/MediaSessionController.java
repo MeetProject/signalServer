@@ -42,4 +42,9 @@ public class MediaSessionController {
     public void consumerParams(@Payload ConsumerParamsResponse consumerParamsResponse) {
         signalMessagingService.sendConsumerParams(consumerParamsResponse);
     }
+
+    @MessageMapping("/media/resume")
+    public void resume(@Payload ResumeResponse resumeResponse) {
+        signalMessagingService.sendResume(resumeResponse);
+    }
 }

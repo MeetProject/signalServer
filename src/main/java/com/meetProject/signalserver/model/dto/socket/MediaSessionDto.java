@@ -24,4 +24,7 @@ public class MediaSessionDto {
 
     public record ConsumerParamsRequestPayload(String correlationId, String userId, String roomId, String producerId, RtpCapabilities rtpCapabilities, String transportId) implements MediaPayload {}
     public record ConsumerParamsResponse(String correlationId, String userId, ConsumerParams consumerParams) {}
+
+    public record ResumeRequestPayload(String correlationId, String userId, String roomId, String consumerId) implements MediaPayload {}
+    public record ResumeResponse(String correlationId, String userId) {}
 }

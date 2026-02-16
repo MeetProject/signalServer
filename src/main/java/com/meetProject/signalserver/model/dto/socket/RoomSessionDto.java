@@ -28,6 +28,9 @@ public class RoomSessionDto {
     public record UserConsumerParamsPayload(String correlationId, String producerId, RtpCapabilities rtpCapabilities, String transportId) {}
     public record UserConsumerParamsResponse(String correlationId, ConsumerParams consumerParams) implements SignalResponse {}
 
+    public record UserResumePayload(String correlationId, String consumerId) {}
+    public record UserResumeResponse(String correlationId) implements SignalResponse {}
+
     public record JoinPayload(String roomId, String correlationId, String produceId, MediaOption mediaOption) {}
     public record JoinResponse(String correlationId, List<User> participants) implements SignalResponse {}
 }
