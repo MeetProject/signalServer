@@ -3,8 +3,8 @@ package com.meetProject.signalserver.service.message;
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.Participant;
 import com.meetProject.signalserver.model.dto.common.TopicResponse;
-import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.LeaveResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ChatResponse;
@@ -13,7 +13,6 @@ import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.EmojiRes
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.HandUpResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ParticipantResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ProducerResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +29,8 @@ public class TopicMessagingService {
         sendTopic(rtlsResponse.roomId(), TopicType.RTLS, response);
     }
 
-    public void sendJoin(User user, JoinPayload joinPayload) {
-        String roomId = joinPayload.roomId();
-        MediaOption mediaOption = joinPayload.mediaOption();
-
-        ParticipantResponse participantResponse = new ParticipantResponse(user, mediaOption);
+    public void sendJoin(String roomId, Participant participant) {
+        ParticipantResponse participantResponse = new ParticipantResponse(participant);
         sendTopic(roomId, TopicType.PARTICIPANT, participantResponse);
     }
 

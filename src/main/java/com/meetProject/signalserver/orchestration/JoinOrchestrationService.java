@@ -9,6 +9,7 @@ import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;
+import com.meetProject.signalserver.service.message.TopicMessagingService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,13 @@ public class JoinOrchestrationService {
     private final UserService userService;
     private final RoomsService roomsService;
     private final SignalMessagingService signalMessagingService;
+    private final TopicMessagingService topicMessagingService;
 
-    public JoinOrchestrationService(UserService userService, RoomsService roomService, SignalMessagingService signalMessagingService) {
+    public JoinOrchestrationService(UserService userService, RoomsService roomService, SignalMessagingService signalMessagingService, TopicMessagingService topicMessagingService) {
         this.userService = userService;
         this.roomsService = roomService;
         this.signalMessagingService = signalMessagingService;
+        this.topicMessagingService = topicMessagingService;
     }
 
     public void joinRoom(String userId, JoinPayload joinPayload) {
@@ -40,6 +43,7 @@ public class JoinOrchestrationService {
             roomsService.addParticipant(roomId, participant);
 
             signalMessagingService.sendJoin(user, joinPayload, participants);
+            topicMessagingService.sendJoin(roomId, participant);
         } catch(Exception e){
             ErrorResponse response = new ErrorResponse(ErrorCode.E001, e.getMessage());
             signalMessagingService.sendError(userId, response);
