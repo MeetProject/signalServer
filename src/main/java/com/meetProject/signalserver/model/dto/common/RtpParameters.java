@@ -3,48 +3,48 @@ package com.meetProject.signalserver.model.dto.common;
 import java.util.List;
 import java.util.Map;
 
-public class RtpParameters {
-    private String mid;
-    private List<Codec> codecs;
-    private List<Encoding> encodings;
-    private List<HeaderExtension> headerExtensions;
-    private Rtcp rtcp;
+public record RtpParameters(
+        String mid,
+        List<Codec> codecs,
+        List<Encoding> encodings,
+        List<HeaderExtension> headerExtensions,
+        Rtcp rtcp
+) {
+    public record Codec(
+            String mimeType,
+            Integer payloadType,
+            Integer clockRate,
+            Integer channels,
+            Map<String, Object> parameters,
+            List<RtcpFeedback> rtcpFeedback
+    ) {}
 
-    public static class Codec {
-        private String mimeType;
-        private Integer payloadType;
-        private Integer clockRate;
-        private Integer channels;
-        private Map<String, Object> parameters;
-        private List<RtcpFeedback> rtcpFeedback;
-    }
+    public record RtcpFeedback(
+            String type,
+            String parameter
+    ) {}
 
-    public static class RtcpFeedback {
-        private String type;
-        private String parameter;
-    }
+    public record Encoding(
+            String rid,
+            Long ssrc,
+            Integer payloadType,
+            Boolean active,
+            Integer maxBitrate,
+            Double scaleResolutionDownBy,
+            String scalabilityMode,
+            Boolean dtx
+    ) {}
 
-    public static class Encoding {
-        private String rid;
-        private Long ssrc;
-        private Integer payloadType;
-        private Boolean active;
-        private Integer maxBitrate;
-        private Double scaleResolutionDownBy;
-        private String scalabilityMode;
-        private Integer dtx;
-    }
+    public record HeaderExtension(
+            String uri,
+            Integer id,
+            Boolean encrypt,
+            Map<String, Object> parameters
+    ) {}
 
-    public static class HeaderExtension {
-        private String uri;
-        private Integer id;
-        private Boolean encrypt;
-        private Boolean parameters;
-    }
-
-    public static class Rtcp {
-        private String cname;
-        private Boolean reducedSize;
-        private Boolean mux;
-    }
+    public record Rtcp(
+            String cname,
+            Boolean reducedSize,
+            Boolean mux
+    ) {}
 }

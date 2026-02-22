@@ -37,9 +37,10 @@ public class MediaSessionController {
 
     @MessageMapping("/media/rtls")
     public void rtls(@Payload RtlsResponse rtlsResponse) {
-        roomsService.addProducer(rtlsResponse.roomId(), rtlsResponse.userId(), rtlsResponse.producerId());
+        String roomId = roomsService.getRoomId(rtlsResponse.userId());
+        roomsService.addProducer(roomId, rtlsResponse.userId(), rtlsResponse.producerId());
         signalMessagingService.sendRtls(rtlsResponse);
-        topicMessagingService.sendProducerId(rtlsResponse);
+        topicMessagingService.sendProducerId(roomId, rtlsResponse);
     }
 
     @MessageMapping("/media/consumerParams")

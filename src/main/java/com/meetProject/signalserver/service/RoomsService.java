@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoomsService {
     private final Map<String, Room> rooms = new ConcurrentHashMap<>();
+    private final Map<String, String> roomInfo = new ConcurrentHashMap<>();
 
     public void createRoom(Room room) {
         if(this.rooms.containsKey(room.getRoomId())) {
@@ -27,6 +28,7 @@ public class RoomsService {
         }
 
         room.addParticipant(participant);
+        roomInfo.put(participant.getUser().userId(), roomId);
     }
 
     public void removeParticipant(String roomId, String userId) {
@@ -37,6 +39,7 @@ public class RoomsService {
         }
 
         room.removeParticipant(userId);
+        roomInfo.remove(userId);
 
         if(room.getParticipants().isEmpty()){
             rooms.remove(roomId);
@@ -57,6 +60,10 @@ public class RoomsService {
 
     public Room getRoom(String roomId) {
         return rooms.get(roomId);
+    }
+
+    public String getRoomId(String userId) {
+        return roomInfo.get(userId);
     }
 
     public void handleHandUp(String roomId, String userId, boolean value) {

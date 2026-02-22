@@ -24,9 +24,9 @@ public class TopicMessagingService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void sendProducerId(RtlsResponse rtlsResponse) {
-        ProducerResponse response = new ProducerResponse(rtlsResponse.producerId());
-        sendTopic(rtlsResponse.roomId(), TopicType.RTLS, response);
+    public void sendProducerId(String roomId, RtlsResponse rtlsResponse) {
+        ProducerResponse response = new ProducerResponse(rtlsResponse.userId(), rtlsResponse.producerId());
+        sendTopic(roomId, TopicType.RTLS, response);
     }
 
     public void sendJoin(String roomId, Participant participant) {

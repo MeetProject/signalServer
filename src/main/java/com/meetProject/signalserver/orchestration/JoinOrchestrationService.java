@@ -35,11 +35,9 @@ public class JoinOrchestrationService {
             }
 
             String roomId = joinPayload.roomId();
-            userService.updateRoomStatus(userId, roomId);
-
-            Participant participant = new Participant(user, joinPayload.mediaOption(), joinPayload.producers());
-
             List<Participant> participants = roomsService.getParticipants(roomId).stream().toList();
+
+            Participant participant = new Participant(user, joinPayload.mediaOption(), List.of());
             roomsService.addParticipant(roomId, participant);
 
             signalMessagingService.sendJoin(user, joinPayload, participants);

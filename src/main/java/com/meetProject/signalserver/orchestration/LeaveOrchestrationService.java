@@ -22,7 +22,7 @@ public class LeaveOrchestrationService {
 
     public void leaveUser(String userId) {
         try {
-            String roomId = userService.getRoomId(userId);
+            String roomId = roomsService.getRoomId(userId);
             if(roomId == null) {
                 throw new IllegalArgumentException(ErrorMessage.ROOM_NULL);
             }
@@ -44,7 +44,6 @@ public class LeaveOrchestrationService {
 
     private void leaveUser(String userId, String roomId) {
         roomsService.removeParticipant(roomId, userId);
-        userService.updateRoomStatus(userId, null);
         //signalMessagingService.sendLeave(userId, roomId);
     }
 }

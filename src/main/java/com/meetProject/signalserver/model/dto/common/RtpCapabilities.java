@@ -4,30 +4,30 @@ import java.util.Map;
 
 import java.util.List;
 
-public class RtpCapabilities {
-    private List<RtpCodecCapability> codecs;
-    private List<RtpHeaderExtension> headerExtensions;
+public record RtpCapabilities(
+        List<RtpCodecCapability> codecs,
+        List<RtpHeaderExtension> headerExtensions
+) {
+    public record RtpCodecCapability(
+            String kind,
+            String mimeType,
+            Integer preferredPayloadType,
+            Integer clockRate,
+            Integer channels,
+            Map<String, Object> parameters,
+            List<RtcpFeedback> rtcpFeedback
+    ) {}
 
-    public static class RtpCodecCapability {
-        private String kind;
-        private String mimeType;
-        private Integer preferredPayloadType;
-        private Integer clockRate;
-        private Integer channels;
-        private Map<String, Object> parameters;
-        private List<RtcpFeedback> rtcpFeedback;
-    }
+    public record RtcpFeedback(
+            String type,
+            String parameter
+    ) {}
 
-    public static class RtcpFeedback {
-        private String type;
-        private String parameter;
-    }
-
-    public static class RtpHeaderExtension {
-        private String kind;
-        private String uri;
-        private Integer preferredId;
-        private Boolean preferredEncrypt;
-        private String direction;
-    }
+    public record RtpHeaderExtension(
+            String kind,
+            String uri,
+            Integer preferredId,
+            Boolean preferredEncrypt,
+            String direction
+    ) {}
 }

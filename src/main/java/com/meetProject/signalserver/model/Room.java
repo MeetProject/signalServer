@@ -3,22 +3,18 @@ package com.meetProject.signalserver.model;
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.RoomRule;
 import com.meetProject.signalserver.model.dto.common.Participant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 
 public class Room {
+    @Getter
     private final String roomId;
     private final Map<String, Participant> participants = new ConcurrentHashMap<>();
 
     public Room(String roomId) {
         this.roomId = roomId;
-    }
-
-    public String getRoomId() {
-        return roomId;
     }
 
     public HashMap<String, Participant> getParticipants() {

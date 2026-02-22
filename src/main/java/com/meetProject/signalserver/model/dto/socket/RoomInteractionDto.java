@@ -14,7 +14,7 @@ public class RoomInteractionDto {
         }
     }
 
-    public record ProducerResponse(String producerId) implements TopicResponse {
+    public record ProducerResponse(String userId, String producerId) implements TopicResponse {
         @Override
         public String id() {
             return null;

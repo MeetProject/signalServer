@@ -3,6 +3,7 @@ package com.meetProject.signalserver.listener;
 import static org.mockito.Mockito.*;
 
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
+import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.util.WebSocketUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,15 +14,17 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 public class WebSocketEventListenerTest {
 
+    private RoomsService roomsService;
     private UserService userService;
     private LeaveOrchestrationService leaveService;
     private WebSocketEventListener listener;
 
     @BeforeEach
     void setUp() {
+        roomsService = mock(RoomsService.class);
         userService = mock(UserService.class);
         leaveService = mock(LeaveOrchestrationService.class);
-        listener = new WebSocketEventListener(userService, leaveService);
+        listener = new WebSocketEventListener(roomsService, userService, leaveService);
     }
 
     @Test
@@ -44,7 +47,7 @@ public class WebSocketEventListenerTest {
 
         try (MockedStatic<WebSocketUtils> utilities = mockStatic(WebSocketUtils.class)) {
             utilities.when(() -> WebSocketUtils.getUserId(event.getUser())).thenReturn("user1");
-            when(userService.getRoomId("user1")).thenReturn(null);
+            when(roomsService.getRoomId("user1")).thenReturn(null);
 
             listener.handleWebSocketDisconnect(event);
 
@@ -60,7 +63,7 @@ public class WebSocketEventListenerTest {
 
         try (MockedStatic<WebSocketUtils> utilities = mockStatic(WebSocketUtils.class)) {
             utilities.when(() -> WebSocketUtils.getUserId(event.getUser())).thenReturn("user1");
-            when(userService.getRoomId("user1")).thenReturn("room1");
+            when(roomsService.getRoomId("user1")).thenReturn("room1");
 
             listener.handleWebSocketDisconnect(event);
 

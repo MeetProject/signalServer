@@ -39,13 +39,13 @@ public class SignalMessagingService {
     }
 
     public void sendDtls(DtlsResponse response) {
-        UserDtlsResponse payload = new UserDtlsResponse(response.correlationId(), response.options(), response.direction(), response.producers());
+        UserDtlsResponse payload = new UserDtlsResponse(response.correlationId(), response.options());
         sendSignal(response.userId(), payload);
     }
 
     public void sendDtlsConnect(DtlsConnectResponse response) {
         UserDtlsConnectResponse payload = new UserDtlsConnectResponse(response.correlationId());
-        sendSignal(response.UserId(), payload);
+        sendSignal(response.userId(), payload);
     }
 
     public void sendRtls(RtlsResponse response) {

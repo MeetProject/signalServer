@@ -2,36 +2,41 @@ package com.meetProject.signalserver.model.dto.common;
 
 import java.util.List;
 
-public class TransportOptions {
-    private String id;
-    private String direction; // "send" | "recv"
-    private IceParameters iceParameters;
-    private List<IceCandidate> iceCandidates;
-    private DtlsParameters dtlsParameters;
+public record TransportOptions(
+        String id,
+        String direction,
+        IceParameters iceParameters,
+        List<IceCandidate> iceCandidates,
+        DtlsParameters dtlsParameters,
+        Object sctpParameters,
+        Object iceServers,
+        Object iceTransportPolicy,
+        Object additionalSettings,
+        Object appData
+) {
+    public record IceParameters(
+            String usernameFragment,
+            String password,
+            Boolean iceLite
+    ) {}
 
-    public static class IceParameters {
-        private String usernameFragment;
-        private String password;
-        private Boolean iceLite;
-    }
+    public record IceCandidate(
+            String foundation,
+            Integer priority,
+            String ip,
+            String protocol,
+            Integer port,
+            String type,
+            String tcpType
+    ) {}
 
-    public static class IceCandidate {
-        private String foundation;
-        private Integer priority;
-        private String ip;
-        private String protocol;
-        private Integer port;
-        private String type;
-        private String tcpType;
-    }
+    public record DtlsParameters(
+            String role,
+            List<DtlsFingerprint> fingerprints
+    ) {}
 
-    public static class DtlsParameters {
-        private String role;
-        private List<DtlsFingerprint> fingerprints;
-    }
-
-    public static class DtlsFingerprint {
-        private String algorithm;
-        private String value;
-    }
+    public record DtlsFingerprint(
+            String algorithm,
+            String value
+    ) {}
 }
