@@ -1,6 +1,8 @@
 package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserProducerMuteResponse;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserResumeResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;
 import com.meetProject.signalserver.service.message.TopicMessagingService;
@@ -50,6 +52,13 @@ public class MediaSessionController {
 
     @MessageMapping("/media/resume")
     public void resume(@Payload ResumeResponse resumeResponse) {
-        signalMessagingService.sendResume(resumeResponse);
+        UserResumeResponse response = new UserResumeResponse(resumeResponse.correlationId());
+        signalMessagingService.sendSignal(resumeResponse.userId(), response);
+    }
+
+    @MessageMapping({"/media/producer/pause", "/media/producer/resume"})
+    public void producerMute(@Payload ProducerMuteResponse muteResponse) {
+        UserProducerMuteResponse response = new UserProducerMuteResponse(muteResponse.correlationId());
+        signalMessagingService.sendSignal(muteResponse.userId(), response);
     }
 }

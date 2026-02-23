@@ -7,4 +7,6 @@ public enum MediaType {
     RTLS,
     PARAMS,
     RESUME,
+    PRODUCER_PAUSE,
+    PRODUCER_RESUME,
 }

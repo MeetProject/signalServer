@@ -27,4 +27,8 @@ public class MediaSessionDto {
 
     public record ResumeRequestPayload(String correlationId, String userId, String consumerId) implements MediaPayload {}
     public record ResumeResponse(String correlationId, String userId) {}
+
+    public record ProducerMutePayload(String correlationId, String userId, String producerId) implements MediaPayload {}
+    public record ProducerMuteResponse(String correlationId, String userId) {}
+
 }

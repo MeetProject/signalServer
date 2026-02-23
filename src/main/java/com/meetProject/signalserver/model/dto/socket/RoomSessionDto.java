@@ -31,6 +31,9 @@ public class RoomSessionDto {
     public record UserResumePayload(String correlationId, String consumerId) {}
     public record UserResumeResponse(String correlationId) implements SignalResponse {}
 
+    public record UserProducerMutePayload(String correlationId, String producerId) {}
+    public record UserProducerMuteResponse(String correlationId) implements SignalResponse {}
+
     public record JoinPayload(String roomId, String correlationId, MediaOption mediaOption) {}
     public record JoinResponse(String correlationId, List<Participant> participants) implements SignalResponse {}
 }

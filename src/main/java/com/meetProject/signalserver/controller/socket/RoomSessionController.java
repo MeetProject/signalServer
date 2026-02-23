@@ -98,6 +98,22 @@ public class RoomSessionController {
         mediaMessagingService.sendResume(payload);
     }
 
+    @MessageMapping("/signal/producer/pause")
+    public void producerPause(@Payload UserProducerMutePayload mutePayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+
+        ProducerMutePayload payload = new ProducerMutePayload(mutePayload.correlationId(), userId, mutePayload.producerId());
+        mediaMessagingService.sendProducerPause(payload);
+    }
+
+    @MessageMapping("/signal/producer/resume")
+    public void producerResume(@Payload UserProducerMutePayload mutePayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+
+        ProducerMutePayload payload = new ProducerMutePayload(mutePayload.correlationId(), userId, mutePayload.producerId());
+        mediaMessagingService.sendProducerResume(payload);
+    }
+
     @MessageMapping("/signal/join")
     public void join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());

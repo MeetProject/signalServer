@@ -58,16 +58,11 @@ public class SignalMessagingService {
         sendSignal(response.userId(), payload);
     }
 
-    public void sendResume(ResumeResponse response) {
-        UserResumeResponse payload = new UserResumeResponse(response.correlationId());
-        sendSignal(response.userId(), payload);
-    }
-
     public void sendError(String userId, ErrorResponse errorResponse) {
         sendSignal(userId, errorResponse);
     }
 
-    private void sendSignal(String userId, SignalResponse payload) {
+    public void sendSignal(String userId, SignalResponse payload) {
         messagingTemplate.convertAndSendToUser(userId, "/queue/replies", payload);
     }
 }

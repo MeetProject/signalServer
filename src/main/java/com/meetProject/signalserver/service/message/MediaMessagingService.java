@@ -6,8 +6,10 @@ import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.Capabilitie
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerMutePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ResumeRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
+import java.util.Arrays;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,16 @@ public class MediaMessagingService {
         sendMedia(MediaType.RESUME, payload);
     }
 
+    public void sendProducerPause(ProducerMutePayload payload) {
+        sendMedia(MediaType.PRODUCER_PAUSE, payload);
+    }
+
+    public void sendProducerResume(ProducerMutePayload payload) {
+        sendMedia(MediaType.PRODUCER_RESUME, payload);
+    }
+
     private void sendMedia(MediaType type, MediaPayload payload) {
-        messagingTemplate.convertAndSendToUser("mediaServer","/media/" + type.name().toLowerCase(), payload);
+        String path = String.join("/",type.name().toLowerCase().split("_"));
+        messagingTemplate.convertAndSendToUser("mediaServer","/media/" + path, payload);
     }
 }
