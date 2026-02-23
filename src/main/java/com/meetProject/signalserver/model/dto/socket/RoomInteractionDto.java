@@ -21,14 +21,14 @@ public class RoomInteractionDto {
         }
     }
 
-    public record ChatPayload(String roomId, String message) {}
+    public record ChatPayload(String message) {}
     public record ChatResponse(String id, String userId, String message, long timestamp) implements TopicResponse {
         public ChatResponse(String userId, String message, long timestamp) {
             this(RandomIdGenerator.uuidGenerator(), userId, message, timestamp);
         }
     }
 
-    public record DevicePayload ( String roomId, MediaOption mediaOption) {}
+    public record DevicePayload (MediaOption mediaOption) {}
     public record DeviceResponse(String userId, MediaOption mediaOption) implements TopicResponse {
         @Override
         public String id() {
@@ -36,15 +36,22 @@ public class RoomInteractionDto {
         }
     }
 
-    public record EmojiPayload(String roomId, Emoji emoji) {}
+    public record EmojiPayload(Emoji emoji) {}
     public record EmojiResponse(String id, String userId, Emoji emoji, long timestamp) implements TopicResponse {
         public EmojiResponse(String userId, Emoji emoji, long timestamp) {
             this(RandomIdGenerator.uuidGenerator(), userId, emoji, timestamp);
         }
     }
 
-    public record HandUpPayload (String roomId, boolean value) {}
+    public record HandUpPayload (boolean value) {}
     public record HandUpResponse (String userId, boolean value) implements TopicResponse {
+        @Override
+        public String id() {
+            return null;
+        }
+    }
+
+    public record LeaveResponse(String userId) implements TopicResponse {
         @Override
         public String id() {
             return null;

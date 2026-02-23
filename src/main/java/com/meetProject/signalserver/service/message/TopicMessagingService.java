@@ -4,16 +4,10 @@ import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.model.dto.common.MediaOption;
 import com.meetProject.signalserver.model.dto.common.Participant;
-import com.meetProject.signalserver.model.dto.common.TopicResponse;
-import com.meetProject.signalserver.model.dto.socket.LeaveResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ChatResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.DeviceResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.EmojiResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.HandUpResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ParticipantResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ProducerResponse;
+import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.meetProject.signalserver.model.dto.common.TopicResponse;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,8 +30,9 @@ public class TopicMessagingService {
 
 
     public void sendLeave(String userId, String roomId) {
-        LeaveResponse response = new LeaveResponse(userId, null);
-        sendTopic(roomId, TopicType.LEAVE, response);
+        LeaveResponse leaveResponse = new LeaveResponse(userId);
+        System.out.println(leaveResponse);
+        sendTopic(roomId, TopicType.LEAVE, leaveResponse);
     }
 
     public void sendChat(String roomId, String userId, String message) {

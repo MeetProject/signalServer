@@ -6,7 +6,6 @@ import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.DevicePa
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.EmojiPayload;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.HandUpPayload;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.message.TopicMessagingService;
 import com.meetProject.signalserver.util.WebSocketUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -26,41 +25,65 @@ public class RoomInteractionController {
 
     @MessageMapping("/chat/send")
     public void sendChat(@Payload ChatPayload chatPayload, SimpMessageHeaderAccessor header) {
-        RoomValidate(chatPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
-        topicMessagingService.sendChat(chatPayload.roomId(), userId, chatPayload.message());
+        String roomId = roomsService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        topicMessagingService.sendChat(roomId, userId, chatPayload.message());
     }
 
     @MessageMapping("/emoji")
     public void sendEmoji(@Payload EmojiPayload emojiPayload, SimpMessageHeaderAccessor header) {
-        RoomValidate(emojiPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
-        topicMessagingService.sendEmoji(emojiPayload.roomId(), userId, emojiPayload.emoji());
+
+        String roomId = roomsService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        topicMessagingService.sendEmoji(roomId, userId, emojiPayload.emoji());
     }
 
     @MessageMapping("/device")
     public void sendDevice(@Payload DevicePayload devicePayload, SimpMessageHeaderAccessor header) {
-        RoomValidate(devicePayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = roomsService.getRoomId(userId);
 
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
         roomsService.handleMediaOption(roomId, userId, devicePayload.mediaOption());
-        topicMessagingService.sendDevice(devicePayload.roomId(), userId, devicePayload.mediaOption());
+        topicMessagingService.sendDevice(roomId, userId, devicePayload.mediaOption());
     }
 
     @MessageMapping("/handUp")
     public void sendHandUp(@Payload HandUpPayload handUpPayload, SimpMessageHeaderAccessor header) {
-        RoomValidate(handUpPayload.roomId());
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = roomsService.getRoomId(userId);
 
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
         roomsService.handleHandUp(roomId, userId, handUpPayload.value());
-        topicMessagingService.sendHandUp(handUpPayload.roomId(), userId, handUpPayload.value());
+        topicMessagingService.sendHandUp(roomId, userId, handUpPayload.value());
     }
 
-    private void RoomValidate(String roomId) {
-        if(!roomsService.exists(roomId)) {
-            throw new IllegalArgumentException(ErrorMessage.ROOM_NOT_FOUND);
+    @MessageMapping("/leave")
+    public void sendLeave(SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        String roomId = roomsService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
         }
+
+        roomsService.removeParticipant(roomId, userId);
+        topicMessagingService.sendLeave(userId, roomId);
     }
 }

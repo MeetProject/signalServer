@@ -32,8 +32,6 @@ public class RoomSessionController {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = roomsService.getRoomId(userId);
 
-        System.out.println("get capabilities " + userId + " roomId: " + roomId);
-
         if(roomId == null) {
             throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
         }
