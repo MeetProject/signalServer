@@ -21,6 +21,14 @@ public class RoomInteractionDto {
         }
     }
 
+    public record RemoveProducerPayload(String producerId, String trackType) {}
+    public record RemoveProducerResponse(String userId, String trackType) implements TopicResponse {
+        @Override
+        public String id() {
+            return null;
+        }
+    }
+
     public record ChatPayload(String message) {}
     public record ChatResponse(String id, String userId, String message, long timestamp) implements TopicResponse {
         public ChatResponse(String userId, String message, long timestamp) {

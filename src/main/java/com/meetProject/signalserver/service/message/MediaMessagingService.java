@@ -7,6 +7,7 @@ import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerPar
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerMutePayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerRemovePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ResumeRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
 import java.util.Arrays;
@@ -51,6 +52,10 @@ public class MediaMessagingService {
 
     public void sendProducerResume(ProducerMutePayload payload) {
         sendMedia(MediaType.PRODUCER_RESUME, payload);
+    }
+
+    public void sendProducerRemove(ProducerRemovePayload payload) {
+        sendMedia(MediaType.PRODUCER_REMOVE, payload);
     }
 
     private void sendMedia(MediaType type, MediaPayload payload) {

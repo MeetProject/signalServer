@@ -7,5 +7,6 @@ public enum TopicType {
     DEVICE,
     HANDUP,
     PARTICIPANT,
-    RTLS
+    RTLS,
+    PRODUCER_REMOVE,
 }

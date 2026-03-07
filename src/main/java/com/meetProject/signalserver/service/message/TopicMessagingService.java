@@ -23,6 +23,11 @@ public class TopicMessagingService {
         sendTopic(roomId, TopicType.RTLS, response);
     }
 
+    public void sendRemoveProducerId(String roomId, String userId, String trackType) {
+        RemoveProducerResponse response = new RemoveProducerResponse(userId, trackType);
+        sendTopic(roomId, TopicType.PRODUCER_REMOVE, response);
+    }
+
     public void sendJoin(String roomId, Participant participant) {
         ParticipantResponse participantResponse = new ParticipantResponse(participant);
         sendTopic(roomId, TopicType.PARTICIPANT, participantResponse);
@@ -56,6 +61,7 @@ public class TopicMessagingService {
     }
 
     private void sendTopic(String roomId, TopicType type, TopicResponse payload) {
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + type.name().toLowerCase(), payload);
+        String path = String.join("/",type.name().toLowerCase().split("_"));
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + path, payload);
     }
 }
