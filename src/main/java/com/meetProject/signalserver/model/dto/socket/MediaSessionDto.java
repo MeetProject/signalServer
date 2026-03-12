@@ -31,6 +31,13 @@ public class MediaSessionDto {
     public record ProducerMutePayload(String correlationId, String userId, String producerId) implements MediaPayload {}
     public record ProducerMuteResponse(String correlationId, String userId) {}
 
+    public record MediaLeavePayload(String userId, String roomId) implements MediaPayload {
+        @Override
+        public String correlationId() {
+            return null;
+        }
+    }
+
     public record ProducerRemovePayload(String userId, String producerId) implements MediaPayload {
         @Override
         public String correlationId() {

@@ -6,11 +6,11 @@ import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.Capabilitie
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.MediaLeavePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerMutePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerRemovePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ResumeRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
-import java.util.Arrays;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +56,10 @@ public class MediaMessagingService {
 
     public void sendProducerRemove(ProducerRemovePayload payload) {
         sendMedia(MediaType.PRODUCER_REMOVE, payload);
+    }
+
+    public void sendLeave(MediaLeavePayload payload) {
+        sendMedia(MediaType.LEAVE, payload);
     }
 
     private void sendMedia(MediaType type, MediaPayload payload) {

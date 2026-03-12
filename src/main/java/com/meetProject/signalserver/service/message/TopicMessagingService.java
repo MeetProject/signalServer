@@ -36,7 +36,6 @@ public class TopicMessagingService {
 
     public void sendLeave(String userId, String roomId) {
         LeaveResponse leaveResponse = new LeaveResponse(userId);
-        System.out.println(leaveResponse);
         sendTopic(roomId, TopicType.LEAVE, leaveResponse);
     }
 

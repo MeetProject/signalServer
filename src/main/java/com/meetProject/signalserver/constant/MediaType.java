@@ -10,4 +10,5 @@ public enum MediaType {
     PRODUCER_PAUSE,
     PRODUCER_RESUME,
     PRODUCER_REMOVE,
+    LEAVE,
 }

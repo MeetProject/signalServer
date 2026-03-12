@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.MediaLeavePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerRemovePayload;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ChatPayload;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.DevicePayload;
@@ -105,6 +106,8 @@ public class RoomInteractionController {
         }
 
         roomsService.removeParticipant(roomId, userId);
+
         topicMessagingService.sendLeave(userId, roomId);
+        mediaMessagingService.sendLeave(new MediaLeavePayload(userId, roomId));
     }
 }

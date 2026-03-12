@@ -16,7 +16,6 @@ public class UserIdHandshakeHandler extends DefaultHandshakeHandler {
                                       Map<String, Object> attributes) {
 
         String query = request.getURI().getQuery();
-        System.out.println(query);
         if (query == null || query.isBlank()) {
             return null;
         }

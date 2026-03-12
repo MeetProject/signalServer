@@ -5,7 +5,6 @@ import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.Capabilitie
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsResponse;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ResumeResponse;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
