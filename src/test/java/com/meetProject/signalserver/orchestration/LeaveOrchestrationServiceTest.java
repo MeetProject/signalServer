@@ -3,14 +3,14 @@ package com.meetProject.signalserver.orchestration;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.meetProject.signalserver.constant.StreamType;
 import com.meetProject.signalserver.model.Room;
-import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.common.MediaOption;
+import com.meetProject.signalserver.model.dto.common.Participant;
+import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.ScreenSharingService;
-import com.meetProject.signalserver.service.SignalMessagingService;
 import com.meetProject.signalserver.service.UserService;
-import java.util.ArrayList;
+import com.meetProject.signalserver.service.message.SignalMessagingService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 public class LeaveOrchestrationServiceTest {
     private UserService userService;
-    private ScreenSharingService screenSharingService;
     private LeaveOrchestrationService leaveService;
 
     @BeforeEach
@@ -27,34 +26,31 @@ public class LeaveOrchestrationServiceTest {
 
         userService = new UserService();
         RoomsService roomService = new RoomsService();
-        screenSharingService = new ScreenSharingService();
-        SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate,
-                screenSharingService, userService);
-        leaveService = new LeaveOrchestrationService(userService, roomService, screenSharingService,
-                signalMessagingService);
+        //WebSocketUserService webSocketUserService = new WebSocketUserService();
+        SignalMessagingService signalMessagingService = new SignalMessagingService(simpMessagingTemplate);
+        leaveService = new LeaveOrchestrationService(userService, roomService, signalMessagingService);
 
-        User user = new User("user1Id", "#000000", "user1", "room1", false);
+        User user = new User("user1Id", "#000000", "user1", "room1");
+        Participant participant = new Participant(user, new MediaOption(true, true), List.of());
         userService.addUser(user);
-        Room room = new Room("room1", new ArrayList<>());
-        room.addParticipant("user1");
+        Room room = new Room("room1");
+        room.addParticipant(participant);
         roomService.createRoom(room);
     }
 
     @Test
     @DisplayName("화면 공유 안한 사용자 나가기 테스트")
     void leaveUserWithNoneScreenShare() {
-        leaveService.leaveUser("user1Id", StreamType.USER);
+        leaveService.leaveUser("user1Id");
         assertThat(userService.getUser("user1Id").roomId()).isNull();
     }
 
     @Test
     @DisplayName("화면 공유 사용자 나가기 테스트")
     void leaveUserWithScreenShare() {
-        screenSharingService.startSharing("room1", "user1Id");
-        leaveService.leaveUser("user1Id", StreamType.USER);
+        leaveService.leaveUser("user1Id");
 
         assertThat(userService.getUser("user1Id").roomId()).isNull();
-        assertThat(screenSharingService.isSharing("room1", "user1Id")).isEqualTo(false);
     }
 
 }

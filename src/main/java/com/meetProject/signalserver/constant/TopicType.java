@@ -6,4 +6,7 @@ public enum TopicType {
     EMOJI,
     DEVICE,
     HANDUP,
+    PARTICIPANT,
+    RTLS,
+    PRODUCER_REMOVE,
 }

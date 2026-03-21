@@ -16,16 +16,33 @@ public class UserIdHandshakeHandler extends DefaultHandshakeHandler {
                                       Map<String, Object> attributes) {
 
         String query = request.getURI().getQuery();
-        if (query == null || query.isBlank()) return null;
+        if (query == null || query.isBlank()) {
+            return null;
+        }
 
         List<String> params = Arrays.stream(query.split("&"))
                 .filter(q -> q.startsWith("userId="))
                 .map(s -> s.substring("userId=".length()))
                 .toList();
 
-        if (params.isEmpty()) return null;
+        if (params.isEmpty()) {
+            return null;
+        }
 
         String userId = params.get(0);
+
+        if(userId == null) {
+            return null;
+        }
+        /*
+        if (userId.equals("mediaServer")) {
+            String Ip = request.getRemoteAddress().getAddress().getHostAddress();
+            List<String> allowedIps = List.of("000.000.0.000");
+            if (Ip == null || !allowedIps.contains(Ip)) {
+                return null;
+            }
+        }
+        */
         attributes.put("userId", userId);
 
         return () -> userId; // Principal 구현

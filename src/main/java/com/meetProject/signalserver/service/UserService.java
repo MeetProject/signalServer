@@ -1,6 +1,6 @@
 package com.meetProject.signalserver.service;
 
-import com.meetProject.signalserver.model.User;
+import com.meetProject.signalserver.model.dto.common.User;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
@@ -17,37 +17,8 @@ public class UserService {
         users.remove(id);
     }
 
-    public boolean exists(String id) {
-        return users.containsKey(id);
-    }
-
     public User getUser(String id) {
         return users.get(id);
     }
 
-    public String getRoomId(String id) {
-        User user = users.get(id);
-        if(user == null){
-            return null;
-        }
-        return user.roomId();
-    }
-
-    public void updateRoomStatus(String id, String roomId) {
-        User user = users.get(id);
-        if(user == null){
-            return;
-        }
-        User updated = new User(user.userId(), user.userName(), user.profileColor(), roomId, user.isHandUp());
-        users.put(id, updated);
-    }
-
-    public void updateUserHandUpStatus(String id, boolean isHandUp) {
-        User user = users.get(id);
-        if(user == null){
-            return;
-        }
-        User updated = new User(user.userId(), user.userName(), user.profileColor(), user.roomId(), isHandUp);
-        users.put(id, updated);
-    }
 }
