@@ -82,16 +82,12 @@ public class RoomInteractionController {
 
     @MessageMapping("/consumer/resume")
     public void consumerResume(@Payload UserConsumerResumePayload resumePayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-
         ConsumerResumeRequestPayload payload = new ConsumerResumeRequestPayload(resumePayload.consumerId());
         mediaMessagingService.sendConsumerResume(payload);
     }
 
     @MessageMapping("/consumer/pause")
     public void consumerPause(@Payload UserConsumerPausePayload pausePayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-
         ConsumerPauseRequestPayload payload = new ConsumerPauseRequestPayload(pausePayload.consumerId());
         mediaMessagingService.sendConsumerPause(payload);
     }
