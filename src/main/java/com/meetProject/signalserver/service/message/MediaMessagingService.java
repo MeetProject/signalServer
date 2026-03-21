@@ -4,12 +4,13 @@ import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.model.dto.common.MediaPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerPauseRequestPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerResumeRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.MediaLeavePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerMutePayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerRemovePayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ResumeRequestPayload;
 import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -42,8 +43,12 @@ public class MediaMessagingService {
         sendMedia(MediaType.PARAMS, payload);
     }
 
-    public void sendResume(ResumeRequestPayload payload) {
-        sendMedia(MediaType.RESUME, payload);
+    public void sendConsumerResume(ConsumerResumeRequestPayload payload) {
+        sendMedia(MediaType.CONSUMER_RESUME, payload);
+    }
+
+    public void sendConsumerPause(ConsumerPauseRequestPayload payload) {
+        sendMedia(MediaType.CONSUMER_PAUSE, payload);
     }
 
     public void sendProducerPause(ProducerMutePayload payload) {

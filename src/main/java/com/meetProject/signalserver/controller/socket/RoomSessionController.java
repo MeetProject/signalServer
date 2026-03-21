@@ -30,11 +30,7 @@ public class RoomSessionController {
     @MessageMapping("/signal/capabilities")
     public void capabilities(@Payload UserCapabilityPayload capabilityPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
-
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
+        String roomId = getRoomId(userId);
 
         CapabilitiesRequestPayload payload = new CapabilitiesRequestPayload(capabilityPayload.correlationId(),userId, roomId);
         mediaMessagingService.sendCapabilities(payload);
@@ -43,11 +39,7 @@ public class RoomSessionController {
     @MessageMapping("/signal/dtls")
     public void dtls(@Payload UserDtlsPayload dtlsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
-
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
+        String roomId = getRoomId(userId);
 
         DtlsRequestPayload payload = new DtlsRequestPayload(dtlsPayload.correlationId(), userId, roomId, dtlsPayload.direction());
         mediaMessagingService.sendDtls(payload);
@@ -56,11 +48,7 @@ public class RoomSessionController {
     @MessageMapping("/signal/dtls/connect")
     public void dtlsConnect(@Payload UserDtlsConnectPayload transportConnectPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
-
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
+        String roomId = getRoomId(userId);
 
         DtlsConnectPayload payload = new DtlsConnectPayload(transportConnectPayload.correlationId(), userId, roomId, transportConnectPayload.dtlsParameters(), transportConnectPayload.direction());
         mediaMessagingService.sendDtlsConnect(payload);
@@ -69,31 +57,20 @@ public class RoomSessionController {
     @MessageMapping("/signal/rtls")
     public void rtls(@Payload UserRtlsPayload rtlsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
+        String roomId = getRoomId(userId);
 
-        RtlsRequestPayload payload = new RtlsRequestPayload(rtlsPayload.correlationId(), userId, rtlsPayload.appData(), rtlsPayload.kind(), rtlsPayload.rtpParameters());
+        RtlsRequestPayload payload = new RtlsRequestPayload(rtlsPayload.correlationId(), userId, roomId, rtlsPayload.appData(), rtlsPayload.kind(), rtlsPayload.rtpParameters());
         mediaMessagingService.sendRtls(payload);
     }
 
     @MessageMapping("/signal/consumerParams")
     public void consumerParams(@Payload UserConsumerParamsPayload consumerParamsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
-
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
+        String roomId = getRoomId(userId);
 
         ConsumerParamsRequestPayload payload = new ConsumerParamsRequestPayload(consumerParamsPayload.correlationId(), userId, roomId, consumerParamsPayload.targetId(),
                 consumerParamsPayload.producerId(), consumerParamsPayload.rtpCapabilities());
         mediaMessagingService.sendConsumerParams(payload);
-    }
-
-    @MessageMapping("/signal/resume")
-    public void resume(@Payload UserResumePayload resumePayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-
-        ResumeRequestPayload payload = new ResumeRequestPayload(resumePayload.correlationId(), userId, resumePayload.consumerId());
-        mediaMessagingService.sendResume(payload);
     }
 
     @MessageMapping("/signal/producer/pause")
@@ -123,6 +100,16 @@ public class RoomSessionController {
     public void leave(SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         leaveService.leaveUser(userId);
+    }
+
+    private String getRoomId(String userId) {
+        String roomId = roomsService.getRoomId(userId);
+
+        if(roomId == null) {
+            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
+        }
+
+        return roomId;
     }
 
 }

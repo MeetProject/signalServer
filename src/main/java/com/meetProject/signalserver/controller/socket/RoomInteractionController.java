@@ -1,13 +1,10 @@
 package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.MediaLeavePayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerRemovePayload;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.ChatPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.DevicePayload;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.EmojiPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.HandUpPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.RemoveProducerPayload;
+import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
+import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserConsumerPausePayload;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserConsumerResumePayload;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.message.MediaMessagingService;
 import com.meetProject.signalserver.service.message.TopicMessagingService;
@@ -81,6 +78,22 @@ public class RoomInteractionController {
 
         topicMessagingService.sendRemoveProducerId(roomId, userId, removeProducerPayload.trackType());
         mediaMessagingService.sendProducerRemove(new ProducerRemovePayload(userId, producerId));
+    }
+
+    @MessageMapping("/consumer/resume")
+    public void consumerResume(@Payload UserConsumerResumePayload resumePayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+
+        ConsumerResumeRequestPayload payload = new ConsumerResumeRequestPayload(resumePayload.consumerId());
+        mediaMessagingService.sendConsumerResume(payload);
+    }
+
+    @MessageMapping("/consumer/pause")
+    public void consumerPause(@Payload UserConsumerPausePayload pausePayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+
+        ConsumerPauseRequestPayload payload = new ConsumerPauseRequestPayload(pausePayload.consumerId());
+        mediaMessagingService.sendConsumerPause(payload);
     }
 
     @MessageMapping("/handUp")

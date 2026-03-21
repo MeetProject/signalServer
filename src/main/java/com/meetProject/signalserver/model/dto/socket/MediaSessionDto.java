@@ -19,14 +19,35 @@ public class MediaSessionDto {
     public record DtlsConnectPayload(String correlationId, String userId, String roomId, DtlsParameters dtlsParameters, String direction) implements MediaPayload {}
     public record DtlsConnectResponse(String correlationId, String userId) {}
 
-    public record RtlsRequestPayload(String correlationId, String userId, AppData appData, String kind, RtpParameters rtpParameters) implements MediaPayload {}
+    public record RtlsRequestPayload(String correlationId, String userId, String roomId, AppData appData, String kind, RtpParameters rtpParameters) implements MediaPayload {}
     public record RtlsResponse(String correlationId, String userId, String producerId) {}
 
     public record ConsumerParamsRequestPayload(String correlationId, String userId, String roomId, String targetId, String producerId, RtpCapabilities rtpCapabilities) implements MediaPayload {}
     public record ConsumerParamsResponse(String correlationId, String userId, ConsumerParams consumerParams) {}
 
-    public record ResumeRequestPayload(String correlationId, String userId, String consumerId) implements MediaPayload {}
-    public record ResumeResponse(String correlationId, String userId) {}
+    public record ConsumerResumeRequestPayload(String consumerId) implements MediaPayload {
+        @Override
+        public String correlationId() {
+            return null;
+        }
+
+        @Override
+        public String userId() {
+            return null;
+        }
+    }
+
+    public record ConsumerPauseRequestPayload(String consumerId) implements MediaPayload {
+        @Override
+        public String correlationId() {
+            return null;
+        }
+
+        @Override
+        public String userId() {
+            return null;
+        }
+    }
 
     public record ProducerMutePayload(String correlationId, String userId, String producerId) implements MediaPayload {}
     public record ProducerMuteResponse(String correlationId, String userId) {}
