@@ -6,6 +6,8 @@ import com.meetProject.signalserver.model.dto.common.Participant;
 import com.meetProject.signalserver.model.dto.common.User;
 import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
 import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.ResyncPayload;
+import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.ResyncResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;
@@ -47,5 +49,18 @@ public class JoinOrchestrationService {
             signalMessagingService.sendError(userId, response);
         }
 
+    }
+
+    public void resyncRoom(String userId, ResyncPayload resyncPayload) {
+        User user = userService.getUser(userId);
+        String roomId = roomsService.getRoomId(userId);
+
+        if (user == null || roomId == null) {
+            signalMessagingService.sendSignal(userId, new ResyncResponse(resyncPayload.correlationId(), List.of(), true));
+            return;
+        }
+
+        List<Participant> participants = roomsService.getParticipants(roomId).stream().toList();
+        signalMessagingService.sendSignal(userId, new ResyncResponse(resyncPayload.correlationId(), participants, false));
     }
 }

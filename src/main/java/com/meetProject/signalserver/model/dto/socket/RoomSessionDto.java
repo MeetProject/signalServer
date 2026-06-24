@@ -30,4 +30,7 @@ public class RoomSessionDto {
 
     public record JoinPayload(String roomId, String correlationId, MediaOption mediaOption) {}
     public record JoinResponse(String correlationId, List<Participant> participants) implements SignalResponse {}
+
+    public record ResyncPayload(String roomId, String correlationId) {}
+    public record ResyncResponse(String correlationId, List<Participant> participants, boolean rejoinRequired) implements SignalResponse {}
 }

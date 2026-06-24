@@ -95,6 +95,12 @@ public class RoomSessionController {
         joinService.joinRoom(userId, joinPayload);
     }
 
+    @MessageMapping("/signal/resync")
+    public void resync(@Payload ResyncPayload resyncPayload, SimpMessageHeaderAccessor header) {
+        String userId = WebSocketUtils.getUserId(header.getUser());
+        joinService.resyncRoom(userId, resyncPayload);
+    }
+
 
     @MessageMapping("/signal/leave")
     public void leave(SimpMessageHeaderAccessor header) {
