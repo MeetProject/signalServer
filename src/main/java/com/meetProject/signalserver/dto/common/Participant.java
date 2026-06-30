@@ -1,6 +1,5 @@
-package com.meetProject.signalserver.model.dto.common;
+package com.meetProject.signalserver.dto.common;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;

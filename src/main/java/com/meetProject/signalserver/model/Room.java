@@ -2,7 +2,7 @@ package com.meetProject.signalserver.model;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.RoomRule;
-import com.meetProject.signalserver.model.dto.common.Participant;
+import com.meetProject.signalserver.dto.common.Participant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

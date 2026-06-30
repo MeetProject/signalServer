@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.model.dto.rest;
+package com.meetProject.signalserver.dto.rest;
 
 public class RoomSessionDto {
     public record CreateRoomResponse(String roomId)  {}

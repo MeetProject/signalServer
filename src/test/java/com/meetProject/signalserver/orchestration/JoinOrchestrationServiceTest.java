@@ -4,10 +4,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.common.MediaOption;
-import com.meetProject.signalserver.model.dto.common.Participant;
-import com.meetProject.signalserver.model.dto.common.User;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
+import com.meetProject.signalserver.dto.common.MediaOption;
+import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.dto.common.User;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinPayload;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;

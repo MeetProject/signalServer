@@ -1,17 +1,17 @@
 package com.meetProject.signalserver.service.message;
 
 import com.meetProject.signalserver.constant.MediaType;
-import com.meetProject.signalserver.model.dto.common.MediaPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerPauseRequestPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerResumeRequestPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsRequestPayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.MediaLeavePayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerMutePayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ProducerRemovePayload;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsRequestPayload;
+import com.meetProject.signalserver.dto.common.MediaPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerPauseRequestPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerResumeRequestPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsRequestPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeavePayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMutePayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerRemovePayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsRequestPayload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 

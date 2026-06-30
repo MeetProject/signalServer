@@ -2,7 +2,7 @@ package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
+import com.meetProject.signalserver.dto.socket.ErrorResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;
 import com.meetProject.signalserver.service.message.TopicMessagingService;

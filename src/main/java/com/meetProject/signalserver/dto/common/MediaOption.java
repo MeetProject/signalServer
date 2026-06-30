@@ -1,3 +1,3 @@
-package com.meetProject.signalserver.model.dto.common;
+package com.meetProject.signalserver.dto.common;
 
 public record MediaOption(Boolean video, Boolean audio) {}

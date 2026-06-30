@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.model.dto.rest;
+package com.meetProject.signalserver.dto.rest;
 
 public class UserSessionDto {
     public record RegisterPayload(String userName, String userColor) {}

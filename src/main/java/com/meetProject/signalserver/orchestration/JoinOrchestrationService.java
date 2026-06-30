@@ -2,12 +2,12 @@ package com.meetProject.signalserver.orchestration;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.common.Participant;
-import com.meetProject.signalserver.model.dto.common.User;
-import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.JoinPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.ResyncPayload;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.ResyncResponse;
+import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.dto.common.User;
+import com.meetProject.signalserver.dto.socket.ErrorResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinPayload;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.ResyncPayload;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.ResyncResponse;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;

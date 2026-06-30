@@ -1,10 +1,8 @@
 package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserConsumerPausePayload;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserConsumerResumePayload;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerPausePayload;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerResumePayload;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.message.MediaMessagingService;
 import com.meetProject.signalserver.service.message.TopicMessagingService;

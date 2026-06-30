@@ -1,6 +1,6 @@
 package com.meetProject.signalserver.listener;
 
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.MediaLeavePayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeavePayload;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;

@@ -1,8 +1,6 @@
 package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
 import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
 import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.RoomsService;

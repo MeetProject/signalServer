@@ -2,12 +2,11 @@ package com.meetProject.signalserver.service.message;
 
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.constant.TopicType;
-import com.meetProject.signalserver.model.dto.common.MediaOption;
-import com.meetProject.signalserver.model.dto.common.Participant;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
+import com.meetProject.signalserver.dto.common.MediaOption;
+import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import com.meetProject.signalserver.model.dto.common.TopicResponse;
+import com.meetProject.signalserver.dto.common.TopicResponse;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,9 +1,9 @@
-package com.meetProject.signalserver.model.dto.socket;
+package com.meetProject.signalserver.dto.socket;
 
 import com.meetProject.signalserver.constant.Emoji;
-import com.meetProject.signalserver.model.dto.common.MediaOption;
-import com.meetProject.signalserver.model.dto.common.Participant;
-import com.meetProject.signalserver.model.dto.common.TopicResponse;
+import com.meetProject.signalserver.dto.common.MediaOption;
+import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.dto.common.TopicResponse;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 
 public class RoomInteractionDto {

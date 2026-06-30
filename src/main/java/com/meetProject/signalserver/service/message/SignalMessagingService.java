@@ -1,16 +1,14 @@
 package com.meetProject.signalserver.service.message;
 
-import com.meetProject.signalserver.model.dto.common.Participant;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.CapabilitiesResponse;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.ConsumerParamsResponse;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsConnectResponse;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.DtlsResponse;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.RtlsResponse;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.*;
-import com.meetProject.signalserver.model.dto.common.User;
-import com.meetProject.signalserver.model.dto.socket.ErrorResponse;
-import com.meetProject.signalserver.model.dto.common.SignalResponse;
+import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsResponse;
+import com.meetProject.signalserver.dto.common.User;
+import com.meetProject.signalserver.dto.socket.ErrorResponse;
+import com.meetProject.signalserver.dto.common.SignalResponse;
 import java.util.List;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

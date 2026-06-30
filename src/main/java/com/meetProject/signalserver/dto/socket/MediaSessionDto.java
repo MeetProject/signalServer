@@ -1,13 +1,13 @@
-package com.meetProject.signalserver.model.dto.socket;
+package com.meetProject.signalserver.dto.socket;
 
 import com.meetProject.signalserver.constant.DtlsDirection;
-import com.meetProject.signalserver.model.dto.common.AppData;
-import com.meetProject.signalserver.model.dto.common.ConsumerParams;
-import com.meetProject.signalserver.model.dto.common.MediaPayload;
-import com.meetProject.signalserver.model.dto.common.RtpCapabilities;
-import com.meetProject.signalserver.model.dto.common.RtpParameters;
-import com.meetProject.signalserver.model.dto.common.TransportOptions;
-import com.meetProject.signalserver.model.dto.common.TransportOptions.DtlsParameters;
+import com.meetProject.signalserver.dto.common.AppData;
+import com.meetProject.signalserver.dto.common.ConsumerParams;
+import com.meetProject.signalserver.dto.common.MediaPayload;
+import com.meetProject.signalserver.dto.common.RtpCapabilities;
+import com.meetProject.signalserver.dto.common.RtpParameters;
+import com.meetProject.signalserver.dto.common.TransportOptions;
+import com.meetProject.signalserver.dto.common.TransportOptions.DtlsParameters;
 
 public class MediaSessionDto {
     public record CapabilitiesRequestPayload(String correlationId, String userId, String roomId) implements MediaPayload {}

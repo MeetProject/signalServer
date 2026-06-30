@@ -1,10 +1,10 @@
 package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.model.Room;
-import com.meetProject.signalserver.model.dto.common.MediaOption;
-import com.meetProject.signalserver.model.dto.common.Participant;
-import com.meetProject.signalserver.model.dto.common.User;
-import java.util.ArrayList;
+import com.meetProject.signalserver.dto.common.MediaOption;
+import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.dto.common.User;
+
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
