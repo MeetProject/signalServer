@@ -2,10 +2,10 @@ package com.meetProject.signalserver.orchestration;
 
 import static org.mockito.Mockito.*;
 
-import com.meetProject.signalserver.model.Room;
-import com.meetProject.signalserver.dto.common.MediaOption;
-import com.meetProject.signalserver.dto.common.Participant;
-import com.meetProject.signalserver.dto.common.User;
+import com.meetProject.signalserver.domain.Room;
+import com.meetProject.signalserver.domain.MediaOption;
+import com.meetProject.signalserver.domain.Participant;
+import com.meetProject.signalserver.domain.User;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.message.SignalMessagingService;

@@ -1,6 +1,15 @@
 package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerPauseRequestPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerResumeRequestPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeavePayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerRemovePayload;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ChatPayload;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.DevicePayload;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.EmojiPayload;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.HandUpPayload;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.RemoveProducerPayload;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerPausePayload;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerResumePayload;
 import com.meetProject.signalserver.service.RoomsService;
@@ -79,13 +88,13 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/consumer/resume")
-    public void consumerResume(@Payload UserConsumerResumePayload resumePayload, SimpMessageHeaderAccessor header) {
+    public void consumerResume(@Payload UserConsumerResumePayload resumePayload) {
         ConsumerResumeRequestPayload payload = new ConsumerResumeRequestPayload(resumePayload.consumerId());
         mediaMessagingService.sendConsumerResume(payload);
     }
 
     @MessageMapping("/consumer/pause")
-    public void consumerPause(@Payload UserConsumerPausePayload pausePayload, SimpMessageHeaderAccessor header) {
+    public void consumerPause(@Payload UserConsumerPausePayload pausePayload) {
         ConsumerPauseRequestPayload payload = new ConsumerPauseRequestPayload(pausePayload.consumerId());
         mediaMessagingService.sendConsumerPause(payload);
     }

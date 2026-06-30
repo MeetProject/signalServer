@@ -1,14 +1,21 @@
 package com.meetProject.signalserver.service.message;
 
-import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.domain.Participant;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsResponse;
-import com.meetProject.signalserver.dto.common.User;
+import com.meetProject.signalserver.domain.User;
 import com.meetProject.signalserver.dto.socket.ErrorResponse;
 import com.meetProject.signalserver.dto.common.SignalResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinPayload;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserCapabilityResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerParamsResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsConnectResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserRtlsResponse;
 import java.util.List;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;

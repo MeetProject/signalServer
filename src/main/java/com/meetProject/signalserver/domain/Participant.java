@@ -1,4 +1,4 @@
-package com.meetProject.signalserver.dto.common;
+package com.meetProject.signalserver.domain;
 
 import java.util.List;
 import java.util.Set;

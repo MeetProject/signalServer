@@ -1,9 +1,9 @@
 package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.Room;
-import com.meetProject.signalserver.dto.common.MediaOption;
-import com.meetProject.signalserver.dto.common.Participant;
+import com.meetProject.signalserver.domain.Room;
+import com.meetProject.signalserver.domain.MediaOption;
+import com.meetProject.signalserver.domain.Participant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

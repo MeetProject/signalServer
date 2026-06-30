@@ -1,7 +1,7 @@
 package com.meetProject.signalserver.controller.rest;
 
 import com.meetProject.signalserver.constant.RoomRule;
-import com.meetProject.signalserver.model.Room;
+import com.meetProject.signalserver.domain.Room;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.CreateRoomResponse;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.LeaveResponse;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.ValidateRoomResponse;

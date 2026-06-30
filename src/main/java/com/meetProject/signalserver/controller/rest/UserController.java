@@ -1,6 +1,6 @@
 package com.meetProject.signalserver.controller.rest;
 
-import com.meetProject.signalserver.dto.common.User;
+import com.meetProject.signalserver.domain.User;
 import com.meetProject.signalserver.dto.rest.UserSessionDto.RegisterPayload;
 import com.meetProject.signalserver.dto.rest.UserSessionDto.RegisterResponse;
 import com.meetProject.signalserver.service.UserService;

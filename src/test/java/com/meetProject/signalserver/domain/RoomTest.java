@@ -1,12 +1,9 @@
-package com.meetProject.signalserver.model;
+package com.meetProject.signalserver.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
 import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.RoomRule;
-import com.meetProject.signalserver.dto.common.MediaOption;
-import com.meetProject.signalserver.dto.common.Participant;
-import com.meetProject.signalserver.dto.common.User;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
