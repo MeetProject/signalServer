@@ -1,13 +1,12 @@
 package com.meetProject.signalserver.listener;
 
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeavePayload;
-import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
 import com.meetProject.signalserver.service.RoomsService;
 import com.meetProject.signalserver.service.UserService;
 import com.meetProject.signalserver.service.WebSocketUserService;
 import com.meetProject.signalserver.service.message.MediaMessagingService;
 import com.meetProject.signalserver.service.message.TopicMessagingService;
-import com.meetProject.signalserver.util.WebSocketUtils;
+import java.security.Principal;
 import java.time.Instant;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
@@ -34,23 +33,27 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleWebSocketDisconnect(SessionDisconnectEvent event) {
-        taskScheduler.schedule(() -> {
-            String userId = WebSocketUtils.getUserId(event.getUser());
-            if (userId == null) {
-                return;
-            }
+        Principal principal = event.getUser();
+        if (principal == null) {
+            return;
+        }
+        String userId = principal.getName();
 
+        taskScheduler.schedule(() -> {
             if (webSocketUserService.isUserConnected(userId)) {
                 return;
             }
 
-            String roomId = roomsService.getRoomId(userId);
-            if(roomId != null) {
-                roomsService.removeParticipant(roomId, userId);
-                topicMessagingService.sendLeave(userId, roomId);
-                mediaMessagingService.sendLeave(new MediaLeavePayload(userId, roomId));
+            try {
+                String roomId = roomsService.getRoomId(userId);
+                if (roomId != null) {
+                    roomsService.removeParticipant(roomId, userId);
+                    topicMessagingService.sendLeave(userId, roomId);
+                    mediaMessagingService.sendLeave(new MediaLeavePayload(userId, roomId));
+                }
+            } finally {
+                userService.removeUser(userId);
             }
-            userService.removeUser(userId);
         }, Instant.now().plusSeconds(10));
     }
 }
