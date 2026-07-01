@@ -1,6 +1,10 @@
 package com.meetProject.signalserver.constant;
 
 public enum ErrorCode {
-    E001,
-    E002
+    ROOM_NOT_FOUND,
+    ROOM_FULL,
+    USER_NOT_FOUND,
+    USER_NOT_JOINED,
+    INVALID_INPUT,
+    INTERNAL_ERROR
 }
