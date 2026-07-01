@@ -1,8 +1,8 @@
 package com.meetProject.signalserver.dto.socket;
 
 import com.meetProject.signalserver.constant.Emoji;
-import com.meetProject.signalserver.domain.MediaOption;
 import com.meetProject.signalserver.domain.Participant;
+import com.meetProject.signalserver.domain.MediaOption;
 import com.meetProject.signalserver.dto.common.TopicResponse;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 
@@ -21,7 +21,7 @@ public class RoomInteractionDto {
         }
     }
 
-    public record RemoveProducerPayload(String producerId, String trackType) {}
+    public record RemoveProducerRequest(String producerId, String trackType) {}
     public record RemoveProducerResponse(String userId, String trackType) implements TopicResponse {
         @Override
         public String id() {
@@ -29,14 +29,14 @@ public class RoomInteractionDto {
         }
     }
 
-    public record ChatPayload(String message) {}
+    public record ChatRequest(String message) {}
     public record ChatResponse(String id, String userId, String message, long timestamp) implements TopicResponse {
-        public ChatResponse(String userId, String message, long timestamp) {
-            this(RandomIdGenerator.uuidGenerator(), userId, message, timestamp);
+        public static ChatResponse of(String userId, String message) {
+            return new ChatResponse(RandomIdGenerator.uuidGenerator(), userId, message, System.currentTimeMillis());
         }
     }
 
-    public record DevicePayload (MediaOption mediaOption) {}
+    public record DeviceRequest (MediaOption mediaOption) {}
     public record DeviceResponse(String userId, MediaOption mediaOption) implements TopicResponse {
         @Override
         public String id() {
@@ -44,14 +44,13 @@ public class RoomInteractionDto {
         }
     }
 
-    public record EmojiPayload(Emoji emoji) {}
+    public record EmojiRequest(Emoji emoji) {}
     public record EmojiResponse(String id, String userId, Emoji emoji, long timestamp) implements TopicResponse {
-        public EmojiResponse(String userId, Emoji emoji, long timestamp) {
-            this(RandomIdGenerator.uuidGenerator(), userId, emoji, timestamp);
+        public static EmojiResponse of(String userId, Emoji emoji) {
+            return new EmojiResponse(RandomIdGenerator.uuidGenerator(), userId, emoji, System.currentTimeMillis());
         }
     }
 
-    public record HandUpPayload (boolean value) {}
     public record HandUpResponse (String userId, boolean value) implements TopicResponse {
         @Override
         public String id() {

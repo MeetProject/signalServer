@@ -5,5 +5,5 @@ public class RoomSessionDto {
 
     public record ValidateRoomResponse(boolean value) {}
 
-    public record LeaveResponse(String userId, String roomId) {}
+    public record LeaveRequest(String userId, String roomId) {}
 }
