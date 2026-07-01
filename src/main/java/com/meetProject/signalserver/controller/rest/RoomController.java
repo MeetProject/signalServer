@@ -1,14 +1,12 @@
 package com.meetProject.signalserver.controller.rest;
 
-import com.meetProject.signalserver.constant.RoomRule;
-import com.meetProject.signalserver.domain.Room;
+import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.CreateRoomResponse;
-import com.meetProject.signalserver.dto.rest.RoomSessionDto.LeaveResponse;
+import com.meetProject.signalserver.dto.rest.RoomSessionDto.LeaveRequest;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.ValidateRoomResponse;
-import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.message.TopicMessagingService;
-import com.meetProject.signalserver.util.RandomIdGenerator;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
+import com.meetProject.signalserver.infrastructure.StompMessageSender;
+import com.meetProject.signalserver.service.RoomService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,36 +19,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/rooms")
 public class RoomController {
-    private final RoomsService roomsService;
-    private final LeaveOrchestrationService leaveService;
-    private final TopicMessagingService topicMessagingService;
+    private final RoomService roomsService;
+    private final StompMessageSender stompMessageSender;
 
-    public RoomController(RoomsService roomsService, LeaveOrchestrationService leaveService, TopicMessagingService topicMessagingService) {
+    public RoomController(RoomService roomsService, StompMessageSender stompMessageSender) {
         this.roomsService = roomsService;
-        this.leaveService = leaveService;
-        this.topicMessagingService = topicMessagingService;
+        this.stompMessageSender = stompMessageSender;
     }
 
     @PostMapping
     public ResponseEntity<CreateRoomResponse> createRoom() {
-        String roomId = RandomIdGenerator.randomId(RoomRule.ROOM_ID_LENGTH);
-        Room room = new Room(roomId);
-        roomsService.createRoom(room);
+        CreateRoomResponse response = roomsService.save();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CreateRoomResponse(roomId));
+                .body(response);
     }
 
     @GetMapping("/{roomId}/validate")
     public ResponseEntity<ValidateRoomResponse> validateRoom(@PathVariable String roomId) {
-        boolean isValid = roomsService.exists(roomId) &&
-                roomsService.getParticipants(roomId).size() < RoomRule.MAX_ROOM_PARTICIPANTS;
-        return ResponseEntity.ok(new ValidateRoomResponse(isValid));
+        ValidateRoomResponse response = roomsService.validate(roomId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/leave")
-    public ResponseEntity<Void> leaveRoom(@RequestBody LeaveResponse leaveResponse) {
-        leaveService.leaveUser(leaveResponse.userId());
-        topicMessagingService.sendLeave(leaveResponse.userId(), leaveResponse.roomId());
+    public ResponseEntity<Void> leaveRoom(@RequestBody LeaveRequest leaveRequest) {
+        roomsService.leave(leaveRequest.userId()).ifPresent(roomId ->
+                stompMessageSender.broadcast(roomId, TopicType.LEAVE, new LeaveResponse(leaveRequest.userId())));
         return ResponseEntity.ok().build();
     }
 }

@@ -1,25 +1,30 @@
 package com.meetProject.signalserver.controller.socket;
 
-import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesRequestPayload;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsRequestPayload;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectPayload;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsRequestPayload;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMutePayload;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsRequestPayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinPayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.ResyncPayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserCapabilityPayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerParamsPayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsConnectPayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsPayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserProducerMutePayload;
-import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserRtlsPayload;
-import com.meetProject.signalserver.orchestration.JoinOrchestrationService;
-import com.meetProject.signalserver.orchestration.LeaveOrchestrationService;
-import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.message.MediaMessagingService;
+import com.meetProject.signalserver.constant.MediaType;
+import com.meetProject.signalserver.constant.TopicType;
+import com.meetProject.signalserver.dto.application.ParticipantPayload;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMuteRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsRequest;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ParticipantResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.ResyncRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.ResyncResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserCapabilityRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerParamsRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsConnectRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserProducerMuteRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserRtlsRequest;
+import com.meetProject.signalserver.infrastructure.StompMessageSender;
+import com.meetProject.signalserver.service.ParticipantService;
+import com.meetProject.signalserver.service.RoomService;
 import com.meetProject.signalserver.util.WebSocketUtils;
+import java.util.List;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -27,107 +32,92 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class RoomSessionController {
-    private final MediaMessagingService mediaMessagingService;
-    private final JoinOrchestrationService joinService;
-    private final LeaveOrchestrationService leaveService;
-    private final RoomsService roomsService;
+    private final RoomService roomService;
+    private final ParticipantService participantService;
+    private final StompMessageSender stompMessageSender;
 
-    public RoomSessionController(MediaMessagingService mediaMessagingService,  LeaveOrchestrationService leaveService,  JoinOrchestrationService joinService, RoomsService roomsService) {
-        this.mediaMessagingService = mediaMessagingService;
-        this.joinService = joinService;
-        this.leaveService = leaveService;
-        this.roomsService = roomsService;
+    public RoomSessionController(RoomService roomService, ParticipantService participantService, StompMessageSender stompMessageSender) {
+        this.roomService = roomService;
+        this.participantService = participantService;
+        this.stompMessageSender = stompMessageSender;
     }
 
     @MessageMapping("/signal/capabilities")
-    public void capabilities(@Payload UserCapabilityPayload capabilityPayload, SimpMessageHeaderAccessor header) {
+    public void capabilities(@Payload UserCapabilityRequest capabilityPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = getRoomId(userId);
+        String roomId = participantService.getJoinedRoomId(userId);
 
-        CapabilitiesRequestPayload payload = new CapabilitiesRequestPayload(capabilityPayload.correlationId(),userId, roomId);
-        mediaMessagingService.sendCapabilities(payload);
+        stompMessageSender.sendToMediaServer(MediaType.CAPABILITIES, new CapabilitiesRequest(capabilityPayload.correlationId(),userId, roomId));
     }
 
     @MessageMapping("/signal/dtls")
-    public void dtls(@Payload UserDtlsPayload dtlsPayload, SimpMessageHeaderAccessor header) {
+    public void dtls(@Payload UserDtlsRequest dtlsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = getRoomId(userId);
+        String roomId = participantService.getJoinedRoomId(userId);
 
-        DtlsRequestPayload payload = new DtlsRequestPayload(dtlsPayload.correlationId(), userId, roomId, dtlsPayload.direction());
-        mediaMessagingService.sendDtls(payload);
+        stompMessageSender.sendToMediaServer(MediaType.DTLS, new DtlsRequest(dtlsPayload.correlationId(), userId, roomId, dtlsPayload.direction()));
     }
 
     @MessageMapping("/signal/dtls/connect")
-    public void dtlsConnect(@Payload UserDtlsConnectPayload transportConnectPayload, SimpMessageHeaderAccessor header) {
+    public void dtlsConnect(@Payload UserDtlsConnectRequest transportConnectPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = getRoomId(userId);
+        String roomId = participantService.getJoinedRoomId(userId);
 
-        DtlsConnectPayload payload = new DtlsConnectPayload(transportConnectPayload.correlationId(), userId, roomId, transportConnectPayload.dtlsParameters(), transportConnectPayload.direction());
-        mediaMessagingService.sendDtlsConnect(payload);
+        stompMessageSender.sendToMediaServer(MediaType.DTLSCONNECT, new DtlsConnectRequest(
+                transportConnectPayload.correlationId(),
+                userId,
+                roomId,
+                transportConnectPayload.dtlsParameters(),
+                transportConnectPayload.direction()
+        ));
     }
 
     @MessageMapping("/signal/rtls")
-    public void rtls(@Payload UserRtlsPayload rtlsPayload, SimpMessageHeaderAccessor header) {
+    public void rtls(@Payload UserRtlsRequest rtlsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = getRoomId(userId);
+        String roomId = participantService.getJoinedRoomId(userId);
 
-        RtlsRequestPayload payload = new RtlsRequestPayload(rtlsPayload.correlationId(), userId, roomId, rtlsPayload.appData(), rtlsPayload.kind(), rtlsPayload.rtpParameters());
-        mediaMessagingService.sendRtls(payload);
+        stompMessageSender.sendToMediaServer(MediaType.RTLS, new RtlsRequest(rtlsPayload.correlationId(), userId, roomId, rtlsPayload.appData(), rtlsPayload.kind(), rtlsPayload.rtpParameters()));
     }
 
     @MessageMapping("/signal/consumerParams")
-    public void consumerParams(@Payload UserConsumerParamsPayload consumerParamsPayload, SimpMessageHeaderAccessor header) {
+    public void consumerParams(@Payload UserConsumerParamsRequest consumerParamsPayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = getRoomId(userId);
+        String roomId = participantService.getJoinedRoomId(userId);
 
-        ConsumerParamsRequestPayload payload = new ConsumerParamsRequestPayload(consumerParamsPayload.correlationId(), userId, roomId, consumerParamsPayload.targetId(),
-                consumerParamsPayload.producerId(), consumerParamsPayload.rtpCapabilities());
-        mediaMessagingService.sendConsumerParams(payload);
+        stompMessageSender.sendToMediaServer(MediaType.PARAMS, new ConsumerParamsRequest(consumerParamsPayload.correlationId(), userId, roomId, consumerParamsPayload.targetId(),
+                consumerParamsPayload.producerId(), consumerParamsPayload.rtpCapabilities()));
     }
 
     @MessageMapping("/signal/producer/pause")
-    public void producerPause(@Payload UserProducerMutePayload mutePayload, SimpMessageHeaderAccessor header) {
+    public void producerPause(@Payload UserProducerMuteRequest mutePayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
 
-        ProducerMutePayload payload = new ProducerMutePayload(mutePayload.correlationId(), userId, mutePayload.producerId());
-        mediaMessagingService.sendProducerPause(payload);
+        stompMessageSender.sendToMediaServer(MediaType.PRODUCER_PAUSE, new ProducerMuteRequest(mutePayload.correlationId(), userId, mutePayload.producerId()));
     }
 
     @MessageMapping("/signal/producer/resume")
-    public void producerResume(@Payload UserProducerMutePayload mutePayload, SimpMessageHeaderAccessor header) {
+    public void producerResume(@Payload UserProducerMuteRequest mutePayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
 
-        ProducerMutePayload payload = new ProducerMutePayload(mutePayload.correlationId(), userId, mutePayload.producerId());
-        mediaMessagingService.sendProducerResume(payload);
+        stompMessageSender.sendToMediaServer(MediaType.PRODUCER_RESUME, new ProducerMuteRequest(mutePayload.correlationId(), userId, mutePayload.producerId()));
     }
 
     @MessageMapping("/signal/join")
-    public void join(@Payload JoinPayload joinPayload, SimpMessageHeaderAccessor header) {
+    public void join(@Payload JoinRequest joinRequest, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        joinService.joinRoom(userId, joinPayload);
+        ParticipantPayload participantPayload = roomService.join(userId, joinRequest);
+
+        stompMessageSender.sendToUser(userId, new JoinResponse(joinRequest.correlationId(), participantPayload.others()));
+        stompMessageSender.broadcast(joinRequest.roomId(), TopicType.PARTICIPANT, new ParticipantResponse(participantPayload.joiner()));
     }
 
     @MessageMapping("/signal/resync")
-    public void resync(@Payload ResyncPayload resyncPayload, SimpMessageHeaderAccessor header) {
+    public void resync(@Payload ResyncRequest resyncRequest, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        joinService.resyncRoom(userId, resyncPayload);
+        ResyncResponse response = roomService.resync(userId)
+                .map(participants -> new ResyncResponse(resyncRequest.correlationId(), participants, false))
+                .orElseGet(() -> new ResyncResponse(resyncRequest.correlationId(), List.of(), true));
+        stompMessageSender.sendToUser(userId, response);
     }
-
-
-    @MessageMapping("/signal/leave")
-    public void leave(SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        leaveService.leaveUser(userId);
-    }
-
-    private String getRoomId(String userId) {
-        String roomId = roomsService.getRoomId(userId);
-
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
-
-        return roomId;
-    }
-
 }

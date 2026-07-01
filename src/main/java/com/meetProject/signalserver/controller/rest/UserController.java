@@ -1,10 +1,9 @@
 package com.meetProject.signalserver.controller.rest;
 
-import com.meetProject.signalserver.domain.User;
 import com.meetProject.signalserver.dto.rest.UserSessionDto.RegisterPayload;
 import com.meetProject.signalserver.dto.rest.UserSessionDto.RegisterResponse;
 import com.meetProject.signalserver.service.UserService;
-import com.meetProject.signalserver.util.RandomIdGenerator;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,9 +21,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterPayload payload) {
-        String userId =  RandomIdGenerator.uuidGenerator();
-        User user = new User(userId, payload.userName(), payload.userColor());
-        userService.addUser(user);
-        return ResponseEntity.ok(new RegisterResponse(userId));
+        RegisterResponse response = userService.create(payload.userName(), payload.userColor());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
