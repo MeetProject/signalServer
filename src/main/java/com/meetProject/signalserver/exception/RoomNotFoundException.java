@@ -1,10 +1,9 @@
 package com.meetProject.signalserver.exception;
 
 import com.meetProject.signalserver.constant.ErrorCode;
-import com.meetProject.signalserver.constant.ErrorMessage;
 
 public class RoomNotFoundException extends BusinessException {
     public RoomNotFoundException() {
-        super(ErrorCode.ROOM_NOT_FOUND, ErrorMessage.ROOM_NOT_FOUND);
+        super(ErrorCode.ROOM_NOT_FOUND, "존재하지 않는 방 입니다.");
     }
 }
