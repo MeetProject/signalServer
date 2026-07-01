@@ -1,32 +1,66 @@
 package com.meetProject.signalserver.domain;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
 public class Participant {
-    private final User user;
-    @Setter
-    private boolean isHandUp;
-    @Setter
+    private User user;
+    private boolean isHandsUp;
     private MediaOption mediaOption;
-    private final Set<String> producerIds;
+    private Set<String> producerIds;
 
-    public Participant(User user, MediaOption mediaOption, List<String> producerId) {
+    public Participant(User user, boolean isHansUp, MediaOption mediaOption, List<String> producerIds) {
         this.user = user;
-        this.isHandUp = false;
+        this.isHandsUp = isHansUp;
         this.mediaOption = mediaOption;
-        this.producerIds = new ConcurrentSkipListSet<>(producerId);
+        this.producerIds = new HashSet<>(producerIds);
     }
 
     public void addProducerId(String producerId) {
-        this.producerIds.add(producerId);
+        producerIds.add(producerId);
     }
 
     public void removeProducerId(String producerId) {
-        this.producerIds.remove(producerId);
+        producerIds.remove(producerId);
+    }
+
+    public void toggleAudio() {
+        this.mediaOption = mediaOption.toggleAudio();
+    }
+
+    public void toggleVideo() {
+        this.mediaOption = mediaOption.toggleVideo();
+    }
+
+    public boolean toggleHandsUp() {
+        boolean prev = isHandsUp;
+        this.isHandsUp = !prev;
+        return !prev;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public boolean getIsHandsUp() {
+        return isHandsUp;
+    }
+
+    public MediaOption getMediaOption() {
+        return mediaOption;
+    }
+
+    public List<String> getProducerIds() {
+        return new ArrayList<>(producerIds);
+    }
+
+    public String getUserId() {
+        return user.getId();
+    }
+
+    public UserName getUserName() {
+        return user.getUserName();
     }
 }

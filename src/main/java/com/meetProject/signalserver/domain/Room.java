@@ -1,37 +1,34 @@
 package com.meetProject.signalserver.domain;
 
-import com.meetProject.signalserver.constant.ErrorMessage;
 import com.meetProject.signalserver.constant.RoomRule;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.Getter;
+import com.meetProject.signalserver.util.RandomIdGenerator;
+import java.time.LocalDateTime;
 
 public class Room {
-    @Getter
-    private final String roomId;
-    private final Map<String, Participant> participants = new ConcurrentHashMap<>();
+    private final String id;
+    private final LocalDateTime createdAt;
 
-    public Room(String roomId) {
-        this.roomId = roomId;
+    private Room(String id, LocalDateTime createdAt) {
+        this.id = id;
+        this.createdAt = createdAt;
     }
 
-    public HashMap<String, Participant> getParticipants() {
-        return new HashMap<>(participants);
+    public static Room create() {
+        String id = RandomIdGenerator.randomId(RoomRule.ROOM_ID_LENGTH);
+        LocalDateTime now = LocalDateTime.now();
+
+        return new Room(id, now);
     }
 
-    public void addParticipant(Participant participant) {
-        if(participants.size() >= RoomRule.MAX_ROOM_PARTICIPANTS) {
-            throw new IllegalArgumentException(ErrorMessage.ROOM_FULL);
-        }
-
-        if(participants.get(participant.getUser().userId()) != null) {
-            throw new IllegalArgumentException(ErrorMessage.ROOM_ALREADY_JOINED);
-        }
-        participants.put(participant.getUser().userId(), participant);
+    public static Room restore(String id, LocalDateTime createdAt) {
+        return new Room(id, createdAt);
     }
 
-    public void removeParticipant(String participant) {
-        participants.remove(participant);
+    public String getId() {
+        return id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }
