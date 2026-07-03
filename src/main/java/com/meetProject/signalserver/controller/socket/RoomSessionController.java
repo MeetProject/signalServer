@@ -5,7 +5,9 @@ import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.domain.Participant;
 import com.meetProject.signalserver.dto.application.JoinResult;
 import com.meetProject.signalserver.dto.application.ResyncResult;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeaveRequest;
 import com.meetProject.signalserver.dto.socket.ParticipantDto;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ParticipantResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinRequest;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinResponse;
@@ -92,6 +94,10 @@ public class RoomSessionController {
     @MessageMapping("/signal/join")
     public void join(@Valid @Payload JoinRequest joinRequest, Principal principal) {
         String userId = principal.getName();
+        roomService.leave(userId).ifPresent(previousRoomId -> {
+            stompMessageSender.broadcast(previousRoomId, TopicType.LEAVE, new LeaveResponse(userId));
+            stompMessageSender.sendToMediaServer(MediaType.LEAVE, new MediaLeaveRequest(previousRoomId, userId));
+        });
         JoinResult result = roomService.join(userId, joinRequest.roomId(), joinRequest.mediaOption());
 
         stompMessageSender.sendToUser(userId, new JoinResponse(joinRequest.correlationId(), toDto(result.others())));

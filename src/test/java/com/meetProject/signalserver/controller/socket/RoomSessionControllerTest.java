@@ -20,9 +20,11 @@ import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesReque
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeaveRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMuteRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsRequest;
 import com.meetProject.signalserver.dto.socket.ParticipantDto;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ParticipantResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinRequest;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinResponse;
@@ -40,6 +42,7 @@ import com.meetProject.signalserver.service.RoomService;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -139,12 +142,29 @@ public class RoomSessionControllerTest {
     void joinSendsRepliesAndBroadcast() {
         Participant joiner = participant("u1");
         Participant other = participant("u2");
+        given(roomService.leave("u1")).willReturn(Optional.empty());
         given(roomService.join("u1", "roomA", mediaOption))
                 .willReturn(new JoinResult(joiner, List.of(other)));
 
         controller.join(new JoinRequest("roomA", "cid", mediaOption), principal);
 
         verify(sender).sendToUser("u1", new JoinResponse("cid", List.of(ParticipantDto.from(other))));
+        verify(sender).broadcast("roomA", TopicType.PARTICIPANT,
+                new ParticipantResponse(ParticipantDto.from(joiner)));
+    }
+
+    @Test
+    @DisplayName("다른 방에 있던 사용자가 join하면 기존 방에 퇴장 알림을 보낸다")
+    void joinLeavesPreviousRoom() {
+        Participant joiner = participant("u1");
+        given(roomService.leave("u1")).willReturn(Optional.of("roomOld"));
+        given(roomService.join("u1", "roomA", mediaOption))
+                .willReturn(new JoinResult(joiner, List.of()));
+
+        controller.join(new JoinRequest("roomA", "cid", mediaOption), principal);
+
+        verify(sender).broadcast("roomOld", TopicType.LEAVE, new LeaveResponse("u1"));
+        verify(sender).sendToMediaServer(MediaType.LEAVE, new MediaLeaveRequest("roomOld", "u1"));
         verify(sender).broadcast("roomA", TopicType.PARTICIPANT,
                 new ParticipantResponse(ParticipantDto.from(joiner)));
     }
