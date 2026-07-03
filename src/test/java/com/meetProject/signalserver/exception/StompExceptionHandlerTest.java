@@ -15,8 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.MethodParameter;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.converter.MessageConversionException;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
 
 @ExtendWith(MockitoExtension.class)
 public class StompExceptionHandlerTest {
@@ -78,5 +83,45 @@ public class StompExceptionHandlerTest {
 
         verify(sender).sendToUser("u1",
                 new SignalErrorResponse(null, ErrorCode.ROOM_FULL, "방 인원이 가득 찼습니다."));
+    }
+
+    @Test
+    @DisplayName("검증 실패는 INVALID_INPUT과 필드 메시지를 보낸다")
+    void sendsValidationError() throws Exception {
+        Message<byte[]> message = message("{\"correlationId\":\"cid-1\"}");
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "joinRequest");
+        bindingResult.addError(new FieldError("joinRequest", "roomId", "방 ID는 필수입니다."));
+        MethodParameter parameter = new MethodParameter(
+                getClass().getDeclaredMethod("sendsValidationError"), -1);
+
+        handler.handleValidation(new MethodArgumentNotValidException(message, parameter, bindingResult),
+                message, principal);
+
+        verify(sender).sendToUser("u1",
+                new SignalErrorResponse("cid-1", ErrorCode.INVALID_INPUT, "방 ID는 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("역직렬화 중 도메인 예외가 나면 INVALID_INPUT과 도메인 메시지를 보낸다")
+    void sendsConversionErrorWithBusinessCause() {
+        Message<byte[]> message = message("{\"correlationId\":\"cid-1\"}");
+        MessageConversionException exception = new MessageConversionException(message, "convert fail",
+                new RuntimeException(new InvalidInputException("유효하지 않은 미디어 옵션입니다.")));
+
+        handler.handleConversion(exception, message, principal);
+
+        verify(sender).sendToUser("u1",
+                new SignalErrorResponse("cid-1", ErrorCode.INVALID_INPUT, "유효하지 않은 미디어 옵션입니다."));
+    }
+
+    @Test
+    @DisplayName("도메인 원인이 없는 역직렬화 실패는 기본 메시지를 보낸다")
+    void sendsConversionErrorWithDefaultMessage() {
+        Message<byte[]> message = message("not-json");
+
+        handler.handleConversion(new MessageConversionException("broken"), message, principal);
+
+        verify(sender).sendToUser("u1",
+                new SignalErrorResponse(null, ErrorCode.INVALID_INPUT, "유효하지 않은 요청입니다."));
     }
 }
