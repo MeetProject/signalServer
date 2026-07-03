@@ -6,7 +6,6 @@ import com.meetProject.signalserver.dto.common.AppData;
 import com.meetProject.signalserver.dto.common.ConsumerParams;
 import com.meetProject.signalserver.dto.common.RtpCapabilities;
 import com.meetProject.signalserver.dto.common.RtpParameters;
-import com.meetProject.signalserver.dto.common.SignalResponse;
 import com.meetProject.signalserver.dto.common.TransportOptions;
 import com.meetProject.signalserver.dto.common.TransportOptions.DtlsParameters;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesRequest;

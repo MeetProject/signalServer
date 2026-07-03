@@ -2,7 +2,6 @@ package com.meetProject.signalserver.dto.socket;
 
 import com.meetProject.signalserver.constant.Emoji;
 import com.meetProject.signalserver.domain.MediaOption;
-import com.meetProject.signalserver.dto.common.TopicResponse;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 
 public class RoomInteractionDto {

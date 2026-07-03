@@ -2,9 +2,9 @@ package com.meetProject.signalserver.infrastructure;
 
 import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
-import com.meetProject.signalserver.dto.common.MediaPayload;
-import com.meetProject.signalserver.dto.common.SignalResponse;
-import com.meetProject.signalserver.dto.common.TopicResponse;
+import com.meetProject.signalserver.dto.socket.MediaRequest;
+import com.meetProject.signalserver.dto.socket.SignalResponse;
+import com.meetProject.signalserver.dto.socket.TopicResponse;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ public class StompMessageSender {
         messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + type.path(), payload);
     }
 
-    public void sendToMediaServer(MediaType type, MediaPayload payload) {
+    public void sendToMediaServer(MediaType type, MediaRequest payload) {
         messagingTemplate.convertAndSendToUser("mediaServer", "/media/" + type.path(), payload);
     }
 }
