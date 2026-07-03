@@ -24,10 +24,9 @@ import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerResume
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.ParticipantService;
 import com.meetProject.signalserver.service.RoomService;
-import com.meetProject.signalserver.util.WebSocketUtils;
+import java.security.Principal;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -43,32 +42,32 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/chat/send")
-    public void sendChat(@Payload ChatRequest chatPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
+    public void sendChat(@Payload ChatRequest chatPayload, Principal principal) {
+        String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
         stompMessageSender.broadcast(roomId, TopicType.CHAT, ChatResponse.of(userId, chatPayload.message()));
     }
 
     @MessageMapping("/emoji")
-    public void sendEmoji(@Payload EmojiRequest emojiPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
+    public void sendEmoji(@Payload EmojiRequest emojiPayload, Principal principal) {
+        String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
         stompMessageSender.broadcast(roomId, TopicType.EMOJI, EmojiResponse.of(userId, emojiPayload.emoji()));
     }
 
     @MessageMapping("/device")
-    public void sendDevice(@Payload DeviceRequest devicePayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
+    public void sendDevice(@Payload DeviceRequest devicePayload, Principal principal) {
+        String userId = principal.getName();
         DevicePayload payload = participantService.updateDevice(userId, devicePayload.mediaOption());
 
         stompMessageSender.broadcast(payload.roomId(), TopicType.DEVICE, new DeviceResponse(userId, payload.mediaOption()));
     }
 
     @MessageMapping("/producer/remove")
-    public void removeTrack(@Payload RemoveProducerRequest removeProducerPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
+    public void removeTrack(@Payload RemoveProducerRequest removeProducerPayload, Principal principal) {
+        String userId = principal.getName();
         ProducerPayload deletion = participantService.removeProducer(userId, removeProducerPayload.producerId());
 
         stompMessageSender.sendToMediaServer(MediaType.PRODUCER_REMOVE, new ProducerRemoveRequest(userId, deletion.producerId()));
@@ -86,16 +85,16 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/handUp")
-    public void sendHandUp(SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
+    public void sendHandUp(Principal principal) {
+        String userId = principal.getName();
         HandsUpPayload payload = participantService.toggleHandsUp(userId);
 
         stompMessageSender.broadcast(payload.roomId(), TopicType.HANDUP, new HandUpResponse(payload.userId(), payload.isHandsUp()));
     }
 
     @MessageMapping("/leave")
-    public void sendLeave(SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
+    public void sendLeave(Principal principal) {
+        String userId = principal.getName();
         roomService.leave(userId).ifPresent(roomId -> {
             stompMessageSender.broadcast(roomId, TopicType.LEAVE, new LeaveResponse(userId));
             stompMessageSender.sendToMediaServer(MediaType.LEAVE, new MediaLeaveRequest(roomId, userId));
