@@ -69,11 +69,13 @@ public class RoomService {
     }
 
     public Optional<String> leave(String userId) {
-        Optional<String> roomId = roomSessionRepository.leave(userId);
-        roomId.filter(id -> roomSessionRepository.find(id).isEmpty())
-                .ifPresent(roomRepository::deleteById);
-
-        return roomId;
+        return roomSessionRepository.leave(userId)
+                .map(result -> {
+                    if (result.roomEmpty()) {
+                        roomRepository.deleteById(result.roomId());
+                    }
+                    return result.roomId();
+                });
     }
 
     private User getUser(String userId) {

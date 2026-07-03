@@ -1,9 +1,11 @@
 package com.meetProject.signalserver.controller.rest;
 
+import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.CreateRoomResponse;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.LeaveRequest;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.ValidateRoomResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeaveRequest;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.RoomService;
@@ -19,31 +21,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/rooms")
 public class RoomController {
-    private final RoomService roomsService;
+    private final RoomService roomService;
     private final StompMessageSender stompMessageSender;
 
-    public RoomController(RoomService roomsService, StompMessageSender stompMessageSender) {
-        this.roomsService = roomsService;
+    public RoomController(RoomService roomService, StompMessageSender stompMessageSender) {
+        this.roomService = roomService;
         this.stompMessageSender = stompMessageSender;
     }
 
     @PostMapping
     public ResponseEntity<CreateRoomResponse> createRoom() {
-        CreateRoomResponse response = roomsService.save();
+        CreateRoomResponse response = roomService.save();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(response);
     }
 
     @GetMapping("/{roomId}/validate")
     public ResponseEntity<ValidateRoomResponse> validateRoom(@PathVariable String roomId) {
-        ValidateRoomResponse response = roomsService.validate(roomId);
+        ValidateRoomResponse response = roomService.validate(roomId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/leave")
     public ResponseEntity<Void> leaveRoom(@RequestBody LeaveRequest leaveRequest) {
-        roomsService.leave(leaveRequest.userId()).ifPresent(roomId ->
-                stompMessageSender.broadcast(roomId, TopicType.LEAVE, new LeaveResponse(leaveRequest.userId())));
+        String userId = leaveRequest.userId();
+        roomService.leave(userId).ifPresent(roomId -> {
+            stompMessageSender.broadcast(roomId, TopicType.LEAVE, new LeaveResponse(userId));
+            stompMessageSender.sendToMediaServer(MediaType.LEAVE, new MediaLeaveRequest(roomId, userId));
+        });
         return ResponseEntity.ok().build();
     }
 }
