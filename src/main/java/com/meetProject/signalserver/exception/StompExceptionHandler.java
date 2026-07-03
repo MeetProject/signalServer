@@ -3,7 +3,7 @@ package com.meetProject.signalserver.exception;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meetProject.signalserver.constant.ErrorCode;
-import com.meetProject.signalserver.dto.socket.ErrorResponse;
+import com.meetProject.signalserver.dto.socket.SignalErrorResponse;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -36,7 +36,7 @@ public class StompExceptionHandler {
             return;
         }
         String correlationId = extractCorrelationId(message);
-        stompMessageSender.sendToUser(principal.getName(), new ErrorResponse(correlationId, code, errorMessage));
+        stompMessageSender.sendToUser(principal.getName(), new SignalErrorResponse(correlationId, code, errorMessage));
     }
 
     private String extractCorrelationId(Message<?> message) {
