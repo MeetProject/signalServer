@@ -41,8 +41,8 @@ public class RoomSessionDto {
             return new Participant(user, false, mediaOption, List.of());
         }
     }
-    public record JoinResponse(String correlationId, List<Participant> participants) implements SignalResponse {}
+    public record JoinResponse(String correlationId, List<ParticipantDto> participants) implements SignalResponse {}
 
     public record ResyncRequest(String roomId, String correlationId) {}
-    public record ResyncResponse(String correlationId, List<Participant> participants, boolean rejoinRequired) implements SignalResponse {}
+    public record ResyncResponse(String correlationId, List<ParticipantDto> participants, boolean rejoinRequired) implements SignalResponse {}
 }

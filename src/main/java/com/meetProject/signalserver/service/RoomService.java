@@ -1,18 +1,19 @@
 package com.meetProject.signalserver.service;
 
-import com.meetProject.signalserver.constant.RoomRule;
 import com.meetProject.signalserver.domain.Participant;
 import com.meetProject.signalserver.domain.Room;
+import com.meetProject.signalserver.domain.RoomSession;
 import com.meetProject.signalserver.domain.User;
 import com.meetProject.signalserver.dto.application.ParticipantPayload;
+import com.meetProject.signalserver.dto.application.ResyncPayload;
+import com.meetProject.signalserver.dto.socket.ParticipantDto;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.CreateRoomResponse;
 import com.meetProject.signalserver.dto.rest.RoomSessionDto.ValidateRoomResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinRequest;
-import com.meetProject.signalserver.exception.RoomFullException;
 import com.meetProject.signalserver.exception.RoomNotFoundException;
 import com.meetProject.signalserver.exception.UserNotFoundException;
-import com.meetProject.signalserver.repository.ParticipantRepository;
 import com.meetProject.signalserver.repository.RoomRepository;
+import com.meetProject.signalserver.repository.RoomSessionRepository;
 import com.meetProject.signalserver.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -24,12 +25,12 @@ import org.springframework.stereotype.Service;
 public class RoomService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
-    private final ParticipantRepository participantRepository;
+    private final RoomSessionRepository roomSessionRepository;
 
-    public RoomService(RoomRepository roomRepository, UserRepository userRepository, ParticipantRepository participantRepository) {
+    public RoomService(RoomRepository roomRepository, UserRepository userRepository, RoomSessionRepository roomSessionRepository) {
         this.roomRepository = roomRepository;
         this.userRepository = userRepository;
-        this.participantRepository = participantRepository;
+        this.roomSessionRepository = roomSessionRepository;
     }
 
     @Retryable(retryFor = DuplicateKeyException.class)
@@ -40,10 +41,12 @@ public class RoomService {
     }
 
     public ValidateRoomResponse validate(String roomId) {
-        boolean isExistRoom = roomRepository.existsById(roomId);
-        boolean isFull = participantRepository.countByRoom(roomId) >= RoomRule.MAX_ROOM_PARTICIPANTS;
+        boolean roomExists = roomRepository.existsById(roomId);
+        boolean roomFull = roomSessionRepository.find(roomId)
+                .map(RoomSession::isFull)
+                .orElse(false);
 
-        return new ValidateRoomResponse(isExistRoom && !isFull);
+        return new ValidateRoomResponse(roomExists && !roomFull);
     }
 
     public ParticipantPayload join(String userId, JoinRequest joinRequest) {
@@ -53,39 +56,35 @@ public class RoomService {
             throw new RoomNotFoundException();
         }
 
-        if(participantRepository.countByRoom(joinRequest.roomId()) >= RoomRule.MAX_ROOM_PARTICIPANTS) {
-            throw new RoomFullException();
-        }
-
         Participant joiner = joinRequest.to(user);
-        List<Participant> others = participantRepository.add(joinRequest.roomId(), joiner);
+        List<Participant> others = roomSessionRepository.join(joinRequest.roomId(), joiner);
 
-        return new ParticipantPayload(joiner, others);
+        return new ParticipantPayload(ParticipantDto.from(joiner), toDto(others));
     }
 
-    public Optional<List<Participant>> resync(String userId) {
-        return participantRepository.findRoomIdByUserId(userId)
-                .map(roomId -> participantRepository.findByRoom(roomId).orElse(List.of()));
+    public ResyncPayload resync(String userId) {
+        return roomSessionRepository.findByUserId(userId)
+                .map(session -> new ResyncPayload(toDto(session.participants()), false))
+                .orElseGet(() -> new ResyncPayload(List.of(), true));
     }
 
     public Optional<String> leave(String userId) {
-        Optional<String> roomId = participantRepository.findRoomIdByUserId(userId);
-        roomId.ifPresent(id -> {
-            participantRepository.remove(id, userId);
-
-            if(participantRepository.countByRoom(id) == 0) {
-                roomRepository.deleteById(id);
-            }
-        });
+        Optional<String> roomId = roomSessionRepository.leave(userId);
+        roomId.filter(id -> roomSessionRepository.find(id).isEmpty())
+                .ifPresent(roomRepository::deleteById);
 
         return roomId;
     }
 
     private User getUser(String userId) {
         return userRepository.findById(userId)
-                .stream()
-                .findFirst()
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    private List<ParticipantDto> toDto(List<Participant> participants) {
+        return participants.stream()
+                .map(ParticipantDto::from)
+                .toList();
     }
 
 }

@@ -3,6 +3,7 @@ package com.meetProject.signalserver.controller.socket;
 import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.dto.application.ParticipantPayload;
+import com.meetProject.signalserver.dto.application.ResyncPayload;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectRequest;
@@ -24,7 +25,6 @@ import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.ParticipantService;
 import com.meetProject.signalserver.service.RoomService;
 import com.meetProject.signalserver.util.WebSocketUtils;
-import java.util.List;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -115,9 +115,8 @@ public class RoomSessionController {
     @MessageMapping("/signal/resync")
     public void resync(@Payload ResyncRequest resyncRequest, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        ResyncResponse response = roomService.resync(userId)
-                .map(participants -> new ResyncResponse(resyncRequest.correlationId(), participants, false))
-                .orElseGet(() -> new ResyncResponse(resyncRequest.correlationId(), List.of(), true));
-        stompMessageSender.sendToUser(userId, response);
+        ResyncPayload resync = roomService.resync(userId);
+
+        stompMessageSender.sendToUser(userId, new ResyncResponse(resyncRequest.correlationId(), resync.participants(), resync.rejoinRequired()));
     }
 }

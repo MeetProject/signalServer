@@ -1,13 +1,12 @@
 package com.meetProject.signalserver.dto.socket;
 
 import com.meetProject.signalserver.constant.Emoji;
-import com.meetProject.signalserver.domain.Participant;
 import com.meetProject.signalserver.domain.MediaOption;
 import com.meetProject.signalserver.dto.common.TopicResponse;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 
 public class RoomInteractionDto {
-    public record ParticipantResponse(Participant participant) implements TopicResponse {
+    public record ParticipantResponse(ParticipantDto participant) implements TopicResponse {
         @Override
         public String id() {
             return null;
