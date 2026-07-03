@@ -2,9 +2,9 @@ package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
-import com.meetProject.signalserver.dto.application.DevicePayload;
-import com.meetProject.signalserver.dto.application.HandsUpPayload;
-import com.meetProject.signalserver.dto.application.ProducerPayload;
+import com.meetProject.signalserver.dto.application.DeviceResult;
+import com.meetProject.signalserver.dto.application.HandsUpResult;
+import com.meetProject.signalserver.dto.application.ProducerResult;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerPauseRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerResumeRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeaveRequest;
@@ -15,10 +15,10 @@ import com.meetProject.signalserver.dto.socket.RoomInteractionDto.DeviceRequest;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.DeviceResponse;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.EmojiRequest;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.EmojiResponse;
-import com.meetProject.signalserver.dto.socket.RoomInteractionDto.HandUpResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.HandsUpResponse;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
-import com.meetProject.signalserver.dto.socket.RoomInteractionDto.RemoveProducerRequest;
-import com.meetProject.signalserver.dto.socket.RoomInteractionDto.RemoveProducerResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ProducerRemoveResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.UserProducerRemoveRequest;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerPauseRequest;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerResumeRequest;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
@@ -60,18 +60,18 @@ public class RoomInteractionController {
     @MessageMapping("/device")
     public void sendDevice(@Payload DeviceRequest devicePayload, Principal principal) {
         String userId = principal.getName();
-        DevicePayload payload = participantService.updateDevice(userId, devicePayload.mediaOption());
+        DeviceResult result = participantService.updateDevice(userId, devicePayload.mediaOption());
 
-        stompMessageSender.broadcast(payload.roomId(), TopicType.DEVICE, new DeviceResponse(userId, payload.mediaOption()));
+        stompMessageSender.broadcast(result.roomId(), TopicType.DEVICE, new DeviceResponse(userId, result.mediaOption()));
     }
 
     @MessageMapping("/producer/remove")
-    public void removeTrack(@Payload RemoveProducerRequest removeProducerPayload, Principal principal) {
+    public void removeTrack(@Payload UserProducerRemoveRequest removeProducerPayload, Principal principal) {
         String userId = principal.getName();
-        ProducerPayload deletion = participantService.removeProducer(userId, removeProducerPayload.producerId());
+        ProducerResult deletion = participantService.removeProducer(userId, removeProducerPayload.producerId());
 
         stompMessageSender.sendToMediaServer(MediaType.PRODUCER_REMOVE, new ProducerRemoveRequest(userId, deletion.producerId()));
-        stompMessageSender.broadcast(deletion.roomId(), TopicType.PRODUCER_REMOVE, new RemoveProducerResponse(userId, removeProducerPayload.trackType()));
+        stompMessageSender.broadcast(deletion.roomId(), TopicType.PRODUCER_REMOVE, new ProducerRemoveResponse(userId, removeProducerPayload.trackType()));
     }
 
     @MessageMapping("/consumer/resume")
@@ -87,9 +87,9 @@ public class RoomInteractionController {
     @MessageMapping("/handUp")
     public void sendHandUp(Principal principal) {
         String userId = principal.getName();
-        HandsUpPayload payload = participantService.toggleHandsUp(userId);
+        HandsUpResult result = participantService.toggleHandsUp(userId);
 
-        stompMessageSender.broadcast(payload.roomId(), TopicType.HANDUP, new HandUpResponse(payload.userId(), payload.isHandsUp()));
+        stompMessageSender.broadcast(result.roomId(), TopicType.HANDUP, new HandsUpResponse(result.userId(), result.isHandsUp()));
     }
 
     @MessageMapping("/leave")

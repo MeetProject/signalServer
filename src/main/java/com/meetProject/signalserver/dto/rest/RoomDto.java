@@ -1,9 +1,9 @@
 package com.meetProject.signalserver.dto.rest;
 
-public class RoomSessionDto {
+public class RoomDto {
     public record CreateRoomResponse(String roomId)  {}
 
     public record ValidateRoomResponse(boolean value) {}
 
-    public record LeaveRequest(String userId, String roomId) {}
+    public record LeaveRequest(String userId) {}
 }

@@ -10,8 +10,8 @@ public class RoomInteractionDto {
 
     public record ProducerResponse(String userId, String producerId) implements TopicResponse {}
 
-    public record RemoveProducerRequest(String producerId, String trackType) {}
-    public record RemoveProducerResponse(String userId, String trackType) implements TopicResponse {}
+    public record UserProducerRemoveRequest(String producerId, String trackType) {}
+    public record ProducerRemoveResponse(String userId, String trackType) implements TopicResponse {}
 
     public record ChatRequest(String message) {}
     public record ChatResponse(String id, String userId, String message, long timestamp) implements TopicResponse {
@@ -30,7 +30,7 @@ public class RoomInteractionDto {
         }
     }
 
-    public record HandUpResponse(String userId, boolean value) implements TopicResponse {}
+    public record HandsUpResponse(String userId, boolean value) implements TopicResponse {}
 
     public record LeaveResponse(String userId) implements TopicResponse {}
 }

@@ -16,7 +16,7 @@ import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserProducerMuteRe
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserRtlsResponse;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.ParticipantService;
-import com.meetProject.signalserver.dto.application.ProducerPayload;
+import com.meetProject.signalserver.dto.application.ProducerResult;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
@@ -51,7 +51,7 @@ public class MediaSessionController {
 
     @MessageMapping("/media/rtls")
     public void rtls(@Payload RtlsResponse rtlsResponse) {
-        ProducerPayload registration = participantService.registerProducer(rtlsResponse.userId(), rtlsResponse.producerId());
+        ProducerResult registration = participantService.registerProducer(rtlsResponse.userId(), rtlsResponse.producerId());
 
         UserRtlsResponse response = new UserRtlsResponse(rtlsResponse.correlationId(), rtlsResponse.producerId());
         stompMessageSender.sendToUser(rtlsResponse.userId(), response);

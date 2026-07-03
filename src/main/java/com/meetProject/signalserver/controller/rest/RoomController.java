@@ -2,9 +2,9 @@ package com.meetProject.signalserver.controller.rest;
 
 import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
-import com.meetProject.signalserver.dto.rest.RoomSessionDto.CreateRoomResponse;
-import com.meetProject.signalserver.dto.rest.RoomSessionDto.LeaveRequest;
-import com.meetProject.signalserver.dto.rest.RoomSessionDto.ValidateRoomResponse;
+import com.meetProject.signalserver.dto.rest.RoomDto.CreateRoomResponse;
+import com.meetProject.signalserver.dto.rest.RoomDto.LeaveRequest;
+import com.meetProject.signalserver.dto.rest.RoomDto.ValidateRoomResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeaveRequest;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
