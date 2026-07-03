@@ -29,12 +29,12 @@ public class User {
         return id;
     }
 
-    public UserName getUserName() {
-        return userName;
+    public String getName() {
+        return userName.name();
     }
 
-    public ProfileColor getProfileColor() {
-        return profileColor;
+    public String getProfileColor() {
+        return profileColor.value();
     }
 
     public LocalDateTime getCreatedAt() {

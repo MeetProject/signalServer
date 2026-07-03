@@ -58,7 +58,7 @@ public class Participant {
         return user.getId();
     }
 
-    public UserName getUserName() {
-        return user.getUserName();
+    public String getUserName() {
+        return user.getName();
     }
 }

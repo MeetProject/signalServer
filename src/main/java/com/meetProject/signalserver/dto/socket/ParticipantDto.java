@@ -23,7 +23,7 @@ public record ParticipantDto(
 
     public record UserData(String userId, String userName, String profileColor) {
         public static UserData from(User user) {
-            return new UserData(user.getId(), user.getUserName().name(), user.getProfileColor().value());
+            return new UserData(user.getId(), user.getName(), user.getProfileColor());
         }
     }
 }

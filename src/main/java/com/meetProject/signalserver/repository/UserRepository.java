@@ -25,8 +25,8 @@ public class UserRepository {
         jdbcTemplate.update(
                 "INSERT INTO member (id, name, profile_color, created_at) VALUES (?, ?, ?, ?)",
                 user.getId(),
-                user.getUserName().name(),
-                user.getProfileColor().value(),
+                user.getName(),
+                user.getProfileColor(),
                 user.getCreatedAt()
         );
     }
