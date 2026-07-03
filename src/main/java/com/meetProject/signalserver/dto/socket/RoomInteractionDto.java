@@ -6,27 +6,12 @@ import com.meetProject.signalserver.dto.common.TopicResponse;
 import com.meetProject.signalserver.util.RandomIdGenerator;
 
 public class RoomInteractionDto {
-    public record ParticipantResponse(ParticipantDto participant) implements TopicResponse {
-        @Override
-        public String id() {
-            return null;
-        }
-    }
+    public record ParticipantResponse(ParticipantDto participant) implements TopicResponse {}
 
-    public record ProducerResponse(String userId, String producerId) implements TopicResponse {
-        @Override
-        public String id() {
-            return null;
-        }
-    }
+    public record ProducerResponse(String userId, String producerId) implements TopicResponse {}
 
     public record RemoveProducerRequest(String producerId, String trackType) {}
-    public record RemoveProducerResponse(String userId, String trackType) implements TopicResponse {
-        @Override
-        public String id() {
-            return null;
-        }
-    }
+    public record RemoveProducerResponse(String userId, String trackType) implements TopicResponse {}
 
     public record ChatRequest(String message) {}
     public record ChatResponse(String id, String userId, String message, long timestamp) implements TopicResponse {
@@ -35,13 +20,8 @@ public class RoomInteractionDto {
         }
     }
 
-    public record DeviceRequest (MediaOption mediaOption) {}
-    public record DeviceResponse(String userId, MediaOption mediaOption) implements TopicResponse {
-        @Override
-        public String id() {
-            return null;
-        }
-    }
+    public record DeviceRequest(MediaOption mediaOption) {}
+    public record DeviceResponse(String userId, MediaOption mediaOption) implements TopicResponse {}
 
     public record EmojiRequest(Emoji emoji) {}
     public record EmojiResponse(String id, String userId, Emoji emoji, long timestamp) implements TopicResponse {
@@ -50,17 +30,7 @@ public class RoomInteractionDto {
         }
     }
 
-    public record HandUpResponse (String userId, boolean value) implements TopicResponse {
-        @Override
-        public String id() {
-            return null;
-        }
-    }
+    public record HandUpResponse(String userId, boolean value) implements TopicResponse {}
 
-    public record LeaveResponse(String userId) implements TopicResponse {
-        @Override
-        public String id() {
-            return null;
-        }
-    }
+    public record LeaveResponse(String userId) implements TopicResponse {}
 }

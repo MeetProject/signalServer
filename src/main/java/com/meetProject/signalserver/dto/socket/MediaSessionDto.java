@@ -25,44 +25,14 @@ public class MediaSessionDto {
     public record ConsumerParamsRequest(String correlationId, String userId, String roomId, String targetId, String producerId, RtpCapabilities rtpCapabilities) implements MediaPayload {}
     public record ConsumerParamsResponse(String correlationId, String userId, ConsumerParams consumerParams) {}
 
-    public record ConsumerResumeRequest(String consumerId) implements MediaPayload {
-        @Override
-        public String correlationId() {
-            return null;
-        }
+    public record ConsumerResumeRequest(String consumerId) implements MediaPayload {}
 
-        @Override
-        public String userId() {
-            return null;
-        }
-    }
-
-    public record ConsumerPauseRequest(String consumerId) implements MediaPayload {
-        @Override
-        public String correlationId() {
-            return null;
-        }
-
-        @Override
-        public String userId() {
-            return null;
-        }
-    }
+    public record ConsumerPauseRequest(String consumerId) implements MediaPayload {}
 
     public record ProducerMuteRequest(String correlationId, String userId, String producerId) implements MediaPayload {}
     public record ProducerMuteResponse(String correlationId, String userId) {}
 
-    public record MediaLeaveRequest(String roomId, String userId) implements MediaPayload {
-        @Override
-        public String correlationId() {
-            return null;
-        }
-    }
+    public record MediaLeaveRequest(String roomId, String userId) implements MediaPayload {}
 
-    public record ProducerRemoveRequest(String userId, String producerId) implements MediaPayload {
-        @Override
-        public String correlationId() {
-            return null;
-        }
-    }
+    public record ProducerRemoveRequest(String userId, String producerId) implements MediaPayload {}
 }

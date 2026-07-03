@@ -21,12 +21,10 @@ public class StompMessageSender {
     }
 
     public void broadcast(String roomId, TopicType type, TopicResponse payload) {
-        String path = String.join("/",type.name().toLowerCase().split("_"));
-        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + path, payload);
+        messagingTemplate.convertAndSend("/topic/room/" + roomId + "/" + type.path(), payload);
     }
 
     public void sendToMediaServer(MediaType type, MediaPayload payload) {
-        String path = String.join("/",type.name().toLowerCase().split("_"));
-        messagingTemplate.convertAndSendToUser("mediaServer","/media/" + path, payload);
+        messagingTemplate.convertAndSendToUser("mediaServer", "/media/" + type.path(), payload);
     }
 }
