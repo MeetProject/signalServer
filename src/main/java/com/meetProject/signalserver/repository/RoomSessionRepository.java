@@ -35,9 +35,9 @@ public class RoomSessionRepository {
         }
         AtomicBoolean roomEmpty = new AtomicBoolean(true);
         sessions.computeIfPresent(roomId, (id, session) -> {
-            session.leave(userId);
-            roomEmpty.set(session.isEmpty());
-            return session.isEmpty() ? null : session;
+            boolean empty = session.leave(userId);
+            roomEmpty.set(empty);
+            return empty ? null : session;
         });
         return Optional.of(new LeaveResult(roomId, roomEmpty.get()));
     }

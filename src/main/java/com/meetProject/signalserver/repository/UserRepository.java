@@ -26,7 +26,7 @@ public class UserRepository {
                 "INSERT INTO member (id, name, profile_color, created_at) VALUES (?, ?, ?, ?)",
                 user.getId(),
                 user.getUserName().name(),
-                user.getProfileColor(),
+                user.getProfileColor().value(),
                 user.getCreatedAt()
         );
     }

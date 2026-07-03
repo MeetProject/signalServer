@@ -24,8 +24,9 @@ public class RoomSession {
         return others;
     }
 
-    public void leave(String userId) {
+    public boolean leave(String userId) {
         participants.remove(userId);
+        return participants.isEmpty();
     }
 
     public boolean isEmpty() {
