@@ -7,8 +7,10 @@ import com.meetProject.signalserver.dto.socket.SignalErrorResponse;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 @ControllerAdvice
@@ -19,6 +21,15 @@ public class StompExceptionHandler {
     public StompExceptionHandler(StompMessageSender stompMessageSender, ObjectMapper objectMapper) {
         this.stompMessageSender = stompMessageSender;
         this.objectMapper = objectMapper;
+    }
+
+    @MessageExceptionHandler(MethodArgumentNotValidException.class)
+    public void handleValidation(MethodArgumentNotValidException exception, Message<?> message, Principal principal) {
+        String errorMessage = exception.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("유효하지 않은 요청입니다.");
+        sendError(principal, message, ErrorCode.INVALID_INPUT, errorMessage);
     }
 
     @MessageExceptionHandler(BusinessException.class)

@@ -24,6 +24,7 @@ import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerResume
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.ParticipantService;
 import com.meetProject.signalserver.service.RoomService;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -42,7 +43,7 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/chat/send")
-    public void sendChat(@Payload ChatRequest chatPayload, Principal principal) {
+    public void sendChat(@Valid @Payload ChatRequest chatPayload, Principal principal) {
         String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
@@ -50,7 +51,7 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/emoji")
-    public void sendEmoji(@Payload EmojiRequest emojiPayload, Principal principal) {
+    public void sendEmoji(@Valid @Payload EmojiRequest emojiPayload, Principal principal) {
         String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
@@ -58,7 +59,7 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/device")
-    public void sendDevice(@Payload DeviceRequest devicePayload, Principal principal) {
+    public void sendDevice(@Valid @Payload DeviceRequest devicePayload, Principal principal) {
         String userId = principal.getName();
         DeviceResult result = participantService.updateDevice(userId, devicePayload.mediaOption());
 
@@ -66,7 +67,7 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/producer/remove")
-    public void removeTrack(@Payload UserProducerRemoveRequest removeProducerPayload, Principal principal) {
+    public void removeTrack(@Valid @Payload UserProducerRemoveRequest removeProducerPayload, Principal principal) {
         String userId = principal.getName();
         ProducerResult deletion = participantService.removeProducer(userId, removeProducerPayload.producerId());
 
@@ -75,12 +76,12 @@ public class RoomInteractionController {
     }
 
     @MessageMapping("/consumer/resume")
-    public void consumerResume(@Payload UserConsumerResumeRequest resumePayload) {
+    public void consumerResume(@Valid @Payload UserConsumerResumeRequest resumePayload) {
         stompMessageSender.sendToMediaServer(MediaType.CONSUMER_RESUME, new ConsumerResumeRequest(resumePayload.consumerId()));
     }
 
     @MessageMapping("/consumer/pause")
-    public void consumerPause(@Payload UserConsumerPauseRequest pausePayload) {
+    public void consumerPause(@Valid @Payload UserConsumerPauseRequest pausePayload) {
         stompMessageSender.sendToMediaServer(MediaType.CONSUMER_PAUSE, new ConsumerPauseRequest(pausePayload.consumerId()));
     }
 

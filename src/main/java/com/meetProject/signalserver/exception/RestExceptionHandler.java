@@ -2,13 +2,25 @@ package com.meetProject.signalserver.exception;
 
 import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.dto.rest.ErrorResponse;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException exception) {
+        String message = exception.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("유효하지 않은 요청입니다.");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(ErrorCode.INVALID_INPUT, message));
+    }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(BusinessException exception) {

@@ -9,6 +9,7 @@ import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeaveRequest
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.RoomService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +43,7 @@ public class RoomController {
     }
 
     @PostMapping("/leave")
-    public ResponseEntity<Void> leaveRoom(@RequestBody LeaveRequest leaveRequest) {
+    public ResponseEntity<Void> leaveRoom(@Valid @RequestBody LeaveRequest leaveRequest) {
         String userId = leaveRequest.userId();
         roomService.leave(userId).ifPresent(roomId -> {
             stompMessageSender.broadcast(roomId, TopicType.LEAVE, new LeaveResponse(userId));

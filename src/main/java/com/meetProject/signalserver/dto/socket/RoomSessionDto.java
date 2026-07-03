@@ -14,58 +14,87 @@ import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectReques
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMuteRequest;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsRequest;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class RoomSessionDto {
-    public record UserCapabilityRequest(String correlationId) {
+    public record UserCapabilityRequest(@NotBlank(message = "correlationId는 필수입니다.") String correlationId) {
         public CapabilitiesRequest toMediaRequest(String userId, String roomId) {
             return new CapabilitiesRequest(correlationId, userId, roomId);
         }
     }
     public record UserCapabilityResponse(String correlationId, RtpCapabilities capabilities) implements SignalResponse {}
 
-    public record UserDtlsRequest(String correlationId, DtlsDirection direction) {
+    public record UserDtlsRequest(
+            @NotBlank(message = "correlationId는 필수입니다.") String correlationId,
+            @NotNull(message = "direction은 필수입니다.") DtlsDirection direction
+    ) {
         public DtlsRequest toMediaRequest(String userId, String roomId) {
             return new DtlsRequest(correlationId, userId, roomId, direction);
         }
     }
     public record UserDtlsResponse(String correlationId, TransportOptions options) implements SignalResponse {}
 
-    public record UserDtlsConnectRequest(String correlationId, DtlsParameters dtlsParameters, String direction) {
+    public record UserDtlsConnectRequest(
+            @NotBlank(message = "correlationId는 필수입니다.") String correlationId,
+            @NotNull(message = "dtlsParameters는 필수입니다.") DtlsParameters dtlsParameters,
+            @NotBlank(message = "direction은 필수입니다.") String direction
+    ) {
         public DtlsConnectRequest toMediaRequest(String userId, String roomId) {
             return new DtlsConnectRequest(correlationId, userId, roomId, dtlsParameters, direction);
         }
     }
     public record UserDtlsConnectResponse(String correlationId) implements SignalResponse {}
 
-    public record UserRtlsRequest(String correlationId, AppData appData, String kind, RtpParameters rtpParameters) {
+    public record UserRtlsRequest(
+            @NotBlank(message = "correlationId는 필수입니다.") String correlationId,
+            @NotNull(message = "appData는 필수입니다.") AppData appData,
+            @NotBlank(message = "kind는 필수입니다.") String kind,
+            @NotNull(message = "rtpParameters는 필수입니다.") RtpParameters rtpParameters
+    ) {
         public RtlsRequest toMediaRequest(String userId, String roomId) {
             return new RtlsRequest(correlationId, userId, roomId, appData, kind, rtpParameters);
         }
     }
     public record UserRtlsResponse(String correlationId, String producerId) implements SignalResponse {}
 
-    public record UserConsumerParamsRequest(String correlationId, String targetId, String producerId, RtpCapabilities rtpCapabilities) {
+    public record UserConsumerParamsRequest(
+            @NotBlank(message = "correlationId는 필수입니다.") String correlationId,
+            @NotBlank(message = "targetId는 필수입니다.") String targetId,
+            @NotBlank(message = "producerId는 필수입니다.") String producerId,
+            @NotNull(message = "rtpCapabilities는 필수입니다.") RtpCapabilities rtpCapabilities
+    ) {
         public ConsumerParamsRequest toMediaRequest(String userId, String roomId) {
             return new ConsumerParamsRequest(correlationId, userId, roomId, targetId, producerId, rtpCapabilities);
         }
     }
     public record UserConsumerParamsResponse(String correlationId, ConsumerParams consumerParams) implements SignalResponse {}
 
-    public record UserConsumerResumeRequest(String consumerId) {}
+    public record UserConsumerResumeRequest(@NotBlank(message = "consumerId는 필수입니다.") String consumerId) {}
 
-    public record UserConsumerPauseRequest(String consumerId) {}
+    public record UserConsumerPauseRequest(@NotBlank(message = "consumerId는 필수입니다.") String consumerId) {}
 
-    public record UserProducerMuteRequest(String correlationId, String producerId) {
+    public record UserProducerMuteRequest(
+            @NotBlank(message = "correlationId는 필수입니다.") String correlationId,
+            @NotBlank(message = "producerId는 필수입니다.") String producerId
+    ) {
         public ProducerMuteRequest toMediaRequest(String userId) {
             return new ProducerMuteRequest(correlationId, userId, producerId);
         }
     }
     public record UserProducerMuteResponse(String correlationId) implements SignalResponse {}
 
-    public record JoinRequest(String roomId, String correlationId, MediaOption mediaOption) {}
+    public record JoinRequest(
+            @NotBlank(message = "방 ID는 필수입니다.") String roomId,
+            @NotBlank(message = "correlationId는 필수입니다.") String correlationId,
+            @NotNull(message = "미디어 옵션은 필수입니다.") MediaOption mediaOption
+    ) {}
     public record JoinResponse(String correlationId, List<ParticipantDto> participants) implements SignalResponse {}
 
-    public record ResyncRequest(String roomId, String correlationId) {}
+    public record ResyncRequest(
+            @NotBlank(message = "방 ID는 필수입니다.") String roomId,
+            @NotBlank(message = "correlationId는 필수입니다.") String correlationId
+    ) {}
     public record ResyncResponse(String correlationId, List<ParticipantDto> participants, boolean rejoinRequired) implements SignalResponse {}
 }

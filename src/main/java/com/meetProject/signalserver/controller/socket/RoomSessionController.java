@@ -20,6 +20,7 @@ import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserRtlsRequest;
 import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.ParticipantService;
 import com.meetProject.signalserver.service.RoomService;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -39,7 +40,7 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/capabilities")
-    public void capabilities(@Payload UserCapabilityRequest request, Principal principal) {
+    public void capabilities(@Valid @Payload UserCapabilityRequest request, Principal principal) {
         String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
@@ -47,7 +48,7 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/dtls")
-    public void dtls(@Payload UserDtlsRequest request, Principal principal) {
+    public void dtls(@Valid @Payload UserDtlsRequest request, Principal principal) {
         String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
@@ -55,7 +56,7 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/dtls/connect")
-    public void dtlsConnect(@Payload UserDtlsConnectRequest request, Principal principal) {
+    public void dtlsConnect(@Valid @Payload UserDtlsConnectRequest request, Principal principal) {
         String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
@@ -63,7 +64,7 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/rtls")
-    public void rtls(@Payload UserRtlsRequest request, Principal principal) {
+    public void rtls(@Valid @Payload UserRtlsRequest request, Principal principal) {
         String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
@@ -71,7 +72,7 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/consumerParams")
-    public void consumerParams(@Payload UserConsumerParamsRequest request, Principal principal) {
+    public void consumerParams(@Valid @Payload UserConsumerParamsRequest request, Principal principal) {
         String userId = principal.getName();
         String roomId = participantService.getJoinedRoomId(userId);
 
@@ -79,17 +80,17 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/producer/pause")
-    public void producerPause(@Payload UserProducerMuteRequest request, Principal principal) {
+    public void producerPause(@Valid @Payload UserProducerMuteRequest request, Principal principal) {
         stompMessageSender.sendToMediaServer(MediaType.PRODUCER_PAUSE, request.toMediaRequest(principal.getName()));
     }
 
     @MessageMapping("/signal/producer/resume")
-    public void producerResume(@Payload UserProducerMuteRequest request, Principal principal) {
+    public void producerResume(@Valid @Payload UserProducerMuteRequest request, Principal principal) {
         stompMessageSender.sendToMediaServer(MediaType.PRODUCER_RESUME, request.toMediaRequest(principal.getName()));
     }
 
     @MessageMapping("/signal/join")
-    public void join(@Payload JoinRequest joinRequest, Principal principal) {
+    public void join(@Valid @Payload JoinRequest joinRequest, Principal principal) {
         String userId = principal.getName();
         JoinResult result = roomService.join(userId, joinRequest.roomId(), joinRequest.mediaOption());
 
@@ -98,7 +99,7 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/resync")
-    public void resync(@Payload ResyncRequest resyncRequest, Principal principal) {
+    public void resync(@Valid @Payload ResyncRequest resyncRequest, Principal principal) {
         String userId = principal.getName();
         ResyncResult result = roomService.resync(userId);
 
