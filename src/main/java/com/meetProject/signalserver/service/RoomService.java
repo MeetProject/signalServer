@@ -38,12 +38,12 @@ public class RoomService {
     }
 
     public boolean validate(String roomId) {
-        boolean roomExists = roomRepository.existsById(roomId);
-        boolean roomFull = roomSessionRepository.find(roomId)
-                .map(RoomSession::isFull)
-                .orElse(false);
-
-        return roomExists && !roomFull;
+        if (!roomRepository.existsById(roomId)) {
+            return false;
+        }
+        return roomSessionRepository.find(roomId)
+                .map(RoomSession::canAccept)
+                .orElse(true);
     }
 
     public JoinResult join(String userId, String roomId, MediaOption mediaOption) {

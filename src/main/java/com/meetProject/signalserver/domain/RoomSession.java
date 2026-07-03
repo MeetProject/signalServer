@@ -16,7 +16,7 @@ public class RoomSession {
     }
 
     public synchronized List<Participant> join(Participant joiner) {
-        if (participants.size() >= RoomRule.MAX_ROOM_PARTICIPANTS) {
+        if (!canAccept()) {
             throw new RoomFullException();
         }
         List<Participant> others = List.copyOf(participants.values());
@@ -33,8 +33,8 @@ public class RoomSession {
         return participants.isEmpty();
     }
 
-    public boolean isFull() {
-        return participants.size() >= RoomRule.MAX_ROOM_PARTICIPANTS;
+    public boolean canAccept() {
+        return participants.size() < RoomRule.MAX_ROOM_PARTICIPANTS;
     }
 
     public List<Participant> participants() {
