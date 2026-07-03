@@ -9,7 +9,7 @@ public class Participant {
     private User user;
     private boolean isHandsUp;
     private MediaOption mediaOption;
-    private Set<String> producerIds;
+    private final Set<String> producerIds;
 
     public Participant(User user, boolean isHansUp, MediaOption mediaOption, List<String> producerIds) {
         this.user = user;
@@ -26,18 +26,14 @@ public class Participant {
         producerIds.remove(producerId);
     }
 
-    public void toggleAudio() {
-        this.mediaOption = mediaOption.toggleAudio();
-    }
-
-    public void toggleVideo() {
-        this.mediaOption = mediaOption.toggleVideo();
-    }
-
     public boolean toggleHandsUp() {
         boolean prev = isHandsUp;
         this.isHandsUp = !prev;
         return !prev;
+    }
+
+    public void updateMediaOption(MediaOption mediaOption) {
+        this.mediaOption = mediaOption;
     }
 
     public User getUser() {

@@ -1,6 +1,8 @@
 package com.meetProject.signalserver.service;
 
+import com.meetProject.signalserver.domain.MediaOption;
 import com.meetProject.signalserver.domain.RoomSession;
+import com.meetProject.signalserver.dto.application.DevicePayload;
 import com.meetProject.signalserver.dto.application.HandsUpPayload;
 import com.meetProject.signalserver.dto.application.ProducerPayload;
 import com.meetProject.signalserver.exception.ParticipantNotJoinedException;
@@ -34,6 +36,13 @@ public class ParticipantService {
         boolean isHandsUp = session.toggleHandsUp(userId);
 
         return new HandsUpPayload(session.getRoomId(), userId, isHandsUp);
+    }
+
+    public DevicePayload updateDevice(String userId, MediaOption mediaOption) {
+        RoomSession session = getSessionByUser(userId);
+        session.updateMediaOption(userId, mediaOption);
+
+        return new DevicePayload(session.getRoomId(), userId, mediaOption);
     }
 
     public String getJoinedRoomId(String userId) {

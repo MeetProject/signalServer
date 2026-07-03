@@ -2,6 +2,7 @@ package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
+import com.meetProject.signalserver.dto.application.DevicePayload;
 import com.meetProject.signalserver.dto.application.HandsUpPayload;
 import com.meetProject.signalserver.dto.application.ProducerPayload;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerPauseRequest;
@@ -60,9 +61,9 @@ public class RoomInteractionController {
     @MessageMapping("/device")
     public void sendDevice(@Payload DeviceRequest devicePayload, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = participantService.getJoinedRoomId(userId);
+        DevicePayload payload = participantService.updateDevice(userId, devicePayload.mediaOption());
 
-        stompMessageSender.broadcast(roomId, TopicType.DEVICE, new DeviceResponse(userId, devicePayload.mediaOption()));
+        stompMessageSender.broadcast(payload.roomId(), TopicType.DEVICE, new DeviceResponse(userId, payload.mediaOption()));
     }
 
     @MessageMapping("/producer/remove")

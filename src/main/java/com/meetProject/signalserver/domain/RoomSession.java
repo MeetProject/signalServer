@@ -44,6 +44,10 @@ public class RoomSession {
         return participant(userId).toggleHandsUp();
     }
 
+    public void updateMediaOption(String userId, MediaOption mediaOption) {
+        participant(userId).updateMediaOption(mediaOption);
+    }
+
     public void addProducer(String userId, String producerId) {
         participant(userId).addProducerId(producerId);
     }
