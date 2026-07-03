@@ -1,122 +1,104 @@
 package com.meetProject.signalserver.controller.socket;
 
-import com.meetProject.signalserver.constant.ErrorMessage;
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
-import com.meetProject.signalserver.model.dto.socket.RoomInteractionDto.*;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserConsumerPausePayload;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserConsumerResumePayload;
-import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.message.MediaMessagingService;
-import com.meetProject.signalserver.service.message.TopicMessagingService;
-import com.meetProject.signalserver.util.WebSocketUtils;
+import com.meetProject.signalserver.constant.MediaType;
+import com.meetProject.signalserver.constant.TopicType;
+import com.meetProject.signalserver.dto.application.DeviceResult;
+import com.meetProject.signalserver.dto.application.HandsUpResult;
+import com.meetProject.signalserver.dto.application.ProducerResult;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerPauseRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerResumeRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaLeaveRequest;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerRemoveRequest;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ChatRequest;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ChatResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.DeviceRequest;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.DeviceResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.EmojiRequest;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.EmojiResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.HandsUpResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.LeaveResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ProducerRemoveResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.UserProducerRemoveRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerPauseRequest;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerResumeRequest;
+import com.meetProject.signalserver.infrastructure.StompMessageSender;
+import com.meetProject.signalserver.service.ParticipantService;
+import com.meetProject.signalserver.service.RoomService;
+import jakarta.validation.Valid;
+import java.security.Principal;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class RoomInteractionController {
-    private final RoomsService roomsService;
-    private final TopicMessagingService topicMessagingService;
-    private final MediaMessagingService mediaMessagingService;
+    private final ParticipantService participantService;
+    private final RoomService roomService;
+    private final StompMessageSender stompMessageSender;
 
-    public RoomInteractionController(RoomsService roomsService, TopicMessagingService topicMessagingService, MediaMessagingService mediaMessagingService) {
-        this.roomsService = roomsService;
-        this.topicMessagingService = topicMessagingService;
-        this.mediaMessagingService = mediaMessagingService;
+    public RoomInteractionController(ParticipantService participantService, RoomService roomService, StompMessageSender stompMessageSender) {
+        this.participantService = participantService;
+        this.roomService = roomService;
+        this.stompMessageSender = stompMessageSender;
     }
 
     @MessageMapping("/chat/send")
-    public void sendChat(@Payload ChatPayload chatPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
+    public void sendChat(@Valid @Payload ChatRequest chatPayload, Principal principal) {
+        String userId = principal.getName();
+        String roomId = participantService.getJoinedRoomId(userId);
 
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
-
-        topicMessagingService.sendChat(roomId, userId, chatPayload.message());
+        stompMessageSender.broadcast(roomId, TopicType.CHAT, ChatResponse.of(userId, chatPayload.message()));
     }
 
     @MessageMapping("/emoji")
-    public void sendEmoji(@Payload EmojiPayload emojiPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
+    public void sendEmoji(@Valid @Payload EmojiRequest emojiPayload, Principal principal) {
+        String userId = principal.getName();
+        String roomId = participantService.getJoinedRoomId(userId);
 
-        String roomId = roomsService.getRoomId(userId);
-
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
-
-        topicMessagingService.sendEmoji(roomId, userId, emojiPayload.emoji());
+        stompMessageSender.broadcast(roomId, TopicType.EMOJI, EmojiResponse.of(userId, emojiPayload.emoji()));
     }
 
     @MessageMapping("/device")
-    public void sendDevice(@Payload DevicePayload devicePayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
+    public void sendDevice(@Valid @Payload DeviceRequest devicePayload, Principal principal) {
+        String userId = principal.getName();
+        DeviceResult result = participantService.updateDevice(userId, devicePayload.mediaOption());
 
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
-
-        roomsService.handleMediaOption(roomId, userId, devicePayload.mediaOption());
-        topicMessagingService.sendDevice(roomId, userId, devicePayload.mediaOption());
+        stompMessageSender.broadcast(result.roomId(), TopicType.DEVICE, new DeviceResponse(userId, result.mediaOption()));
     }
 
     @MessageMapping("/producer/remove")
-    public void removeTrack(@Payload RemoveProducerPayload removeProducerPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
-        String producerId = removeProducerPayload.producerId();
+    public void removeTrack(@Valid @Payload UserProducerRemoveRequest removeProducerPayload, Principal principal) {
+        String userId = principal.getName();
+        ProducerResult deletion = participantService.removeProducer(userId, removeProducerPayload.producerId());
 
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
-
-        roomsService.removeProducer(roomId, userId, producerId);
-
-        topicMessagingService.sendRemoveProducerId(roomId, userId, removeProducerPayload.trackType());
-        mediaMessagingService.sendProducerRemove(new ProducerRemovePayload(userId, producerId));
+        stompMessageSender.sendToMediaServer(MediaType.PRODUCER_REMOVE, new ProducerRemoveRequest(userId, deletion.producerId()));
+        stompMessageSender.broadcast(deletion.roomId(), TopicType.PRODUCER_REMOVE, new ProducerRemoveResponse(userId, removeProducerPayload.trackType()));
     }
 
     @MessageMapping("/consumer/resume")
-    public void consumerResume(@Payload UserConsumerResumePayload resumePayload, SimpMessageHeaderAccessor header) {
-        ConsumerResumeRequestPayload payload = new ConsumerResumeRequestPayload(resumePayload.consumerId());
-        mediaMessagingService.sendConsumerResume(payload);
+    public void consumerResume(@Valid @Payload UserConsumerResumeRequest resumePayload) {
+        stompMessageSender.sendToMediaServer(MediaType.CONSUMER_RESUME, new ConsumerResumeRequest(resumePayload.consumerId()));
     }
 
     @MessageMapping("/consumer/pause")
-    public void consumerPause(@Payload UserConsumerPausePayload pausePayload, SimpMessageHeaderAccessor header) {
-        ConsumerPauseRequestPayload payload = new ConsumerPauseRequestPayload(pausePayload.consumerId());
-        mediaMessagingService.sendConsumerPause(payload);
+    public void consumerPause(@Valid @Payload UserConsumerPauseRequest pausePayload) {
+        stompMessageSender.sendToMediaServer(MediaType.CONSUMER_PAUSE, new ConsumerPauseRequest(pausePayload.consumerId()));
     }
 
     @MessageMapping("/handUp")
-    public void sendHandUp(@Payload HandUpPayload handUpPayload, SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
+    public void sendHandUp(Principal principal) {
+        String userId = principal.getName();
+        HandsUpResult result = participantService.toggleHandsUp(userId);
 
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
-
-        roomsService.handleHandUp(roomId, userId, handUpPayload.value());
-        topicMessagingService.sendHandUp(roomId, userId, handUpPayload.value());
+        stompMessageSender.broadcast(result.roomId(), TopicType.HANDUP, new HandsUpResponse(result.userId(), result.isHandsUp()));
     }
 
     @MessageMapping("/leave")
-    public void sendLeave(SimpMessageHeaderAccessor header) {
-        String userId = WebSocketUtils.getUserId(header.getUser());
-        String roomId = roomsService.getRoomId(userId);
-
-        if(roomId == null) {
-            throw new IllegalArgumentException(ErrorMessage.USER_NOT_JOINED);
-        }
-
-        roomsService.removeParticipant(roomId, userId);
-
-        topicMessagingService.sendLeave(userId, roomId);
-        mediaMessagingService.sendLeave(new MediaLeavePayload(userId, roomId));
+    public void sendLeave(Principal principal) {
+        String userId = principal.getName();
+        roomService.leave(userId).ifPresent(roomId -> {
+            stompMessageSender.broadcast(roomId, TopicType.LEAVE, new LeaveResponse(userId));
+            stompMessageSender.sendToMediaServer(MediaType.LEAVE, new MediaLeaveRequest(roomId, userId));
+        });
     }
 }

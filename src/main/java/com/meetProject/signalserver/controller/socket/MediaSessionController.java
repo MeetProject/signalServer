@@ -1,57 +1,74 @@
 package com.meetProject.signalserver.controller.socket;
 
-import com.meetProject.signalserver.model.dto.socket.MediaSessionDto.*;
-import com.meetProject.signalserver.model.dto.socket.RoomSessionDto.UserProducerMuteResponse;
-import com.meetProject.signalserver.service.RoomsService;
-import com.meetProject.signalserver.service.message.SignalMessagingService;
-import com.meetProject.signalserver.service.message.TopicMessagingService;
+import com.meetProject.signalserver.constant.TopicType;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMuteResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsResponse;
+import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ProducerResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserCapabilityResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerParamsResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsConnectResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserProducerMuteResponse;
+import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserRtlsResponse;
+import com.meetProject.signalserver.infrastructure.StompMessageSender;
+import com.meetProject.signalserver.service.ParticipantService;
+import com.meetProject.signalserver.dto.application.ProducerResult;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class MediaSessionController {
-    private final SignalMessagingService signalMessagingService;
-    private final TopicMessagingService topicMessagingService;
-    private final RoomsService roomsService;
+    private final StompMessageSender stompMessageSender;
+    private final ParticipantService participantService;
 
-    public MediaSessionController(SignalMessagingService signalMessagingService, TopicMessagingService topicMessagingService, RoomsService roomsService) {
-        this.signalMessagingService = signalMessagingService;
-        this.topicMessagingService = topicMessagingService;
-        this.roomsService = roomsService;
+    public MediaSessionController(StompMessageSender stompMessageSender, ParticipantService participantService) {
+        this.stompMessageSender = stompMessageSender;
+        this.participantService = participantService;
     }
 
     @MessageMapping("/media/capabilities")
     public void capabilities(@Payload CapabilitiesResponse capabilitiesResponse) {
-        signalMessagingService.sendCapabilitiesToUser(capabilitiesResponse);
+        UserCapabilityResponse response = new UserCapabilityResponse(capabilitiesResponse.correlationId(), capabilitiesResponse.capabilities());
+        stompMessageSender.sendToUser(capabilitiesResponse.userId(), response);
     }
 
     @MessageMapping("/media/dtls")
     public void dtls(@Payload DtlsResponse dtlsResponse) {
-        signalMessagingService.sendDtls(dtlsResponse);
+        UserDtlsResponse response = new UserDtlsResponse(dtlsResponse.correlationId(), dtlsResponse.options());
+        stompMessageSender.sendToUser(dtlsResponse.userId(), response);
     }
 
     @MessageMapping("/media/dtls/connect")
     public void dtlsConnect(@Payload DtlsConnectResponse dtlsConnectResponse) {
-        signalMessagingService.sendDtlsConnect(dtlsConnectResponse);
+        UserDtlsConnectResponse response = new UserDtlsConnectResponse(dtlsConnectResponse.correlationId());
+        stompMessageSender.sendToUser(dtlsConnectResponse.userId(), response);
     }
 
     @MessageMapping("/media/rtls")
     public void rtls(@Payload RtlsResponse rtlsResponse) {
-        String roomId = roomsService.getRoomId(rtlsResponse.userId());
-        roomsService.addProducer(roomId, rtlsResponse.userId(), rtlsResponse.producerId());
-        signalMessagingService.sendRtls(rtlsResponse);
-        topicMessagingService.sendProducerId(roomId, rtlsResponse);
+        ProducerResult registration = participantService.registerProducer(rtlsResponse.userId(), rtlsResponse.producerId());
+
+        UserRtlsResponse response = new UserRtlsResponse(rtlsResponse.correlationId(), rtlsResponse.producerId());
+        stompMessageSender.sendToUser(rtlsResponse.userId(), response);
+
+        ProducerResponse producerResponse = new ProducerResponse(rtlsResponse.userId(), rtlsResponse.producerId());
+        stompMessageSender.broadcast(registration.roomId(), TopicType.RTLS, producerResponse);
     }
 
     @MessageMapping("/media/consumerParams")
     public void consumerParams(@Payload ConsumerParamsResponse consumerParamsResponse) {
-        signalMessagingService.sendConsumerParams(consumerParamsResponse);
+        UserConsumerParamsResponse response = new UserConsumerParamsResponse(consumerParamsResponse.correlationId(), consumerParamsResponse.consumerParams());
+        stompMessageSender.sendToUser(consumerParamsResponse.userId(), response);
     }
 
     @MessageMapping({"/media/producer/pause", "/media/producer/resume"})
     public void producerMute(@Payload ProducerMuteResponse muteResponse) {
         UserProducerMuteResponse response = new UserProducerMuteResponse(muteResponse.correlationId());
-        signalMessagingService.sendSignal(muteResponse.userId(), response);
+        stompMessageSender.sendToUser(muteResponse.userId(), response);
     }
 }

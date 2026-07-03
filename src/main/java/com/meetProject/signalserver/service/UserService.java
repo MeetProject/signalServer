@@ -1,24 +1,24 @@
 package com.meetProject.signalserver.service;
 
-import com.meetProject.signalserver.model.dto.common.User;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.meetProject.signalserver.domain.User;
+import com.meetProject.signalserver.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    private final Map<String, User> users = new ConcurrentHashMap<>();
+    private final UserRepository userRepository;
 
-    public void addUser(User user) {
-        users.put(user.userId(), user);
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public void removeUser(String id) {
-        users.remove(id);
+    public String create(String name, String profileColor) {
+        User user = User.create(name, profileColor);
+        userRepository.save(user);
+        return user.getId();
     }
 
-    public User getUser(String id) {
-        return users.get(id);
+    public void delete(String userId) {
+        userRepository.deleteById(userId);
     }
-
 }
