@@ -1,6 +1,7 @@
 package com.meetProject.signalserver.config;
 
 import jakarta.annotation.Nonnull;
+import java.security.Principal;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -13,6 +14,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DestinationGuardInterceptor implements ChannelInterceptor {
     private static final String ALLOWED_SEND_PREFIX = "/app/";
+    private static final String MEDIA_SEND_PREFIX = "/app/media/";
+
+    private final MediaServerProperties mediaServerProperties;
+
+    public DestinationGuardInterceptor(MediaServerProperties mediaServerProperties) {
+        this.mediaServerProperties = mediaServerProperties;
+    }
 
     @Override
     public Message<?> preSend(@Nonnull Message<?> message, @Nonnull MessageChannel channel) {
@@ -28,6 +36,14 @@ public class DestinationGuardInterceptor implements ChannelInterceptor {
             throw new MessagingException("Forbidden SEND destination: " + destination);
         }
 
+        if (destination.startsWith(MEDIA_SEND_PREFIX) && !isMediaServer(accessor.getUser())) {
+            throw new MessagingException("Forbidden media SEND destination: " + destination);
+        }
+
         return message;
+    }
+
+    private boolean isMediaServer(Principal principal) {
+        return principal != null && mediaServerProperties.id().equals(principal.getName());
     }
 }

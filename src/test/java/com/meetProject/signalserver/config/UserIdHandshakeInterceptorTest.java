@@ -16,7 +16,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
 
 public class UserIdHandshakeInterceptorTest {
-    private final UserIdHandshakeInterceptor interceptor = new UserIdHandshakeInterceptor();
+    private final UserIdHandshakeInterceptor interceptor =
+            new UserIdHandshakeInterceptor(new MediaServerProperties("mediaServer", "secret-token"));
     private final ServerHttpRequest request = mock(ServerHttpRequest.class);
     private final ServerHttpResponse response = mock(ServerHttpResponse.class);
     private final WebSocketHandler wsHandler = mock(WebSocketHandler.class);
@@ -55,6 +56,29 @@ public class UserIdHandshakeInterceptorTest {
     @DisplayName("userId가 비어 있으면 403으로 거절한다")
     void rejectsBlankUserId() {
         assertThat(handshake("ws://localhost/ws?userId=", new HashMap<>())).isFalse();
+        verify(response).setStatusCode(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("미디어 서버 id는 올바른 토큰이면 통과한다")
+    void acceptsMediaServerWithValidToken() {
+        Map<String, Object> attributes = new HashMap<>();
+
+        assertThat(handshake("ws://localhost/ws?userId=mediaServer&token=secret-token", attributes)).isTrue();
+        assertThat(attributes).containsEntry("userId", "mediaServer");
+    }
+
+    @Test
+    @DisplayName("미디어 서버 id에 토큰이 틀리면 403으로 거절한다")
+    void rejectsMediaServerWithWrongToken() {
+        assertThat(handshake("ws://localhost/ws?userId=mediaServer&token=wrong", new HashMap<>())).isFalse();
+        verify(response).setStatusCode(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @DisplayName("미디어 서버 id에 토큰이 없으면 403으로 거절한다")
+    void rejectsMediaServerWithoutToken() {
+        assertThat(handshake("ws://localhost/ws?userId=mediaServer", new HashMap<>())).isFalse();
         verify(response).setStatusCode(HttpStatus.FORBIDDEN);
     }
 }
