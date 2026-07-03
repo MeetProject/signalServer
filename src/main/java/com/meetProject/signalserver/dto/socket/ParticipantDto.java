@@ -15,7 +15,7 @@ public record ParticipantDto(
     public static ParticipantDto from(Participant participant) {
         return new ParticipantDto(
                 UserData.from(participant.getUser()),
-                participant.getIsHandsUp(),
+                participant.isHandsUp(),
                 participant.getMediaOption(),
                 participant.getProducerIds()
         );

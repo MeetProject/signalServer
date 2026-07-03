@@ -1,7 +1,6 @@
 package com.meetProject.signalserver.service;
 
 import com.meetProject.signalserver.domain.User;
-import com.meetProject.signalserver.dto.rest.UserSessionDto.RegisterResponse;
 import com.meetProject.signalserver.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +12,10 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public RegisterResponse create(String name, String profileColor) {
+    public String create(String name, String profileColor) {
         User user = User.create(name, profileColor);
         userRepository.save(user);
-        return new RegisterResponse(user.getId());
+        return user.getId();
     }
 
     public void delete(String userId) {

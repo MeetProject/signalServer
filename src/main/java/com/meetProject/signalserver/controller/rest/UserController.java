@@ -21,7 +21,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterPayload payload) {
-        RegisterResponse response = userService.create(payload.userName(), payload.userColor());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        String userId = userService.create(payload.userName(), payload.userColor());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new RegisterResponse(userId));
     }
 }

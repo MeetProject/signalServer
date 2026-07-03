@@ -1,21 +1,24 @@
 package com.meetProject.signalserver.domain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Participant {
-    private User user;
+    private final User user;
     private boolean isHandsUp;
     private MediaOption mediaOption;
-    private final Set<String> producerIds;
+    private final Set<String> producerIds = ConcurrentHashMap.newKeySet();
 
-    public Participant(User user, boolean isHansUp, MediaOption mediaOption, List<String> producerIds) {
+    private Participant(User user, boolean isHandsUp, MediaOption mediaOption) {
         this.user = user;
-        this.isHandsUp = isHansUp;
+        this.isHandsUp = isHandsUp;
         this.mediaOption = mediaOption;
-        this.producerIds = new HashSet<>(producerIds);
+    }
+
+    public static Participant join(User user, MediaOption mediaOption) {
+        return new Participant(user, false, mediaOption);
     }
 
     public void addProducerId(String producerId) {
@@ -26,10 +29,9 @@ public class Participant {
         producerIds.remove(producerId);
     }
 
-    public boolean toggleHandsUp() {
-        boolean prev = isHandsUp;
-        this.isHandsUp = !prev;
-        return !prev;
+    public synchronized boolean toggleHandsUp() {
+        this.isHandsUp = !isHandsUp;
+        return isHandsUp;
     }
 
     public void updateMediaOption(MediaOption mediaOption) {
@@ -40,7 +42,7 @@ public class Participant {
         return user;
     }
 
-    public boolean getIsHandsUp() {
+    public boolean isHandsUp() {
         return isHandsUp;
     }
 

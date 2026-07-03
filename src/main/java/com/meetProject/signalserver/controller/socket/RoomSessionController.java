@@ -2,14 +2,10 @@ package com.meetProject.signalserver.controller.socket;
 
 import com.meetProject.signalserver.constant.MediaType;
 import com.meetProject.signalserver.constant.TopicType;
-import com.meetProject.signalserver.dto.application.ParticipantPayload;
-import com.meetProject.signalserver.dto.application.ResyncPayload;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesRequest;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsRequest;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectRequest;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsRequest;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMuteRequest;
-import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsRequest;
+import com.meetProject.signalserver.domain.Participant;
+import com.meetProject.signalserver.dto.application.JoinResult;
+import com.meetProject.signalserver.dto.application.ResyncResult;
+import com.meetProject.signalserver.dto.socket.ParticipantDto;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ParticipantResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinRequest;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.JoinResponse;
@@ -25,6 +21,7 @@ import com.meetProject.signalserver.infrastructure.StompMessageSender;
 import com.meetProject.signalserver.service.ParticipantService;
 import com.meetProject.signalserver.service.RoomService;
 import com.meetProject.signalserver.util.WebSocketUtils;
+import java.util.List;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -43,80 +40,79 @@ public class RoomSessionController {
     }
 
     @MessageMapping("/signal/capabilities")
-    public void capabilities(@Payload UserCapabilityRequest capabilityPayload, SimpMessageHeaderAccessor header) {
+    public void capabilities(@Payload UserCapabilityRequest request, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = participantService.getJoinedRoomId(userId);
 
-        stompMessageSender.sendToMediaServer(MediaType.CAPABILITIES, new CapabilitiesRequest(capabilityPayload.correlationId(),userId, roomId));
+        stompMessageSender.sendToMediaServer(MediaType.CAPABILITIES, request.toMediaRequest(userId, roomId));
     }
 
     @MessageMapping("/signal/dtls")
-    public void dtls(@Payload UserDtlsRequest dtlsPayload, SimpMessageHeaderAccessor header) {
+    public void dtls(@Payload UserDtlsRequest request, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = participantService.getJoinedRoomId(userId);
 
-        stompMessageSender.sendToMediaServer(MediaType.DTLS, new DtlsRequest(dtlsPayload.correlationId(), userId, roomId, dtlsPayload.direction()));
+        stompMessageSender.sendToMediaServer(MediaType.DTLS, request.toMediaRequest(userId, roomId));
     }
 
     @MessageMapping("/signal/dtls/connect")
-    public void dtlsConnect(@Payload UserDtlsConnectRequest transportConnectPayload, SimpMessageHeaderAccessor header) {
+    public void dtlsConnect(@Payload UserDtlsConnectRequest request, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = participantService.getJoinedRoomId(userId);
 
-        stompMessageSender.sendToMediaServer(MediaType.DTLSCONNECT, new DtlsConnectRequest(
-                transportConnectPayload.correlationId(),
-                userId,
-                roomId,
-                transportConnectPayload.dtlsParameters(),
-                transportConnectPayload.direction()
-        ));
+        stompMessageSender.sendToMediaServer(MediaType.DTLSCONNECT, request.toMediaRequest(userId, roomId));
     }
 
     @MessageMapping("/signal/rtls")
-    public void rtls(@Payload UserRtlsRequest rtlsPayload, SimpMessageHeaderAccessor header) {
+    public void rtls(@Payload UserRtlsRequest request, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = participantService.getJoinedRoomId(userId);
 
-        stompMessageSender.sendToMediaServer(MediaType.RTLS, new RtlsRequest(rtlsPayload.correlationId(), userId, roomId, rtlsPayload.appData(), rtlsPayload.kind(), rtlsPayload.rtpParameters()));
+        stompMessageSender.sendToMediaServer(MediaType.RTLS, request.toMediaRequest(userId, roomId));
     }
 
     @MessageMapping("/signal/consumerParams")
-    public void consumerParams(@Payload UserConsumerParamsRequest consumerParamsPayload, SimpMessageHeaderAccessor header) {
+    public void consumerParams(@Payload UserConsumerParamsRequest request, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
         String roomId = participantService.getJoinedRoomId(userId);
 
-        stompMessageSender.sendToMediaServer(MediaType.PARAMS, new ConsumerParamsRequest(consumerParamsPayload.correlationId(), userId, roomId, consumerParamsPayload.targetId(),
-                consumerParamsPayload.producerId(), consumerParamsPayload.rtpCapabilities()));
+        stompMessageSender.sendToMediaServer(MediaType.PARAMS, request.toMediaRequest(userId, roomId));
     }
 
     @MessageMapping("/signal/producer/pause")
-    public void producerPause(@Payload UserProducerMuteRequest mutePayload, SimpMessageHeaderAccessor header) {
+    public void producerPause(@Payload UserProducerMuteRequest request, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
 
-        stompMessageSender.sendToMediaServer(MediaType.PRODUCER_PAUSE, new ProducerMuteRequest(mutePayload.correlationId(), userId, mutePayload.producerId()));
+        stompMessageSender.sendToMediaServer(MediaType.PRODUCER_PAUSE, request.toMediaRequest(userId));
     }
 
     @MessageMapping("/signal/producer/resume")
-    public void producerResume(@Payload UserProducerMuteRequest mutePayload, SimpMessageHeaderAccessor header) {
+    public void producerResume(@Payload UserProducerMuteRequest request, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
 
-        stompMessageSender.sendToMediaServer(MediaType.PRODUCER_RESUME, new ProducerMuteRequest(mutePayload.correlationId(), userId, mutePayload.producerId()));
+        stompMessageSender.sendToMediaServer(MediaType.PRODUCER_RESUME, request.toMediaRequest(userId));
     }
 
     @MessageMapping("/signal/join")
     public void join(@Payload JoinRequest joinRequest, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        ParticipantPayload participantPayload = roomService.join(userId, joinRequest);
+        JoinResult result = roomService.join(userId, joinRequest.roomId(), joinRequest.mediaOption());
 
-        stompMessageSender.sendToUser(userId, new JoinResponse(joinRequest.correlationId(), participantPayload.others()));
-        stompMessageSender.broadcast(joinRequest.roomId(), TopicType.PARTICIPANT, new ParticipantResponse(participantPayload.joiner()));
+        stompMessageSender.sendToUser(userId, new JoinResponse(joinRequest.correlationId(), toDto(result.others())));
+        stompMessageSender.broadcast(joinRequest.roomId(), TopicType.PARTICIPANT, new ParticipantResponse(ParticipantDto.from(result.joiner())));
     }
 
     @MessageMapping("/signal/resync")
     public void resync(@Payload ResyncRequest resyncRequest, SimpMessageHeaderAccessor header) {
         String userId = WebSocketUtils.getUserId(header.getUser());
-        ResyncPayload resync = roomService.resync(userId);
+        ResyncResult result = roomService.resync(userId);
 
-        stompMessageSender.sendToUser(userId, new ResyncResponse(resyncRequest.correlationId(), resync.participants(), resync.rejoinRequired()));
+        stompMessageSender.sendToUser(userId, new ResyncResponse(resyncRequest.correlationId(), toDto(result.participants()), result.rejoinRequired()));
+    }
+
+    private List<ParticipantDto> toDto(List<Participant> participants) {
+        return participants.stream()
+                .map(ParticipantDto::from)
+                .toList();
     }
 }

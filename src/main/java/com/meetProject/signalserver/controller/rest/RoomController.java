@@ -31,15 +31,14 @@ public class RoomController {
 
     @PostMapping
     public ResponseEntity<CreateRoomResponse> createRoom() {
-        CreateRoomResponse response = roomService.save();
+        String roomId = roomService.save();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
+                .body(new CreateRoomResponse(roomId));
     }
 
     @GetMapping("/{roomId}/validate")
     public ResponseEntity<ValidateRoomResponse> validateRoom(@PathVariable String roomId) {
-        ValidateRoomResponse response = roomService.validate(roomId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ValidateRoomResponse(roomService.validate(roomId)));
     }
 
     @PostMapping("/leave")
