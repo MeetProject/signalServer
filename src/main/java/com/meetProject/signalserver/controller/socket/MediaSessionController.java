@@ -1,12 +1,15 @@
 package com.meetProject.signalserver.controller.socket;
 
+import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaErrorResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMuteResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsResponse;
+import com.meetProject.signalserver.dto.socket.SignalErrorResponse;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ProducerResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserCapabilityResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerParamsResponse;
@@ -70,5 +73,12 @@ public class MediaSessionController {
     public void producerMute(@Payload ProducerMuteResponse muteResponse) {
         UserProducerMuteResponse response = new UserProducerMuteResponse(muteResponse.correlationId());
         stompMessageSender.sendToUser(muteResponse.userId(), response);
+    }
+
+    @MessageMapping("/media/error")
+    public void error(@Payload MediaErrorResponse errorResponse) {
+        SignalErrorResponse response = new SignalErrorResponse(
+                errorResponse.correlationId(), ErrorCode.INTERNAL_ERROR, "미디어 서버 처리 중 오류가 발생했습니다.");
+        stompMessageSender.sendToUser(errorResponse.userId(), response);
     }
 }

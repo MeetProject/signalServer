@@ -3,6 +3,7 @@ package com.meetProject.signalserver.controller.socket;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.meetProject.signalserver.constant.ErrorCode;
 import com.meetProject.signalserver.constant.TopicType;
 import com.meetProject.signalserver.dto.application.ProducerResult;
 import com.meetProject.signalserver.dto.common.ConsumerParams;
@@ -12,9 +13,11 @@ import com.meetProject.signalserver.dto.socket.MediaSessionDto.CapabilitiesRespo
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ConsumerParamsResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsConnectResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.DtlsResponse;
+import com.meetProject.signalserver.dto.socket.MediaSessionDto.MediaErrorResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.ProducerMuteResponse;
 import com.meetProject.signalserver.dto.socket.MediaSessionDto.RtlsResponse;
 import com.meetProject.signalserver.dto.socket.RoomInteractionDto.ProducerResponse;
+import com.meetProject.signalserver.dto.socket.SignalErrorResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserCapabilityResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserConsumerParamsResponse;
 import com.meetProject.signalserver.dto.socket.RoomSessionDto.UserDtlsConnectResponse;
@@ -92,5 +95,14 @@ public class MediaSessionControllerTest {
         controller.producerMute(new ProducerMuteResponse("cid", "u1"));
 
         verify(sender).sendToUser("u1", new UserProducerMuteResponse("cid"));
+    }
+
+    @Test
+    @DisplayName("미디어 서버 에러를 대상 사용자에게 에러 응답으로 전달한다")
+    void forwardsMediaError() {
+        controller.error(new MediaErrorResponse("cid", "u1"));
+
+        verify(sender).sendToUser("u1",
+                new SignalErrorResponse("cid", ErrorCode.INTERNAL_ERROR, "미디어 서버 처리 중 오류가 발생했습니다."));
     }
 }

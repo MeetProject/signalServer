@@ -33,5 +33,7 @@ public class MediaSessionDto {
 
     public record MediaLeaveRequest(String roomId, String userId) implements MediaRequest {}
 
+    public record MediaErrorResponse(String correlationId, String userId) {}
+
     public record ProducerRemoveRequest(String userId, String producerId) implements MediaRequest {}
 }
