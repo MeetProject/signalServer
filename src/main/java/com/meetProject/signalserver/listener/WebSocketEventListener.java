@@ -9,6 +9,8 @@ import com.meetProject.signalserver.service.RoomService;
 import com.meetProject.signalserver.service.UserService;
 import java.security.Principal;
 import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.scheduling.TaskScheduler;
@@ -24,6 +26,7 @@ public class WebSocketEventListener {
     private final StompMessageSender stompMessageSender;
     private final SimpUserRegistry userRegistry;
     private final TaskScheduler taskScheduler;
+    private final Map<String, Object> pendingRemovals = new ConcurrentHashMap<>();
 
     public WebSocketEventListener(RoomService roomService, UserService userService, StompMessageSender stompMessageSender, SimpUserRegistry userRegistry, TaskScheduler taskScheduler) {
         this.roomService = roomService;
@@ -41,7 +44,13 @@ public class WebSocketEventListener {
         }
         String userId = principal.getName();
 
+        Object ticket = new Object();
+        pendingRemovals.put(userId, ticket);
+
         taskScheduler.schedule(() -> {
+            if (!pendingRemovals.remove(userId, ticket)) {
+                return;
+            }
             if (userRegistry.getUser(userId) != null) {
                 return;
             }
