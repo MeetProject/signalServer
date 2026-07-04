@@ -59,8 +59,9 @@ public class RoomService {
         return new JoinResult(joiner, others);
     }
 
-    public ResyncResult resync(String userId) {
+    public ResyncResult resync(String userId, String roomId) {
         return roomSessionRepository.findByUserId(userId)
+                .filter(session -> session.getRoomId().equals(roomId))
                 .map(session -> new ResyncResult(session.participants(), false))
                 .orElseGet(() -> new ResyncResult(List.of(), true));
     }

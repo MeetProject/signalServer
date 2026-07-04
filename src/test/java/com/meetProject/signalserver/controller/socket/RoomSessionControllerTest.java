@@ -173,7 +173,7 @@ public class RoomSessionControllerTest {
     @DisplayName("resync는 참여자 목록과 재입장 필요여부를 요청자에게 보낸다")
     void resyncSendsReply() {
         Participant p = participant("u1");
-        given(roomService.resync("u1")).willReturn(new ResyncResult(List.of(p), false));
+        given(roomService.resync("u1", "roomA")).willReturn(new ResyncResult(List.of(p), false));
 
         controller.resync(new ResyncRequest("roomA", "cid"), principal);
 
@@ -184,7 +184,7 @@ public class RoomSessionControllerTest {
     @Test
     @DisplayName("resync 시 세션이 없으면 재입장 필요로 보고된다")
     void resyncRequiresRejoin() {
-        given(roomService.resync("u1")).willReturn(new ResyncResult(List.of(), true));
+        given(roomService.resync("u1", "roomA")).willReturn(new ResyncResult(List.of(), true));
 
         controller.resync(new ResyncRequest("roomA", "cid"), principal);
 

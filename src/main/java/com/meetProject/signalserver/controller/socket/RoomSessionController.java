@@ -107,7 +107,7 @@ public class RoomSessionController {
     @MessageMapping("/signal/resync")
     public void resync(@Valid @Payload ResyncRequest resyncRequest, Principal principal) {
         String userId = principal.getName();
-        ResyncResult result = roomService.resync(userId);
+        ResyncResult result = roomService.resync(userId, resyncRequest.roomId());
 
         stompMessageSender.sendToUser(userId, new ResyncResponse(resyncRequest.correlationId(), toDto(result.participants()), result.rejoinRequired()));
     }

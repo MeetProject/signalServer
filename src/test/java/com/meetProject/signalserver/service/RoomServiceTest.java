@@ -134,7 +134,7 @@ public class RoomServiceTest {
     void resyncReturnsParticipants() {
         roomSessionRepository.join("roomA", participant("u1"));
 
-        ResyncResult result = roomService.resync("u1");
+        ResyncResult result = roomService.resync("u1", "roomA");
 
         assertThat(result.rejoinRequired()).isFalse();
         assertThat(result.participants()).hasSize(1);
@@ -143,7 +143,18 @@ public class RoomServiceTest {
     @Test
     @DisplayName("resync 시 세션이 없으면 재입장 필요로 보고한다")
     void resyncRequiresRejoin() {
-        ResyncResult result = roomService.resync("ghost");
+        ResyncResult result = roomService.resync("ghost", "roomA");
+
+        assertThat(result.rejoinRequired()).isTrue();
+        assertThat(result.participants()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("resync 시 요청한 방과 세션의 방이 다르면 재입장 필요로 보고한다")
+    void resyncRequiresRejoinWhenRoomMismatched() {
+        roomSessionRepository.join("roomA", participant("u1"));
+
+        ResyncResult result = roomService.resync("u1", "roomB");
 
         assertThat(result.rejoinRequired()).isTrue();
         assertThat(result.participants()).isEmpty();
