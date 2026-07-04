@@ -74,7 +74,7 @@ cp .env.example .env.local   # 값 채우기 (미디어 서버의 .env.local과 
 | 변수 | 설명 |
 |---|---|
 | `MEDIA_SERVER_ID` | 미디어 서버 접속 id (기본 `mediaServer`) |
-| `MEDIA_SERVER_TOKEN` | 공유 시크릿 — `openssl rand -hex 32` 권장, URL-safe 문자만 |
+| `MEDIA_SERVER_TOKEN` | 공유 시크릿 — `openssl rand -hex 32` 권장 |
 
 ## 실행
 

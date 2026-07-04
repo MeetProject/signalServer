@@ -81,4 +81,17 @@ public class UserIdHandshakeInterceptorTest {
         assertThat(handshake("ws://localhost/ws?userId=mediaServer", new HashMap<>())).isFalse();
         verify(response).setStatusCode(HttpStatus.FORBIDDEN);
     }
+
+    @Test
+    @DisplayName("URL 인코딩된 파라미터는 디코딩해 비교한다")
+    void decodesEncodedParams() {
+        UserIdHandshakeInterceptor tokenInterceptor =
+                new UserIdHandshakeInterceptor(new MediaServerProperties("mediaServer", "a+b/c=d"));
+        Map<String, Object> attributes = new HashMap<>();
+
+        given(request.getURI()).willReturn(URI.create("ws://localhost/ws?userId=mediaServer&token=a%2Bb%2Fc%3Dd"));
+
+        assertThat(tokenInterceptor.beforeHandshake(request, response, wsHandler, attributes)).isTrue();
+        assertThat(attributes).containsEntry("userId", "mediaServer");
+    }
 }

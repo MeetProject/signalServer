@@ -11,6 +11,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.util.UriUtils;
 
 @Component
 public class UserIdHandshakeInterceptor implements HandshakeInterceptor {
@@ -30,7 +31,7 @@ public class UserIdHandshakeInterceptor implements HandshakeInterceptor {
                                    @Nonnull ServerHttpResponse response,
                                    @Nonnull WebSocketHandler wsHandler,
                                    @Nonnull Map<String, Object> attributes) {
-        String query = request.getURI().getQuery();
+        String query = request.getURI().getRawQuery();
         String userId = extractParam(query, USER_ID_PARAM);
         if (userId == null || userId.isBlank()) {
             response.setStatusCode(HttpStatus.FORBIDDEN);
@@ -68,8 +69,16 @@ public class UserIdHandshakeInterceptor implements HandshakeInterceptor {
         String prefix = name + "=";
         return Arrays.stream(query.split("&"))
                 .filter(param -> param.startsWith(prefix))
-                .map(param -> param.substring(prefix.length()))
                 .findFirst()
+                .map(param -> decode(param.substring(prefix.length())))
                 .orElse(null);
+    }
+
+    private String decode(String value) {
+        try {
+            return UriUtils.decode(value, StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }
